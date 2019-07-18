@@ -1,0 +1,16 @@
+[
+{
+  "modid": "youmatter",
+  "name": "You Matter",
+  "description": "Remember that purple fluid from IC²? Well, here you have it.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "https://mayus.me",
+  "updateUrl": "",
+  "authorList": ["realmayus"],
+  "credits": "no u",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
