@@ -224,12 +224,12 @@ public class GuiReplicator extends GuiContainer {
                 //Playing Click sound
                 Minecraft.getMinecraft().getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 //Sending packet to server
-                PacketHandler.INSTANCE.sendToServer(new PacketShowNext());
+                PacketHandler.INSTANCE.sendToServer(new PacketShowPrevious());
             } else if(xAxis >= 108 && xAxis <= 113 && yAxis >= 21 && yAxis <= 31) {
                 //Playing Click sound
                 Minecraft.getMinecraft().getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 //Sending packet to server
-                PacketHandler.INSTANCE.sendToServer(new PacketShowPrevious());
+                PacketHandler.INSTANCE.sendToServer(new PacketShowNext() );
             }
         }
     }

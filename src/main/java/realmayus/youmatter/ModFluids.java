@@ -16,4 +16,16 @@ public class ModFluids {
             .setLuminosity(9)
             .setViscosity(1000)
             .setTemperature(300);
+
+    public static final ModFluid STABILIZER = (ModFluid) new ModFluid(
+            "stabilizer",
+            new ResourceLocation(YouMatter.MODID,"stabilizer_still"),
+            new ResourceLocation(YouMatter.MODID, "stabilizer_flow")
+    )
+            .setMaterial(ModMaterials.STABILIZER)
+            .setDensity(1100)
+            .setGaseous(false)
+            .setLuminosity(9)
+            .setViscosity(1000)
+            .setTemperature(300);
 }

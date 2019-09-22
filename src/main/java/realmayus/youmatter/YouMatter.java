@@ -30,7 +30,7 @@ public class YouMatter
         FluidRegistry.enableUniversalBucket();
     }
 
-    public static CreativeTabs creativeTab = new CreativeTabs("zpmmod") {
+    public static CreativeTabs creativeTab = new CreativeTabs("youmatter") {
         @Override
         public ItemStack createIcon() {
             return new ItemStack(ModBlocks.REPLICATOR);

@@ -152,6 +152,7 @@ public class TileReplicator extends TileEntity implements IGuiTile, ITickable{
                 PacketHandler.INSTANCE.sendToAll(new PacketUpdateReplicatorClient(getTank().getFluidAmount(), getEnergy(), 10, this.getTank().writeToNBT(new NBTTagCompound())));
                 if (!this.inputHandler.getStackInSlot(3).isEmpty()) {
 
+                    //TODO: Any other liquid bucket also works! o.O
                     if (this.inputHandler.getStackInSlot(3).isItemEqual(FluidUtil.getFilledBucket(new FluidStack(ModFluids.UMATTER, ModFluids.UMATTER.BUCKET_VOLUME)))) {
                         if (getTank().getFluidAmount() + 1000 < getTank().getCapacity()) {
                             getTank().fill(new FluidStack(ModFluids.UMATTER, 1000), true);
@@ -199,11 +200,13 @@ public class TileReplicator extends TileEntity implements IGuiTile, ITickable{
 
 
     public void renderPrevious() {
+        if(cachedItems == null) { return; }
         if(currentIndex <= 0) { return; }
         currentIndex = currentIndex - 1;
     }
 
     public void renderNext() {
+        if(cachedItems == null) { return; }
         if(currentIndex == cachedItems.size()) { return; }
         currentIndex = currentIndex + 1;
     }

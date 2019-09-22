@@ -7,4 +7,6 @@ import net.minecraft.block.material.MaterialLiquid;
 public class ModMaterials {
     public static final Material UMATTER = new MaterialLiquid(
             MapColor.GREEN_STAINED_HARDENED_CLAY);
+    public static final Material STABILIZER = new MaterialLiquid(
+            MapColor.GREEN_STAINED_HARDENED_CLAY);
 }

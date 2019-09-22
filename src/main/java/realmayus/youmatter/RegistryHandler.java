@@ -28,8 +28,11 @@ public class RegistryHandler {
     public static void addBlocksAndFluids(RegistryEvent.Register<Block> event) {
         FluidRegistry.registerFluid(ModFluids.UMATTER);
         FluidRegistry.addBucketForFluid(ModFluids.UMATTER);
+        FluidRegistry.registerFluid(ModFluids.STABILIZER);
+        FluidRegistry.addBucketForFluid(ModFluids.STABILIZER);
 
         event.getRegistry().register(ModBlocks.UMATTER_BLOCK.setRegistryName(YouMatter.MODID,"umatter_block"));
+        event.getRegistry().register(ModBlocks.STABILIZER_BLOCK.setRegistryName(YouMatter.MODID,"stabilizer_block"));
         event.getRegistry().register(new BlockReplicator().setRegistryName(YouMatter.MODID, "replicator").setCreativeTab(YouMatter.creativeTab));
 
         GameRegistry.registerTileEntity(TileReplicator.class, new ResourceLocation("te_replicator"));
@@ -38,6 +41,7 @@ public class RegistryHandler {
     @SubscribeEvent
     public static void addItems(RegistryEvent.Register<Item> event) {
         event.getRegistry().register(ModItems.UMATTER_BLOCK.setRegistryName(YouMatter.MODID,"umatter_block"));
+        event.getRegistry().register(ModItems.STABILIZER_BLOCK.setRegistryName(YouMatter.MODID,"stabilizer_block"));
 
         event.getRegistry().register(new ItemBlock(ModBlocks.REPLICATOR).setRegistryName(YouMatter.MODID, "replicator"));
         event.getRegistry().register(new ThumbdriveItem().setRegistryName(YouMatter.MODID, "thumb_drive").setCreativeTab(YouMatter.creativeTab));
@@ -50,6 +54,7 @@ public class RegistryHandler {
     @SubscribeEvent
     public static void onRegisterModelsEvent(@Nonnull final ModelRegistryEvent event) {
         ModelLoader.setCustomStateMapper(ModBlocks.UMATTER_BLOCK, new StateMap.Builder().ignore(ModBlocks.UMATTER_BLOCK.LEVEL).build());
+        ModelLoader.setCustomStateMapper(ModBlocks.STABILIZER_BLOCK, new StateMap.Builder().ignore(ModBlocks.STABILIZER_BLOCK.LEVEL).build());
 
         ForgeRegistries.ITEMS.getValues().stream()
                 .filter(item -> item.getRegistryName().getNamespace().equals(YouMatter.MODID))
