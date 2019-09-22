@@ -1,0 +1,11 @@
+itemGroup.youmatter=You Matter
+
+# Blocks
+tile.youmatter.replicator.name=Replicator
+
+
+# Items
+item.youmatter.thumb_drive.name=Thumb Drive
+
+# Fluids
+fluid.umatter=U-Matter

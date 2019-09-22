@@ -1,4 +1,4 @@
-package realmayus.youmatter.replicator;
+package realmayus.youmatter.util;
 
 import net.minecraftforge.energy.EnergyStorage;
 

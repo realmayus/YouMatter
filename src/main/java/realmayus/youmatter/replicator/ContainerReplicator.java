@@ -11,6 +11,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
+import realmayus.youmatter.util.DisplaySlot;
 import realmayus.youmatter.util.IReplicatorStateContainer;
 
 public class ContainerReplicator extends Container implements IReplicatorStateContainer {
@@ -45,7 +46,7 @@ public class ContainerReplicator extends Container implements IReplicatorStateCo
         for (int row = 0; row < 3; ++row) {
             for (int col = 0; col < 9; ++col) {
                 int x = col * 18 + 8;
-                int y = row * 18 + 84;
+                int y = row * 18 + 83;
                 this.addSlotToContainer(new Slot(playerInventory, col + row * 9 + 9, x, y));
             }
         }
@@ -53,7 +54,7 @@ public class ContainerReplicator extends Container implements IReplicatorStateCo
         // Slots for the hotbar
         for (int row = 0; row < 9; ++row) {
             int x = 8 + row * 18;
-            int y = 58 + 84;
+            int y = 141;
             this.addSlotToContainer(new Slot(playerInventory, row, x, y));
 
         }
@@ -63,15 +64,15 @@ public class ContainerReplicator extends Container implements IReplicatorStateCo
         IItemHandler itemHandler = this.te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
 
         // Flash drive
-        addSlotToContainer(new SlotItemHandler(itemHandler, 0, 149, 60));
+        addSlotToContainer(new SlotItemHandler(itemHandler, 0, 150, 61));
         // Output slot
-        addSlotToContainer(new SlotItemHandler(itemHandler, 1, 88, 60));
+        addSlotToContainer(new SlotItemHandler(itemHandler, 1, 89, 61));
         // Item to replicate slot
-        addSlotToContainer(new SlotItemHandler(itemHandler, 2, 88, 18));
+        addSlotToContainer(new DisplaySlot(itemHandler, 2, 89, 18));
         // bucket input slot
-        addSlotToContainer(new SlotItemHandler(itemHandler, 3, 46, 18));
+        addSlotToContainer(new SlotItemHandler(itemHandler, 3, 47, 19));
         // bucket output slot
-        addSlotToContainer(new SlotItemHandler(itemHandler, 4, 46, 60));
+        addSlotToContainer(new SlotItemHandler(itemHandler, 4, 47, 61));
     }
 
     @Override
@@ -81,5 +82,5 @@ public class ContainerReplicator extends Container implements IReplicatorStateCo
         te.setClientProgress(progress);
         te.setClientTank(tank);
     }
-    
+
 }

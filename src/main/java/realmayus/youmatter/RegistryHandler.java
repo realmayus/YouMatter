@@ -15,6 +15,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import realmayus.youmatter.items.ThumbdriveItem;
 import realmayus.youmatter.replicator.BlockReplicator;
 import realmayus.youmatter.replicator.TileReplicator;
 
@@ -39,6 +40,7 @@ public class RegistryHandler {
         event.getRegistry().register(ModItems.UMATTER_BLOCK.setRegistryName(YouMatter.MODID,"umatter_block"));
 
         event.getRegistry().register(new ItemBlock(ModBlocks.REPLICATOR).setRegistryName(YouMatter.MODID, "replicator"));
+        event.getRegistry().register(new ThumbdriveItem().setRegistryName(YouMatter.MODID, "thumb_drive").setCreativeTab(YouMatter.creativeTab));
     }
 
     /**

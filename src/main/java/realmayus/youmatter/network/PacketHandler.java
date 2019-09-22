@@ -15,5 +15,9 @@ public class PacketHandler {
         INSTANCE = NetworkRegistry.INSTANCE.newSimpleChannel(YouMatter.MODID);
         //TODO register packet
         INSTANCE.registerMessage(PacketUpdateReplicatorClient.Handler.class, PacketUpdateReplicatorClient.class, nextID(), Side.CLIENT);
+
+        INSTANCE.registerMessage(PacketShowPrevious.Handler.class, PacketShowPrevious.class, nextID(), Side.SERVER);
+        INSTANCE.registerMessage(PacketShowNext.Handler.class, PacketShowNext.class, nextID(), Side.SERVER);
+
     }
 }

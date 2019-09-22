@@ -5,8 +5,12 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTTagString;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
@@ -14,25 +18,25 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.fluids.*;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
 import realmayus.youmatter.ModFluids;
-import realmayus.youmatter.ModItems;
 import realmayus.youmatter.network.PacketHandler;
 import realmayus.youmatter.network.PacketUpdateReplicatorClient;
 import realmayus.youmatter.util.IGuiTile;
+import realmayus.youmatter.util.MyEnergyStorage;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TileReplicator extends TileEntity implements IGuiTile, ITickable{
 
 
     public static final int MAX_UMATTER = 10000;
 
-    private FluidTank tank = new FluidTank(MAX_UMATTER) {
+    private FluidTank tank = new FluidTank(MAX_UMATTER + 1000) {
         @Override
         protected void onContentsChanged() {
             IBlockState state = world.getBlockState(pos);
@@ -76,8 +80,8 @@ public class TileReplicator extends TileEntity implements IGuiTile, ITickable{
         if(capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
             return true;
         }
-
         return super.hasCapability(capability, facing);
+
 
     }
 
@@ -100,7 +104,7 @@ public class TileReplicator extends TileEntity implements IGuiTile, ITickable{
     }
 
     //int has to be 0 as we don't want to receive energy
-    private MyEnergyStorage myEnergyStorage = new MyEnergyStorage(1000000, 0);
+    private MyEnergyStorage myEnergyStorage = new MyEnergyStorage(1000000, 2000);
 
     /**
      * Handler for the Input Slots
@@ -131,8 +135,10 @@ public class TileReplicator extends TileEntity implements IGuiTile, ITickable{
     };
 
     private CombinedInvWrapper combinedHandler = new CombinedInvWrapper(inputHandler, outputHandler);
+    public List<ItemStack> cachedItems;
 
-
+    // Current displayed item index -> cachedItems
+    public int currentIndex = 0;
     private int currentPartTick = 0;
     @Override
     public void update() {
@@ -161,11 +167,59 @@ public class TileReplicator extends TileEntity implements IGuiTile, ITickable{
 
                     }
                 }
+                ItemStack thumbdrive = inputHandler.getStackInSlot(0);
+                if (thumbdrive.equals(ItemStack.EMPTY)){
+                    combinedHandler.setStackInSlot(2, ItemStack.EMPTY);
+                    cachedItems = null;
+                    currentIndex = 0;
+                } else {
+                    if (thumbdrive.hasTagCompound()) {
+                        if(thumbdrive.getTagCompound() != null) {
+                            NBTTagList taglist = (NBTTagList) thumbdrive.getTagCompound().getTag("MyStringList");
+                            cachedItems = new ArrayList<>();
+                            for(NBTBase nbt : taglist) {
+                                if(nbt instanceof NBTTagString) {
+                                    NBTTagString item = (NBTTagString) nbt;
+                                    ItemStack newitem = new ItemStack(Item.getByNameOrId(item.getString()));
+                                    cachedItems.add(newitem);
+
+
+                                }
+                            }
+                            renderItem(cachedItems, currentIndex);
+                        }
+                    }
+                }
             }
         }
         currentPartTick++;
     }
 
+
+
+
+    public void renderPrevious() {
+        if(currentIndex <= 0) { return; }
+        currentIndex = currentIndex - 1;
+    }
+
+    public void renderNext() {
+        if(currentIndex == cachedItems.size()) { return; }
+        currentIndex = currentIndex + 1;
+    }
+
+    public void renderItem(List<ItemStack> cache, int index) {
+        try{
+            if(cache.get(index) != null) {
+                combinedHandler.setStackInSlot(2, cache.get(index));
+            } else {
+                System.out.println("warn: currentIndex doesn't refer to any item in cachedItems!");
+            }
+        } catch (IndexOutOfBoundsException e) {
+            //TODO fix dis buck
+            System.out.println("warn:Index out of bounds!");
+        }
+    }
 
     public int getClientProgress() {
         return clientProgress;
@@ -207,6 +261,28 @@ public class TileReplicator extends TileEntity implements IGuiTile, ITickable{
     private int clientEnergy = -1;
     private int clientProgress = -1;
 
+    
+    @Override
+    public void readFromNBT(NBTTagCompound compound) {
+        super.readFromNBT(compound);
+        readRestorableFromNBT(compound);
+    }
+
+    public void readRestorableFromNBT(NBTTagCompound compound) {
+//        isEnabled = compound.getBoolean("enabled");
+//        redstoneBehaviour = compound.getInteger("redstone");
+    }
+
+    @Override
+    public NBTTagCompound writeToNBT(NBTTagCompound compound) {
+        super.writeToNBT(compound);
+        writeRestorableToNBT(compound);
+        return compound;
+    }
+
+    public void writeRestorableToNBT(NBTTagCompound compound) {
+
+    }
 
 
 }

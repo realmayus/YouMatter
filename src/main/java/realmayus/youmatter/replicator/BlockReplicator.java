@@ -57,9 +57,7 @@ public class BlockReplicator extends Block {
         if (!(te instanceof IGuiTile)) { return false; }
 
         if(!player.isSneaking()) {
-            if(facing == EnumFacing.UP) {
-                player.openGui(YouMatter.instance, 0, world, pos.getX(), pos.getY(), pos.getZ());
-            }
+            player.openGui(YouMatter.instance, 0, world, pos.getX(), pos.getY(), pos.getZ());
         } else {
             return false;
         }

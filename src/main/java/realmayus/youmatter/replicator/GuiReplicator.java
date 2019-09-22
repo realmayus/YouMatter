@@ -1,22 +1,25 @@
 package realmayus.youmatter.replicator;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.client.resources.I18n;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fluids.*;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fml.client.FMLClientHandler;
-import realmayus.youmatter.ModFluids;
 import realmayus.youmatter.YouMatter;
-import scala.actors.threadpool.Arrays;
+import realmayus.youmatter.network.PacketHandler;
+import realmayus.youmatter.network.PacketShowNext;
+import realmayus.youmatter.network.PacketShowPrevious;
 
-import javax.annotation.Nullable;
 import java.awt.*;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -51,6 +54,8 @@ public class GuiReplicator extends GuiContainer {
         drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
 
         drawFluidTank(26, 20, replicator.getTank(), Color.blue);
+
+        drawEnergyBar((int)((replicator.getClientEnergy() * 100.0f) / 1000000.0f));
     }
 
     @Override
@@ -58,7 +63,7 @@ public class GuiReplicator extends GuiContainer {
         super.drawGuiContainerForegroundLayer(mouseX, mouseY);
 
         //TODO remove dis when not needed anymore
-        this.fontRenderer.drawString(replicator.getTank().getFluidAmount() + "mB, " + replicator.getClientProgress() + "%, " + replicator.getClientEnergy() + "RF", 8, 6, 4210752);
+        this.fontRenderer.drawString("Replicator", 8, 6, 4210752);
     }
 
     @Override
@@ -76,10 +81,14 @@ public class GuiReplicator extends GuiContainer {
         int xAxis = (mouseX - (width - xSize) / 2);
         int yAxis = (mouseY - (height - ySize) / 2);
 
-        if(xAxis > 26 && xAxis < 39 && yAxis > 20 && yAxis < 75) {
+        if(xAxis >= 26 && xAxis <= 39 && yAxis >= 20 && yAxis <= 75) {
 
             //TODO localize diz
-            drawTooltip(mouseX, mouseY, Stream.of("U-Matter", "Amount: " + replicator.getTank().getFluidAmount() + "mB").collect(Collectors.toList()));
+            drawTooltip(mouseX, mouseY, Stream.of("U-Matter", "Amount: " + replicator.getTank().getFluidAmount() + " mB").collect(Collectors.toList()));
+        }
+
+        if(xAxis >= 10 && xAxis <= 23 && yAxis >= 20 && yAxis <= 75) {
+            drawTooltip(mouseX, mouseY, Stream.of("Energy", replicator.getClientEnergy() + " FE (" + (int)((replicator.getClientEnergy() * 100.0f) / 1000000.0f) + "%)").collect(Collectors.toList()));
         }
     }
 
@@ -88,13 +97,8 @@ public class GuiReplicator extends GuiContainer {
         drawHoveringText(tooltips, x, y, fontRenderer);
     }
 
-    @Override
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
-        super.mouseClicked(mouseX, mouseY, mouseButton);
 
-    }
-
-
+    //both drawFluid and drawFluidTank is courtesy of DarkGuardsMan and was modified to suit my needs. Go check him out: https://github.com/BuiltBrokenModding/Atomic-Science | MIT License |  Copyright (c) 2018 Built Broken Modding License: https://opensource.org/licenses/MIT
     protected void drawFluid(int x, int y, int line, int col, int width, int drawSize, FluidStack fluidStack)
     {
         if (fluidStack != null && fluidStack.getFluid() != null)
@@ -196,4 +200,39 @@ public class GuiReplicator extends GuiContainer {
         }
     }
 
+    private void drawEnergyBar(int percentage) {
+//        drawRect(guiLeft + 10, guiTop + 5, guiLeft + 112, guiTop + 15, 0xff555555);
+
+        int linesToDraw = Math.toIntExact(Math.round(56 * (percentage / 100.0f)));
+        for(int i = 0; i < linesToDraw - 1; i++) {
+            if(i == 0 || i == 54){
+                drawHorizontalLine(guiLeft + 11, guiLeft + 22, guiTop + 74 - i, 0xffad0000);
+            } else {
+                drawHorizontalLine(guiLeft + 10, guiLeft + 23, guiTop + 74 - i, i % 2 == 0 ? 0xffad0000 : 0xFF570000);
+            }
+
+        }
+    }
+
+    @Override
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+        super.mouseClicked(mouseX, mouseY, mouseButton);
+        if(mouseButton == 0) {
+            int xAxis = (mouseX - (width - xSize) / 2);
+            int yAxis = (mouseY - (height - ySize) / 2);
+            if(xAxis >= 80 && xAxis <= 85 && yAxis >= 21 && yAxis <= 31) {
+                //Playing Click sound
+                Minecraft.getMinecraft().getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                //Sending packet to server
+                PacketHandler.INSTANCE.sendToServer(new PacketShowNext());
+            } else if(xAxis >= 108 && xAxis <= 113 && yAxis >= 21 && yAxis <= 31) {
+                //Playing Click sound
+                Minecraft.getMinecraft().getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                //Sending packet to server
+                PacketHandler.INSTANCE.sendToServer(new PacketShowPrevious());
+            }
+        }
+    }
+
 }
+//    drawVerticalLine(guiLeft + 10 + 1 + i, guiTop + 5, guiTop + 14, i % 2 == 0 ? 0xffff0000 : 0xff000000);
