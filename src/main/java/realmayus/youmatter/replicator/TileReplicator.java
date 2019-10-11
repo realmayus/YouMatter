@@ -30,6 +30,7 @@ import realmayus.youmatter.util.MyEnergyStorage;
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class TileReplicator extends TileEntity implements IGuiTile, ITickable{
 
@@ -152,20 +153,18 @@ public class TileReplicator extends TileEntity implements IGuiTile, ITickable{
                 PacketHandler.INSTANCE.sendToAll(new PacketUpdateReplicatorClient(getTank().getFluidAmount(), getEnergy(), 10, this.getTank().writeToNBT(new NBTTagCompound())));
                 if (!this.inputHandler.getStackInSlot(3).isEmpty()) {
 
-                    //TODO: Any other liquid bucket also works! o.O
-                    if (this.inputHandler.getStackInSlot(3).isItemEqual(FluidUtil.getFilledBucket(new FluidStack(ModFluids.UMATTER, ModFluids.UMATTER.BUCKET_VOLUME)))) {
-                        if (getTank().getFluidAmount() + 1000 < getTank().getCapacity()) {
-                            getTank().fill(new FluidStack(ModFluids.UMATTER, 1000), true);
-                            System.out.println("Current tank amount: " + getTank().getFluidAmount() + "mB");
-                            this.inputHandler.setStackInSlot(3, ItemStack.EMPTY);
-                            this.combinedHandler.insertItem(4, new ItemStack(Items.BUCKET, 1), false);
+                    if(this.inputHandler.getStackInSlot(3).getItem() instanceof UniversalBucket) {
 
-                        } else {
-                            System.out.println("tank capacity exceeded.");
+                        UniversalBucket bucket = (UniversalBucket) this.inputHandler.getStackInSlot(3).getItem();
+                        if(bucket.getFluid(this.inputHandler.getStackInSlot(3)) != null) {
+                            if (bucket.getFluid(this.inputHandler.getStackInSlot(3)).getFluid().equals(ModFluids.UMATTER)) {
+                                if (getTank().getFluidAmount() + 1000 < getTank().getCapacity()) {
+                                    getTank().fill(new FluidStack(ModFluids.UMATTER, 1000), true);
+                                    this.inputHandler.setStackInSlot(3, ItemStack.EMPTY);
+                                    this.combinedHandler.insertItem(4, new ItemStack(Items.BUCKET, 1), false);
+                                }
+                            }
                         }
-                    } else {
-                        System.out.println("Definitely not a umatter bucket!");
-
                     }
                 }
                 ItemStack thumbdrive = inputHandler.getStackInSlot(0);
