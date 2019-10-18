@@ -1,0 +1,15 @@
+itemGroup.youmatter=You Matter
+
+# Blocks
+tile.youmatter.replicator.name=Replikator
+tile.youmatter.encoder.name=Encoder
+tile.youmatter.scanner.name=Scanner
+
+
+# Items
+item.youmatter.thumb_drive.name=USB-Stick
+item.youmatter.black_hole.name=Tragbares Schwarzes Loch
+
+# Fluids
+fluid.umatter=U-Matter
+fluid.stabilizer=Stabilisierer
