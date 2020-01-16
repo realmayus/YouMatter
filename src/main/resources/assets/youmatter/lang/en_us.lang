@@ -2,6 +2,7 @@ itemGroup.youmatter=You Matter
 
 # Blocks
 tile.youmatter.replicator.name=Replicator
+tile.youmatter.creator.name=U-Matter Creator
 tile.youmatter.encoder.name=Encoder
 tile.youmatter.scanner.name=Scanner
 

@@ -1,0 +1,27 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "cube",
+    "textures": {
+      "particle": "youmatter:blocks/creator",
+      "north": "youmatter:blocks/creator",
+      "south": "youmatter:blocks/creator",
+      "west": "youmatter:blocks/creator",
+      "east": "youmatter:blocks/creator",
+      "up": "youmatter:blocks/creator",
+      "down": "youmatter:blocks/creator"
+    }
+  },
+  "variants": {
+    "normal": [{}],
+    "inventory": [{}],
+    "facing": {
+      "north": {},
+      "south": {"y": 180},
+      "west": {"y": 270},
+      "east": {"y": 90},
+      "up": {"x": -90},
+      "down": {"x": 90}
+    }
+  }
+}

@@ -3,12 +3,12 @@
   "defaults": {
     "model": "cube",
     "textures": {
-      "particle": "youmatter:blocks/replicator_top",
-      "north": "youmatter:blocks/replicator_side",
-      "south": "youmatter:blocks/replicator_side",
-      "west": "youmatter:blocks/replicator_side",
-      "east": "youmatter:blocks/replicator_side",
-      "up": "youmatter:blocks/replicator_top",
+      "particle": "youmatter:blocks/encoder_side",
+      "north": "youmatter:blocks/encoder_side",
+      "south": "youmatter:blocks/encoder_side",
+      "west": "youmatter:blocks/encoder_side",
+      "east": "youmatter:blocks/encoder_side",
+      "up": "youmatter:blocks/generic_side",
       "down": "youmatter:blocks/generic_side"
     }
   },

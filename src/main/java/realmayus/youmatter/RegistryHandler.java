@@ -15,9 +15,12 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import realmayus.youmatter.creator.BlockCreator;
+import realmayus.youmatter.encoder.BlockEncoder;
 import realmayus.youmatter.items.ThumbdriveItem;
 import realmayus.youmatter.replicator.BlockReplicator;
 import realmayus.youmatter.replicator.TileReplicator;
+import realmayus.youmatter.scanner.BlockScanner;
 
 import javax.annotation.Nonnull;
 
@@ -34,6 +37,9 @@ public class RegistryHandler {
         event.getRegistry().register(ModBlocks.UMATTER_BLOCK.setRegistryName(YouMatter.MODID,"umatter_block"));
         event.getRegistry().register(ModBlocks.STABILIZER_BLOCK.setRegistryName(YouMatter.MODID,"stabilizer_block"));
         event.getRegistry().register(new BlockReplicator().setRegistryName(YouMatter.MODID, "replicator").setCreativeTab(YouMatter.creativeTab));
+        event.getRegistry().register(new BlockScanner().setRegistryName(YouMatter.MODID, "scanner").setCreativeTab(YouMatter.creativeTab));
+        event.getRegistry().register(new BlockEncoder().setRegistryName(YouMatter.MODID, "encoder").setCreativeTab(YouMatter.creativeTab));
+        event.getRegistry().register(new BlockCreator().setRegistryName(YouMatter.MODID, "creator").setCreativeTab(YouMatter.creativeTab));
 
         GameRegistry.registerTileEntity(TileReplicator.class, new ResourceLocation("te_replicator"));
     }
@@ -44,6 +50,9 @@ public class RegistryHandler {
         event.getRegistry().register(ModItems.STABILIZER_BLOCK.setRegistryName(YouMatter.MODID,"stabilizer_block"));
 
         event.getRegistry().register(new ItemBlock(ModBlocks.REPLICATOR).setRegistryName(YouMatter.MODID, "replicator"));
+        event.getRegistry().register(new ItemBlock(ModBlocks.SCANNER).setRegistryName(YouMatter.MODID, "scanner"));
+        event.getRegistry().register(new ItemBlock(ModBlocks.ENCODER).setRegistryName(YouMatter.MODID, "encoder"));
+        event.getRegistry().register(new ItemBlock(ModBlocks.CREATOR).setRegistryName(YouMatter.MODID, "creator"));
         event.getRegistry().register(new ThumbdriveItem().setRegistryName(YouMatter.MODID, "thumb_drive").setCreativeTab(YouMatter.creativeTab));
     }
 
@@ -59,7 +68,5 @@ public class RegistryHandler {
         ForgeRegistries.ITEMS.getValues().stream()
                 .filter(item -> item.getRegistryName().getNamespace().equals(YouMatter.MODID))
                 .forEach(item -> ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(item.getRegistryName(), "normal")));
-
-//        ModelLoader.setCustomModelResourceLocation(ModItems.UMATTER_BLOCK, 0, new ModelResourceLocation());
     }
 }
