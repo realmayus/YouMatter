@@ -6,6 +6,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagByteArray;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -183,22 +184,23 @@ public class TileCreator extends TileEntity implements IGuiTile, ITickable{
     @Override
     public void readFromNBT(NBTTagCompound compound) {
         super.readFromNBT(compound);
-        readRestorableFromNBT(compound);
+        NBTTagCompound tagUTank = compound.getCompoundTag("uTank");
+        NBTTagCompound tagSTank = compound.getCompoundTag("sTank");
+        uTank.readFromNBT(tagUTank);
+        sTank.readFromNBT(tagSTank);
     }
 
-    public void readRestorableFromNBT(NBTTagCompound compound) {
-//        isEnabled = compound.getBoolean("enabled");
-    }
 
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
         super.writeToNBT(compound);
-        writeRestorableToNBT(compound);
+        NBTTagCompound tagSTank = new NBTTagCompound();
+        NBTTagCompound tagUTank = new NBTTagCompound();
+        sTank.writeToNBT(tagSTank);
+        uTank.writeToNBT(tagUTank);
+        compound.setTag("uTank", tagUTank);
+        compound.setTag("sTank", tagSTank);
         return compound;
-    }
-
-    public void writeRestorableToNBT(NBTTagCompound compound) {
-
     }
 
     public void setClientUTank(NBTTagCompound tank) {

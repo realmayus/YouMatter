@@ -33,7 +33,7 @@ public class GuiCreator extends GuiContainer {
 
     private ContainerCreator container;
 
-    private static final ResourceLocation GUI = new ResourceLocation(YouMatter.MODID, "textures/gui/creator.png");
+    private static final ResourceLocation GUI = new ResourceLocation(YouMatter.MODID, "textures/gui/creator_improved.png");
 
     public GuiCreator(TileCreator tileEntity, ContainerCreator container) {
         super(container);
