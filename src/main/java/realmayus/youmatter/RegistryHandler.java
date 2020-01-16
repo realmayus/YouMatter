@@ -16,6 +16,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import realmayus.youmatter.creator.BlockCreator;
+import realmayus.youmatter.creator.TileCreator;
 import realmayus.youmatter.encoder.BlockEncoder;
 import realmayus.youmatter.items.ThumbdriveItem;
 import realmayus.youmatter.replicator.BlockReplicator;
@@ -41,7 +42,8 @@ public class RegistryHandler {
         event.getRegistry().register(new BlockEncoder().setRegistryName(YouMatter.MODID, "encoder").setCreativeTab(YouMatter.creativeTab));
         event.getRegistry().register(new BlockCreator().setRegistryName(YouMatter.MODID, "creator").setCreativeTab(YouMatter.creativeTab));
 
-        GameRegistry.registerTileEntity(TileReplicator.class, new ResourceLocation("te_replicator"));
+        GameRegistry.registerTileEntity(TileReplicator.class, new ResourceLocation("youmatter","te_replicator"));
+        GameRegistry.registerTileEntity(TileCreator.class, new ResourceLocation("youmatter", "te_creator"));
     }
 
     @SubscribeEvent
