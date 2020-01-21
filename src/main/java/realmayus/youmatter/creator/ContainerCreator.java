@@ -1,15 +1,22 @@
 package realmayus.youmatter.creator;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 
+import realmayus.youmatter.network.PacketHandler;
+import realmayus.youmatter.network.PacketUpdateCreatorClient;
 import realmayus.youmatter.util.ICreatorStateContainer;
+
+import java.util.stream.Collectors;
 
 
 public class ContainerCreator extends Container implements ICreatorStateContainer {
@@ -32,6 +39,11 @@ public class ContainerCreator extends Container implements ICreatorStateContaine
     @Override
     public void detectAndSendChanges() {
         super.detectAndSendChanges();
+        for(IContainerListener p : listeners) {
+            if(p instanceof EntityPlayerMP) {
+                PacketHandler.INSTANCE.sendTo(new PacketUpdateCreatorClient(te.getUTank().getFluidAmount(), te.getSTank().getFluidAmount(), te.getEnergy(), 10, te.getUTank().writeToNBT(new NBTTagCompound()), te.getSTank().writeToNBT(new NBTTagCompound())), (EntityPlayerMP)p);
+            }
+        }
     }
 
     @Override
@@ -44,7 +56,7 @@ public class ContainerCreator extends Container implements ICreatorStateContaine
         for (int row = 0; row < 3; ++row) {
             for (int col = 0; col < 9; ++col) {
                 int x = col * 18 + 8;
-                int y = row * 18 + 83;
+                int y = row * 18 + 86;
                 this.addSlotToContainer(new Slot(playerInventory, col + row * 9 + 9, x, y));
             }
         }
@@ -52,7 +64,7 @@ public class ContainerCreator extends Container implements ICreatorStateContaine
         // Slots for the hotbar
         for (int row = 0; row < 9; ++row) {
             int x = 8 + row * 18;
-            int y = 141;
+            int y = 144;
             this.addSlotToContainer(new Slot(playerInventory, row, x, y));
 
         }
@@ -62,14 +74,14 @@ public class ContainerCreator extends Container implements ICreatorStateContaine
         IItemHandler itemHandler = this.te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
 
         // stabilizer bucket input slot
-        addSlotToContainer(new SlotItemHandler(itemHandler, 1, 51, 18));
+        addSlotToContainer(new SlotItemHandler(itemHandler, 1, 52, 21));
         // stabilizer bucket output slot
-        addSlotToContainer(new SlotItemHandler(itemHandler, 2, 51, 60));
+        addSlotToContainer(new SlotItemHandler(itemHandler, 2, 52, 63));
 
-        // u-matter bucket input slot
-        addSlotToContainer(new SlotItemHandler(itemHandler, 3, 109, 18));
+        // u-matte++++r bucket input slot
+        addSlotToContainer(new SlotItemHandler(itemHandler, 3, 110, 21));
         // u-matter bucket output slot
-        addSlotToContainer(new SlotItemHandler(itemHandler, 4, 109, 60));
+        addSlotToContainer(new SlotItemHandler(itemHandler, 4, 110, 63));
     }
 
     @Override
@@ -81,5 +93,7 @@ public class ContainerCreator extends Container implements ICreatorStateContaine
         te.setClientUTank(uTank);
         te.setClientSTank(sTank);
     }
+
+
 
 }

@@ -104,7 +104,6 @@ public class TileReplicator extends TileEntity implements IGuiTile, ITickable{
         return super.getCapability(capability, facing);
     }
 
-    //int has to be 0 as we don't want to receive energy
     private MyEnergyStorage myEnergyStorage = new MyEnergyStorage(1000000, 2000);
 
     /**

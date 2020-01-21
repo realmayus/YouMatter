@@ -3,6 +3,7 @@ package realmayus.youmatter.creator;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
@@ -16,16 +17,19 @@ import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.UniversalBucket;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
 import realmayus.youmatter.ModFluids;
 import realmayus.youmatter.network.PacketHandler;
 import realmayus.youmatter.network.PacketUpdateCreatorClient;
+import realmayus.youmatter.umatter.ModFluid;
 import realmayus.youmatter.util.IGuiTile;
 import realmayus.youmatter.util.MyEnergyStorage;
 
 import javax.annotation.Nonnull;
+import java.util.stream.Collectors;
 
 public class TileCreator extends TileEntity implements IGuiTile, ITickable{
 
@@ -104,8 +108,6 @@ public class TileCreator extends TileEntity implements IGuiTile, ITickable{
         return super.getCapability(capability, facing);
     }
 
-    //int has to be 0 as we don't want to receive energy
-    private MyEnergyStorage myEnergyStorage = new MyEnergyStorage(1000000, 2000);
 
     /**
      * Handler for the Input Slots
@@ -180,6 +182,7 @@ public class TileCreator extends TileEntity implements IGuiTile, ITickable{
     private int clientEnergy = -1;
     private int clientProgress = -1;
 
+    private MyEnergyStorage myEnergyStorage = new MyEnergyStorage(1000000, Integer.MAX_VALUE);
 
     @Override
     public void readFromNBT(NBTTagCompound compound) {
@@ -188,6 +191,8 @@ public class TileCreator extends TileEntity implements IGuiTile, ITickable{
         NBTTagCompound tagSTank = compound.getCompoundTag("sTank");
         uTank.readFromNBT(tagUTank);
         sTank.readFromNBT(tagSTank);
+        myEnergyStorage.setEnergy(compound.getInteger("energy"));
+        clientProgress = compound.getInteger("progress"); //todo
     }
 
 
@@ -200,6 +205,8 @@ public class TileCreator extends TileEntity implements IGuiTile, ITickable{
         uTank.writeToNBT(tagUTank);
         compound.setTag("uTank", tagUTank);
         compound.setTag("sTank", tagSTank);
+        compound.setInteger("energy", getEnergy());
+        compound.setInteger("progress", getClientProgress()); //todo
         return compound;
     }
 
@@ -218,28 +225,35 @@ public class TileCreator extends TileEntity implements IGuiTile, ITickable{
     private int currentPartTick = 0;
     @Override
     public void update() {
-        if(currentPartTick == 5) {
-            if(!world.isRemote) {
+        if (currentPartTick == 40) { // every 2 sec
+            if (!world.isRemote) {
+                if (getEnergy() >= 0.3f * 1000000 && sTank.getFluidAmount() >= 125) { // if energy more than 10 % of max energy
+                    sTank.drain(125, true);
+                    uTank.fill(new FluidStack(ModFluids.UMATTER, Math.round((float) 0.000005 * (getEnergy()/3f))), true);
+                    myEnergyStorage.consumePower(Math.round(getEnergy()/3f));
+                }
+            }
+            currentPartTick = 0;
+        } else if ((currentPartTick % 5) == 0) { // every five ticks
+            if (!world.isRemote) {
                 //TODO: URGENT!!!! Send this packet only to those who have the GUI opened!
-                PacketHandler.INSTANCE.sendToAll(new PacketUpdateCreatorClient(getUTank().getFluidAmount(), getSTank().getFluidAmount(), getEnergy(), 10, this.getUTank().writeToNBT(new NBTTagCompound()), this.getSTank().writeToNBT(new NBTTagCompound())));
+//                PacketHandler.INSTANCE.sendTo(new PacketUpdateCreatorClient(getUTank().getFluidAmount(), getSTank().getFluidAmount(), getEnergy(), 10, this.getUTank().writeToNBT(new NBTTagCompound()), this.getSTank().writeToNBT(new NBTTagCompound())));
+
+
+
                 if (!this.inputHandler.getStackInSlot(3).isEmpty()) {
-                    if(this.inputHandler.getStackInSlot(3).getItem() instanceof UniversalBucket) {
-                        UniversalBucket bucket = (UniversalBucket) this.inputHandler.getStackInSlot(3).getItem();
-                        if(bucket.getFluid(this.inputHandler.getStackInSlot(3)) != null) {
-                            if (bucket.getFluid(this.inputHandler.getStackInSlot(3)).getFluid().equals(ModFluids.UMATTER)) {
-                                if (getUTank().getFluidAmount() + 1000 < getUTank().getCapacity()) {
-                                    getUTank().fill(new FluidStack(ModFluids.UMATTER, 1000), true);
-                                    this.inputHandler.setStackInSlot(3, ItemStack.EMPTY);
-                                    this.combinedHandler.insertItem(4, new ItemStack(Items.BUCKET, 1), false);
-                                }
-                            }
+                    if (this.inputHandler.getStackInSlot(3).getItem() == Items.BUCKET) {
+                        if (getUTank().getFluidAmount() >= 1000) {
+                            getUTank().drain(1000, true);
+                            this.inputHandler.setStackInSlot(3, ItemStack.EMPTY);
+                            this.combinedHandler.insertItem(4, UniversalBucket.getFilledBucket(new UniversalBucket(), ModFluids.UMATTER), false);
                         }
                     }
                 }
                 if (!this.inputHandler.getStackInSlot(1).isEmpty()) {
-                    if(this.inputHandler.getStackInSlot(1).getItem() instanceof UniversalBucket) {
+                    if (this.inputHandler.getStackInSlot(1).getItem() instanceof UniversalBucket) {
                         UniversalBucket bucket = (UniversalBucket) this.inputHandler.getStackInSlot(1).getItem();
-                        if(bucket.getFluid(this.inputHandler.getStackInSlot(1)) != null) {
+                        if (bucket.getFluid(this.inputHandler.getStackInSlot(1)) != null) {
                             if (bucket.getFluid(this.inputHandler.getStackInSlot(1)).getFluid().equals(ModFluids.STABILIZER)) {
                                 if (getSTank().getFluidAmount() + 1000 < getUTank().getCapacity()) {
                                     getSTank().fill(new FluidStack(ModFluids.STABILIZER, 1000), true);
@@ -251,7 +265,7 @@ public class TileCreator extends TileEntity implements IGuiTile, ITickable{
                     }
                 }
             }
-            currentPartTick = 0;
+            currentPartTick++;
         } else {
             currentPartTick++;
         }

@@ -33,7 +33,7 @@ public class GuiCreator extends GuiContainer {
 
     private ContainerCreator container;
 
-    private static final ResourceLocation GUI = new ResourceLocation(YouMatter.MODID, "textures/gui/creator_improved.png");
+    private static final ResourceLocation GUI = new ResourceLocation(YouMatter.MODID, "textures/gui/creator_improved_fixed.png");
 
     public GuiCreator(TileCreator tileEntity, ContainerCreator container) {
         super(container);
@@ -51,13 +51,24 @@ public class GuiCreator extends GuiContainer {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         mc.getTextureManager().bindTexture(GUI);
         drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
-        drawFluidTank(89, 20, creator.getUTank());
-        drawFluidTank(31, 20, creator.getSTank());
+        drawFluidTank(89, 23, creator.getUTank());
+        drawFluidTank(31, 23, creator.getSTank());
     }
 
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         super.drawGuiContainerForegroundLayer(mouseX, mouseY);
+
+        mc.getTextureManager().bindTexture(GUI);
+
+        if(creator.getClientEnergy() == 0) {
+            drawTexturedModalRect(150, 59, 176, 114, 15, 20);
+        } else {
+            double percentage = creator.getClientEnergy() * 100 / 1000000;  // i know this is dumb
+            float percentagef = (float)percentage / 100; // but it works.
+            drawTexturedModalRect(150, 59, 176, 93, 15, Math.round(20 * percentagef)); // it's not really intended that the bolt fills from the top but it looks cool tbh.
+
+        }
 
         //TODO remove dis when not needed anymore
         this.fontRenderer.drawString("Creator", 8, 6, 4210752);
@@ -81,12 +92,17 @@ public class GuiCreator extends GuiContainer {
         if(xAxis >= 31 && xAxis <= 44 && yAxis >= 20 && yAxis <= 75) {
 
             //TODO localize diz
-            drawTooltip(mouseX, mouseY, Stream.of("Stabilizer", "Amount: " + creator.getSTank().getFluidAmount() + " mB").collect(Collectors.toList()));
+            drawTooltip(mouseX, mouseY, Stream.of("§6Stabilizer", "Amount: " + creator.getSTank().getFluidAmount() + " mB").collect(Collectors.toList()));
         }
         if(xAxis >= 89 && xAxis <= 102 && yAxis >= 20 && yAxis <= 75) {
 
             //TODO localize diz
-            drawTooltip(mouseX, mouseY, Stream.of("U-Matter", "Amount: " + creator.getUTank().getFluidAmount() + " mB").collect(Collectors.toList()));
+            drawTooltip(mouseX, mouseY, Stream.of("§6U-Matter", "Amount: " + creator.getUTank().getFluidAmount() + " mB").collect(Collectors.toList()));
+        }
+        if(xAxis >= 150 && xAxis <= 164 && yAxis >= 57 && yAxis <= 77) {
+
+            //TODO localize diz
+            drawTooltip(mouseX, mouseY, Stream.of("§6Energy", "Stored: " + creator.getClientEnergy() + " FE").collect(Collectors.toList()));
         }
     }
 
