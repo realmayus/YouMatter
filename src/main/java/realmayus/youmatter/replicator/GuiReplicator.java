@@ -53,16 +53,24 @@ public class GuiReplicator extends GuiContainer {
 
         drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
 
-        drawFluidTank(26, 20, replicator.getTank(), Color.blue);
+        drawFluidTank(26, 20, replicator.getTank());
 
-        drawEnergyBar((int)((replicator.getClientEnergy() * 100.0f) / 1000000.0f));
     }
 
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         super.drawGuiContainerForegroundLayer(mouseX, mouseY);
 
-        //TODO remove dis when not needed anymore
+        mc.getTextureManager().bindTexture(GUI);
+
+        if(replicator.getClientEnergy() == 0) {
+            drawTexturedModalRect(127, 59, 176, 114, 15, 20);
+        } else {
+            double percentage = replicator.getClientEnergy() * 100 / 1000000;  // i know this is dumb
+            float percentagef = (float)percentage / 100; // but it works.
+            drawTexturedModalRect(127, 59, 176, 93, 15, Math.round(20 * percentagef)); // it's not really intended that the bolt fills from the top but it looks cool tbh.
+
+        }
         this.fontRenderer.drawString("Replicator", 8, 6, 4210752);
     }
 
@@ -84,11 +92,13 @@ public class GuiReplicator extends GuiContainer {
         if(xAxis >= 26 && xAxis <= 39 && yAxis >= 20 && yAxis <= 75) {
 
             //TODO localize diz
-            drawTooltip(mouseX, mouseY, Stream.of("U-Matter", "Amount: " + replicator.getTank().getFluidAmount() + " mB").collect(Collectors.toList()));
+            drawTooltip(mouseX, mouseY, Stream.of("§6U-Matter", "Amount: " + replicator.getTank().getFluidAmount() + " mB").collect(Collectors.toList()));
         }
 
-        if(xAxis >= 10 && xAxis <= 23 && yAxis >= 20 && yAxis <= 75) {
-            drawTooltip(mouseX, mouseY, Stream.of("Energy", replicator.getClientEnergy() + " FE (" + (int)((replicator.getClientEnergy() * 100.0f) / 1000000.0f) + "%)").collect(Collectors.toList()));
+        if(xAxis >= 127 && xAxis <= 142 && yAxis >= 59 && yAxis <= 79) {
+
+            //TODO localize diz
+            drawTooltip(mouseX, mouseY, Stream.of("§6Energy", "Stored: " + replicator.getClientEnergy() + " FE").collect(Collectors.toList()));
         }
     }
 
@@ -103,7 +113,7 @@ public class GuiReplicator extends GuiContainer {
     {
         if (fluidStack != null && fluidStack.getFluid() != null)
         {
-            drawSize -= 1; //TODO why?
+            drawSize -= 1;
 
             ResourceLocation fluidIcon = null;
             Fluid fluid = fluidStack.getFluid();
@@ -158,11 +168,8 @@ public class GuiReplicator extends GuiContainer {
         }
     }
 
-    protected int meterHeight = 55;
-    protected int meterWidth = 14;
 
-
-    protected void drawFluidTank(int x, int y, IFluidTank tank, Color edgeColor)
+    private void drawFluidTank(int x, int y, IFluidTank tank)
     {
 
             //Get data
@@ -174,21 +181,23 @@ public class GuiReplicator extends GuiContainer {
 
 
             //Draw fluid
-            if (fluidStack != null)
+        int meterHeight = 55;
+        if (fluidStack != null)
             {
                 this.drawFluid(this.guiLeft + x -1, this.guiTop + y, -3, 1, 14, (int) ((meterHeight - 1) * scale), fluidStack);
             }
 
             //Draw lines
             this.mc.renderEngine.bindTexture(GUI);
-            this.drawTexturedModalRect(this.guiLeft + x, this.guiTop + y, 176, 35, meterWidth, meterHeight);
+        int meterWidth = 14;
+        this.drawTexturedModalRect(this.guiLeft + x, this.guiTop + y, 176, 35, meterWidth, meterHeight);
 
             //Reset color
             setColor(null);
 
     }
 
-    protected void setColor(Color color)
+    private void setColor(Color color)
     {
         if (color == null)
         {
@@ -200,19 +209,6 @@ public class GuiReplicator extends GuiContainer {
         }
     }
 
-    private void drawEnergyBar(int percentage) {
-//        drawRect(guiLeft + 10, guiTop + 5, guiLeft + 112, guiTop + 15, 0xff555555);
-
-        int linesToDraw = Math.toIntExact(Math.round(56 * (percentage / 100.0f)));
-        for(int i = 0; i < linesToDraw - 1; i++) {
-            if(i == 0 || i == 54){
-                drawHorizontalLine(guiLeft + 11, guiLeft + 22, guiTop + 74 - i, 0xffad0000);
-            } else {
-                drawHorizontalLine(guiLeft + 10, guiLeft + 23, guiTop + 74 - i, i % 2 == 0 ? 0xffad0000 : 0xFF570000);
-            }
-
-        }
-    }
 
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
@@ -233,6 +229,4 @@ public class GuiReplicator extends GuiContainer {
             }
         }
     }
-
 }
-//    drawVerticalLine(guiLeft + 10 + 1 + i, guiTop + 5, guiTop + 14, i % 2 == 0 ? 0xffff0000 : 0xff000000);

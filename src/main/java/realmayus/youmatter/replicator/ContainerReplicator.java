@@ -1,18 +1,18 @@
 package realmayus.youmatter.replicator;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
+import realmayus.youmatter.network.PacketHandler;
+import realmayus.youmatter.network.PacketUpdateReplicatorClient;
 import realmayus.youmatter.util.DisplaySlot;
-import realmayus.youmatter.util.IReplicatorStateContainer;
 
 public class ContainerReplicator extends Container implements IReplicatorStateContainer {
     public TileReplicator te;
@@ -34,6 +34,11 @@ public class ContainerReplicator extends Container implements IReplicatorStateCo
     @Override
     public void detectAndSendChanges() {
         super.detectAndSendChanges();
+        for(IContainerListener p : listeners) {
+            if(p instanceof EntityPlayerMP) {
+                PacketHandler.INSTANCE.sendTo(new PacketUpdateReplicatorClient(te.getTank().getFluidAmount(), te.getEnergy(), 10, te.getTank().writeToNBT(new NBTTagCompound())), (EntityPlayerMP)p);
+            }
+        }
     }
 
     @Override
@@ -46,7 +51,7 @@ public class ContainerReplicator extends Container implements IReplicatorStateCo
         for (int row = 0; row < 3; ++row) {
             for (int col = 0; col < 9; ++col) {
                 int x = col * 18 + 8;
-                int y = row * 18 + 83;
+                int y = row * 18 + 86;
                 this.addSlotToContainer(new Slot(playerInventory, col + row * 9 + 9, x, y));
             }
         }
@@ -54,7 +59,7 @@ public class ContainerReplicator extends Container implements IReplicatorStateCo
         // Slots for the hotbar
         for (int row = 0; row < 9; ++row) {
             int x = 8 + row * 18;
-            int y = 141;
+            int y = 144;
             this.addSlotToContainer(new Slot(playerInventory, row, x, y));
 
         }

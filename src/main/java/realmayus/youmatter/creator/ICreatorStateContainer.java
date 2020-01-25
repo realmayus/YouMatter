@@ -1,4 +1,4 @@
-package realmayus.youmatter.util;
+package realmayus.youmatter.creator;
 
 import net.minecraft.nbt.NBTTagCompound;
 

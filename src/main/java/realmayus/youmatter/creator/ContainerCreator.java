@@ -7,16 +7,12 @@ import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 
 import realmayus.youmatter.network.PacketHandler;
 import realmayus.youmatter.network.PacketUpdateCreatorClient;
-import realmayus.youmatter.util.ICreatorStateContainer;
-
-import java.util.stream.Collectors;
 
 
 public class ContainerCreator extends Container implements ICreatorStateContainer {

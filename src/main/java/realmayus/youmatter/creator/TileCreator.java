@@ -192,7 +192,6 @@ public class TileCreator extends TileEntity implements IGuiTile, ITickable{
         uTank.readFromNBT(tagUTank);
         sTank.readFromNBT(tagSTank);
         myEnergyStorage.setEnergy(compound.getInteger("energy"));
-        clientProgress = compound.getInteger("progress"); //todo
     }
 
 
@@ -206,7 +205,6 @@ public class TileCreator extends TileEntity implements IGuiTile, ITickable{
         compound.setTag("uTank", tagUTank);
         compound.setTag("sTank", tagSTank);
         compound.setInteger("energy", getEnergy());
-        compound.setInteger("progress", getClientProgress()); //todo
         return compound;
     }
 

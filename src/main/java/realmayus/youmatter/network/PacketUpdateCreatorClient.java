@@ -8,7 +8,7 @@ import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import realmayus.youmatter.util.ICreatorStateContainer;
+import realmayus.youmatter.creator.ICreatorStateContainer;
 
 public class PacketUpdateCreatorClient implements IMessage {
     private int uFluidAmount;

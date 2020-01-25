@@ -26,23 +26,20 @@ import java.util.stream.Stream;
 
 public class GuiCreator extends GuiContainer {
 
-    public static final int WIDTH = 176;
-    public static final int HEIGHT = 165;
+    private static final int WIDTH = 176;
+    private static final int HEIGHT = 165;
 
-    private TileCreator creator;
+    private TileCreator te;
 
-    private ContainerCreator container;
+    private static final ResourceLocation GUI = new ResourceLocation(YouMatter.MODID, "textures/gui/creator.png");
 
-    private static final ResourceLocation GUI = new ResourceLocation(YouMatter.MODID, "textures/gui/creator_improved_fixed.png");
-
-    public GuiCreator(TileCreator tileEntity, ContainerCreator container) {
+    GuiCreator(TileCreator tileEntity, ContainerCreator container) {
         super(container);
 
-        this.container = container;
         xSize = WIDTH;
         ySize = HEIGHT;
 
-        creator = tileEntity;
+        te = tileEntity;
     }
 
     @Override
@@ -51,8 +48,8 @@ public class GuiCreator extends GuiContainer {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         mc.getTextureManager().bindTexture(GUI);
         drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
-        drawFluidTank(89, 23, creator.getUTank());
-        drawFluidTank(31, 23, creator.getSTank());
+        drawFluidTank(89, 23, te.getUTank());
+        drawFluidTank(31, 23, te.getSTank());
     }
 
     @Override
@@ -61,17 +58,17 @@ public class GuiCreator extends GuiContainer {
 
         mc.getTextureManager().bindTexture(GUI);
 
-        if(creator.getClientEnergy() == 0) {
+        if(te.getClientEnergy() == 0) {
             drawTexturedModalRect(150, 59, 176, 114, 15, 20);
         } else {
-            double percentage = creator.getClientEnergy() * 100 / 1000000;  // i know this is dumb
+            double percentage = te.getClientEnergy() * 100 / 1000000;  // i know this is dumb
             float percentagef = (float)percentage / 100; // but it works.
             drawTexturedModalRect(150, 59, 176, 93, 15, Math.round(20 * percentagef)); // it's not really intended that the bolt fills from the top but it looks cool tbh.
 
         }
 
-        //TODO remove dis when not needed anymore
-        this.fontRenderer.drawString("Creator", 8, 6, 4210752);
+        //TODO Localize
+        this.fontRenderer.drawString("U-Matter Creator", 8, 6, 4210752);
     }
 
     @Override
@@ -92,17 +89,17 @@ public class GuiCreator extends GuiContainer {
         if(xAxis >= 31 && xAxis <= 44 && yAxis >= 20 && yAxis <= 75) {
 
             //TODO localize diz
-            drawTooltip(mouseX, mouseY, Stream.of("§6Stabilizer", "Amount: " + creator.getSTank().getFluidAmount() + " mB").collect(Collectors.toList()));
+            drawTooltip(mouseX, mouseY, Stream.of("§6Stabilizer", "Amount: " + te.getSTank().getFluidAmount() + " mB").collect(Collectors.toList()));
         }
         if(xAxis >= 89 && xAxis <= 102 && yAxis >= 20 && yAxis <= 75) {
 
             //TODO localize diz
-            drawTooltip(mouseX, mouseY, Stream.of("§6U-Matter", "Amount: " + creator.getUTank().getFluidAmount() + " mB").collect(Collectors.toList()));
+            drawTooltip(mouseX, mouseY, Stream.of("§6U-Matter", "Amount: " + te.getUTank().getFluidAmount() + " mB").collect(Collectors.toList()));
         }
         if(xAxis >= 150 && xAxis <= 164 && yAxis >= 57 && yAxis <= 77) {
 
             //TODO localize diz
-            drawTooltip(mouseX, mouseY, Stream.of("§6Energy", "Stored: " + creator.getClientEnergy() + " FE").collect(Collectors.toList()));
+            drawTooltip(mouseX, mouseY, Stream.of("§6Energy", "Stored: " + te.getClientEnergy() + " FE").collect(Collectors.toList()));
         }
     }
 

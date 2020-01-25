@@ -144,12 +144,8 @@ public class TileReplicator extends TileEntity implements IGuiTile, ITickable{
     public void update() {
         if(currentPartTick == 5) {
             currentPartTick = 0;
-
             //only execute this code on the server
             if(!world.isRemote) {
-
-                //TODO: URGENT!!!! Send this packet only to those who have the GUI opened!
-                PacketHandler.INSTANCE.sendToAll(new PacketUpdateReplicatorClient(getTank().getFluidAmount(), getEnergy(), 10, this.getTank().writeToNBT(new NBTTagCompound())));
                 if (!this.inputHandler.getStackInSlot(3).isEmpty()) {
 
                     if(this.inputHandler.getStackInSlot(3).getItem() instanceof UniversalBucket) {
@@ -262,28 +258,20 @@ public class TileReplicator extends TileEntity implements IGuiTile, ITickable{
     private int clientEnergy = -1;
     private int clientProgress = -1;
 
-    
     @Override
     public void readFromNBT(NBTTagCompound compound) {
         super.readFromNBT(compound);
-        readRestorableFromNBT(compound);
-    }
-
-    public void readRestorableFromNBT(NBTTagCompound compound) {
-//        isEnabled = compound.getBoolean("enabled");
-//        redstoneBehaviour = compound.getInteger("redstone");
+        tank.readFromNBT(compound.getCompoundTag("tank"));
+        myEnergyStorage.setEnergy(compound.getInteger("energy"));
     }
 
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
         super.writeToNBT(compound);
-        writeRestorableToNBT(compound);
+        NBTTagCompound tagTank = new NBTTagCompound();
+        tank.writeToNBT(tagTank);
+        compound.setTag("tank", tagTank);
+        compound.setInteger("energy", getEnergy());
         return compound;
     }
-
-    public void writeRestorableToNBT(NBTTagCompound compound) {
-
-    }
-
-
 }
