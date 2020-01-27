@@ -170,7 +170,7 @@ public class TileReplicator extends TileEntity implements IGuiTile, ITickable{
                 } else {
                     if (thumbdrive.hasTagCompound()) {
                         if(thumbdrive.getTagCompound() != null) {
-                            NBTTagList taglist = (NBTTagList) thumbdrive.getTagCompound().getTag("MyStringList");
+                            NBTTagList taglist = (NBTTagList) thumbdrive.getTagCompound().getTag("stored_items");
                             cachedItems = new ArrayList<>();
                             for(NBTBase nbt : taglist) {
                                 if(nbt instanceof NBTTagString) {

@@ -234,11 +234,6 @@ public class TileCreator extends TileEntity implements IGuiTile, ITickable{
             currentPartTick = 0;
         } else if ((currentPartTick % 5) == 0) { // every five ticks
             if (!world.isRemote) {
-                //TODO: URGENT!!!! Send this packet only to those who have the GUI opened!
-//                PacketHandler.INSTANCE.sendTo(new PacketUpdateCreatorClient(getUTank().getFluidAmount(), getSTank().getFluidAmount(), getEnergy(), 10, this.getUTank().writeToNBT(new NBTTagCompound()), this.getSTank().writeToNBT(new NBTTagCompound())));
-
-
-
                 if (!this.inputHandler.getStackInSlot(3).isEmpty()) {
                     if (this.inputHandler.getStackInSlot(3).getItem() == Items.BUCKET) {
                         if (getUTank().getFluidAmount() >= 1000) {

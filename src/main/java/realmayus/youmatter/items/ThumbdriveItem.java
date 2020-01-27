@@ -1,5 +1,6 @@
 package realmayus.youmatter.items;
 
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -14,6 +15,8 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import realmayus.youmatter.YouMatter;
 
+import javax.annotation.Nullable;
+import java.util.List;
 import java.util.UUID;
 
 public class ThumbdriveItem extends Item {
@@ -39,11 +42,24 @@ public class ThumbdriveItem extends Item {
 
 
         assert nbt != null;
-        nbt.setTag("MyStringList", list);
+        nbt.setTag("stored_items", list); //todo rename
 
         player.sendMessage(new TextComponentString("Loaded NBT Data."));
-        player.sendMessage(new TextComponentString(stack.getTagCompound().toString()));
 
         return super.onItemUseFirst(player, world, pos, side, hitX, hitY, hitZ, hand);
+    }
+
+    @Override
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+        if(stack.hasTagCompound()) {
+            if(stack.getTagCompound() != null) {
+                if (stack.getTagCompound().hasKey("stored_items")) {
+                    tooltip.add("§5Data stored.");
+                    tooltip.add("(" + stack.getTagCompound().getTagList("stored_items", 9).tagCount() + "/8 KB used)"); //todo fix (always shows 0/8KB used)e
+                } else {
+                    tooltip.add("§cNo Data stored.");
+                }
+            }
+        }
     }
 }

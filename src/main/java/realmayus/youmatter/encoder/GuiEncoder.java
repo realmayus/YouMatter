@@ -4,6 +4,8 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 import realmayus.youmatter.YouMatter;
+import realmayus.youmatter.items.ThumbdriveItem;
+import realmayus.youmatter.scanner.ContainerScanner;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,18 +43,41 @@ public class GuiEncoder extends GuiContainer {
         drawEnergyBolt(te.getClientEnergy());
         drawProgressDisplayChain(te.getClientProgress());
 
-        //TODO Localize
+        if (!(te.inputHandler.getStackInSlot(1).getItem() instanceof ThumbdriveItem)) {
+            drawTexturedModalRect(16, 59, 176, 66, 16, 16);
+        }
+
+            //TODO Localize
         this.fontRenderer.drawString("Encoder", 8, 6, 4210752);
     }
 
     private void drawProgressDisplayChain(int progress) {
-        int firstArrow = progress - 33.3f;
+        int arrow1;
+        int lock;
+        int arrow2;
+
+        if(progress < 33) {
+            arrow1 = Math.round(progress * 3.03F);
+            lock = 0;
+            arrow2 = 0;
+        } else if(progress < 66) {
+            arrow1 = 100;
+            lock = Math.round((progress - 33) * 3.03F);
+            arrow2 = 0;
+        } else if(progress < 99) {
+            arrow1 = 100;
+            lock = 100;
+            arrow2 = Math.round((progress - 66) * 3.03F);
+        } else {
+            arrow1 = 100;
+            lock = 100;
+            arrow2 = 100;
+        }
 
         mc.getTextureManager().bindTexture(GUI);
-        System.out.println(progress);
-        float percentagef = (float) progress / 100;
-        System.out.println(percentagef);
-        drawTexturedModalRect(22, 42, 176, 41, Math.round(18 * percentagef), 12); // it's not really intended that the bolt fills from the top but it looks cool tbh.
+        drawTexturedModalRect(22, 42, 176, 41, Math.round((arrow1 / 100.0f) * 18), 12);
+        drawTexturedModalRect(47, 41, 176, 53, 7, Math.round((lock / 100.0f) * 13));
+        drawTexturedModalRect(61, 42, 176, 41, Math.round((arrow2 / 100.0f) * 18), 12);
 
     }
 
@@ -63,7 +88,7 @@ public class GuiEncoder extends GuiContainer {
             drawTexturedModalRect(141, 37, 176, 21, 15, 20);
         } else {
             double percentage = energy * 100 / 1000000;  // i know this is dumb
-            float percentagef = (float)percentage / 100; // but it works.
+            float percentagef = (float) percentage / 100; // but it works.
             drawTexturedModalRect(141, 37, 176, 0, 15, Math.round(20 * percentagef)); // it's not really intended that the bolt fills from the top but it looks cool tbh.
 
         }
@@ -84,6 +109,14 @@ public class GuiEncoder extends GuiContainer {
 
             //TODO localize diz
             drawTooltip(mouseX, mouseY, Stream.of("§6Energy", "Stored: " + te.getClientEnergy() + " FE").collect(Collectors.toList()));
+        }
+
+        if (!(te.inputHandler.getStackInSlot(1).getItem() instanceof ThumbdriveItem)) {
+            if (xAxis >= 16 && xAxis <= 32 && yAxis >= 59 && yAxis <= 75) {
+                //TODO localize diz
+                drawTooltip(mouseX, mouseY, Stream.of("§cYou need to insert a thumbdrive first.").collect(Collectors.toList()));
+
+            }
         }
     }
 
