@@ -56,4 +56,4 @@ IC² is outdated, has many bugs and often is just included in modpacks because o
   
 </details>
 
-For more updates about the mod, feel free to [join my discord server.](http://discord.mayus.me)
+For more updates about the mod, feel free to [join my discord server.](https://discordapp.com/invite/53FQpTQ)
