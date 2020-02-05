@@ -9,27 +9,35 @@ IC² is outdated, has many bugs and often is just included in modpacks because o
 <details>
   <summary>**Machines & Items**</summary>
   ### U-Matter Creator
-  ![](https://i.imgur.com/AZ0rLh2.png)
+  ![s](https://i.imgur.com/AZ0rLh2.png)
   ### Scanner
-  ![](https://i.imgur.com/8QLuxx3.png)
+  ![s](https://i.imgur.com/8QLuxx3.png)
   ### Replicator
-  ![](https://i.imgur.com/hngmexV.png)
+  ![s](https://i.imgur.com/hngmexV.png)
   ### Encoder
-  ![](https://i.imgur.com/GJxXkAM.png)
+  ![s](https://i.imgur.com/GJxXkAM.png)
   ### Thumb drive
-  ![](https://i.imgur.com/qzjJZ5n.png)
+  ![s](https://i.imgur.com/qzjJZ5n.png)
 </details>
 <details>
   <summary>**Crafting Items**</summary>
+  
   ### Machine Casing
-  ![](https://i.imgur.com/dr5bDIB.png)
+  ![s](https://i.imgur.com/dr5bDIB.png)
+  
+  <br>
   ### Transistor
-  ![](https://i.imgur.com/sKKNGQ5.png)
+  ![s](https://i.imgur.com/sKKNGQ5.png)
+  
+  <br>
   ### Transistor (Raw)
-  ![](https://i.imgur.com/L50E9iY.png)
+  ![s](https://i.imgur.com/L50E9iY.png)
+  
+  <br>
   ### Compute Module
-  ![](https://i.imgur.com/1tM0aRY.png)
+  ![s](https://i.imgur.com/1tM0aRY.png)
   **Note:** You can use any wooden slabs in this recipe.
+  
 </details>
 
 For more updates about the mod, feel free to [join my discord server.](http://discord.mayus.me)
