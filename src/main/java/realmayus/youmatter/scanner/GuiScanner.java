@@ -2,6 +2,7 @@ package realmayus.youmatter.scanner;
 
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
 import realmayus.youmatter.YouMatter;
 
@@ -11,7 +12,7 @@ import java.util.stream.Stream;
 
 public class GuiScanner extends GuiContainer {
     private static final int WIDTH = 176;
-    private static final int HEIGHT = 165;
+    private static final int HEIGHT = 168;
 
     private TileScanner te;
 
@@ -45,8 +46,7 @@ public class GuiScanner extends GuiContainer {
             drawTexturedModalRect(16, 59, 176, 101, 16, 16);
         }
 
-        //TODO Localize
-        this.fontRenderer.drawString("Scanner", 8, 6, 4210752);
+        this.fontRenderer.drawString(I18n.format("youmatter.guiname.scanner"), 8, 6, 4210752);
     }
 
     private void drawProgressDisplayChain(int progress) {
@@ -64,12 +64,10 @@ public class GuiScanner extends GuiContainer {
             arrow = 100;
         }
 
-
         mc.getTextureManager().bindTexture(GUI);
         drawTexturedModalRect(79, 63, 176, 41, Math.round((arrow / 100.0f) * 18), 12);
         drawTexturedModalRect(104, 35, 176, 53, 17, Math.round((circuits / 100.0f) * 24));
         drawTexturedModalRect(54, 35, 176, 77, 17, Math.round((circuits / 100.0f) * 24));
-
     }
 
     private void drawEnergyBolt(int energy) {
@@ -97,20 +95,17 @@ public class GuiScanner extends GuiContainer {
         int yAxis = (mouseY - (height - ySize) / 2);
 
         if (xAxis >= 141 && xAxis <= 156 && yAxis >= 37 && yAxis <= 57) {
-            //TODO localize diz
-            drawTooltip(mouseX, mouseY, Stream.of("§6Energy", "Stored: " + te.getClientEnergy() + " FE").collect(Collectors.toList()));
+            drawTooltip(mouseX, mouseY, Stream.of(I18n.format("youmatter.gui.energy.title"), I18n.format("youmatter.gui.energy.description", te.getClientEnergy())).collect(Collectors.toList()));
         }
 
         if (!te.getHasEncoderClient()) {
             if (xAxis >= 16 && xAxis <= 32 && yAxis >= 59 && yAxis <= 75) {
-                //TODO localize diz
-                drawTooltip(mouseX, mouseY, Stream.of("§cYou need to place an Encoder", "§cnext to this block so that", "§cdata can be transmitted.").collect(Collectors.toList()));
+                drawTooltip(mouseX, mouseY, Stream.of(I18n.format("youmatter.warning.scanner1"), I18n.format("youmatter.warning.scanner2"), I18n.format("youmatter.warning.scanner3")).collect(Collectors.toList()));
 
             }
         }
     }
-    private void drawTooltip(int x, int y, List<String> tooltips)
-    {
+    private void drawTooltip(int x, int y, List<String> tooltips) {
         drawHoveringText(tooltips, x, y, fontRenderer);
     }
 }

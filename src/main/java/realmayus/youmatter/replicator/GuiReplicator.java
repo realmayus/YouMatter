@@ -6,6 +6,7 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.Fluid;
@@ -14,11 +15,11 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import realmayus.youmatter.YouMatter;
+import realmayus.youmatter.network.PacketChangeSettingsReplicatorServer;
 import realmayus.youmatter.network.PacketHandler;
 import realmayus.youmatter.network.PacketShowNext;
 import realmayus.youmatter.network.PacketShowPrevious;
 
-import java.awt.*;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,23 +27,20 @@ import java.util.stream.Stream;
 
 public class GuiReplicator extends GuiContainer {
 
-    public static final int WIDTH = 176;
-    public static final int HEIGHT = 165;
+    private static final int WIDTH = 176;
+    private static final int HEIGHT = 168;
 
-    private TileReplicator replicator;
-
-    private ContainerReplicator container;
+    private TileReplicator te;
 
     private static final ResourceLocation GUI = new ResourceLocation(YouMatter.MODID, "textures/gui/replicator.png");
 
-    public GuiReplicator(TileReplicator tileEntity, ContainerReplicator container) {
+    GuiReplicator(TileReplicator tileEntity, ContainerReplicator container) {
         super(container);
 
-        this.container = container;
         xSize = WIDTH;
         ySize = HEIGHT;
 
-        replicator = tileEntity;
+        te = tileEntity;
     }
 
     @Override
@@ -53,7 +51,7 @@ public class GuiReplicator extends GuiContainer {
 
         drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
 
-        drawFluidTank(26, 20, replicator.getTank());
+        drawFluidTank(26, 21, te.getTank());
 
     }
 
@@ -63,15 +61,47 @@ public class GuiReplicator extends GuiContainer {
 
         mc.getTextureManager().bindTexture(GUI);
 
-        if(replicator.getClientEnergy() == 0) {
+        if(te.getClientEnergy() == 0) {
             drawTexturedModalRect(127, 59, 176, 114, 15, 20);
         } else {
-            double percentage = replicator.getClientEnergy() * 100 / 1000000;  // i know this is dumb
+            double percentage = te.getClientEnergy() * 100 / 1000000;  // i know this is dumb
             float percentagef = (float)percentage / 100; // but it works.
             drawTexturedModalRect(127, 59, 176, 93, 15, Math.round(20 * percentagef)); // it's not really intended that the bolt fills from the top but it looks cool tbh.
 
         }
-        this.fontRenderer.drawString("Replicator", 8, 6, 4210752);
+
+        drawActiveIcon(te.isActiveClient());
+        drawModeIcon(te.isCurrentClientMode());
+        drawProgressArrow(te.getClientProgress());
+
+        this.fontRenderer.drawString(I18n.format("youmatter.guiname.replicator"), 8, 6, 4210752);
+    }
+
+
+    private void drawProgressArrow(int progress) {
+        mc.getTextureManager().bindTexture(GUI);
+        drawTexturedModalRect(91, 39, 176, 134, 11, Math.round((progress / 100.0f) * 19));
+    }
+
+    private void drawActiveIcon(boolean isActive) {
+        mc.getTextureManager().bindTexture(GUI);
+
+        if(isActive) {
+            drawTexturedModalRect(154, 13, 176, 24, 8, 9);
+        } else {
+            drawTexturedModalRect(154, 13, 184, 24, 8, 9);
+        }
+    }
+
+    private void drawModeIcon(boolean mode) {
+        mc.getTextureManager().bindTexture(GUI);
+
+        if (mode){
+            //loop
+            drawTexturedModalRect(152, 35, 176, 11, 13,13);
+        } else {
+            drawTexturedModalRect(151, 36, 176, 0, 13, 11);
+        }
     }
 
     @Override
@@ -90,34 +120,36 @@ public class GuiReplicator extends GuiContainer {
         int yAxis = (mouseY - (height - ySize) / 2);
 
         if(xAxis >= 26 && xAxis <= 39 && yAxis >= 20 && yAxis <= 75) {
-
-            //TODO localize diz
-            drawTooltip(mouseX, mouseY, Stream.of("§6U-Matter", "Amount: " + replicator.getTank().getFluidAmount() + " mB").collect(Collectors.toList()));
+            drawTooltip(mouseX, mouseY, Stream.of(I18n.format("youmatter.gui.umatter.title"), I18n.format("youmatter.gui.umatter.description", te.getClientFluidAmount())).collect(Collectors.toList()));
         }
 
         if(xAxis >= 127 && xAxis <= 142 && yAxis >= 59 && yAxis <= 79) {
+            drawTooltip(mouseX, mouseY, Stream.of(I18n.format("youmatter.gui.energy.title"), I18n.format("youmatter.gui.energy.description", te.getClientEnergy())).collect(Collectors.toList()));
+        }
 
-            //TODO localize diz
-            drawTooltip(mouseX, mouseY, Stream.of("§6Energy", "Stored: " + replicator.getClientEnergy() + " FE").collect(Collectors.toList()));
+        if(xAxis >= 148 && xAxis <= 167 && yAxis >= 7 && yAxis <= 27) {
+            drawTooltip(mouseX, mouseY, Stream.of(te.isActiveClient() ? I18n.format("youmatter.gui.active") : I18n.format("youmatter.gui.paused"), I18n.format("youmatter.gui.clicktochange")).collect(Collectors.toList()));
+        }
+
+        if(xAxis >= 148 && xAxis <= 167 && yAxis >= 31 && yAxis <= 51) {
+            drawTooltip(mouseX, mouseY, Stream.of(te.isCurrentClientMode() ? I18n.format("youmatter.gui.performInfiniteRuns") : I18n.format("youmatter.gui.performSingleRun"), I18n.format("youmatter.gui.clicktochange")).collect(Collectors.toList()));
+
         }
     }
 
-    public void drawTooltip(int x, int y, List<String> tooltips)
+    private void drawTooltip(int x, int y, List<String> tooltips)
     {
         drawHoveringText(tooltips, x, y, fontRenderer);
     }
 
-
     //both drawFluid and drawFluidTank is courtesy of DarkGuardsMan and was modified to suit my needs. Go check him out: https://github.com/BuiltBrokenModding/Atomic-Science | MIT License |  Copyright (c) 2018 Built Broken Modding License: https://opensource.org/licenses/MIT
-    protected void drawFluid(int x, int y, int line, int col, int width, int drawSize, FluidStack fluidStack)
+    private void drawFluid(int x, int y, int line, int col, int width, int drawSize, FluidStack fluidStack)
     {
         if (fluidStack != null && fluidStack.getFluid() != null)
         {
             drawSize -= 1;
-
             ResourceLocation fluidIcon = null;
             Fluid fluid = fluidStack.getFluid();
-
             if (fluid != null)
             {
                 if (fluid.getStill(fluidStack) != null)
@@ -133,82 +165,51 @@ public class GuiReplicator extends GuiContainer {
                     fluidIcon = FluidRegistry.WATER.getStill();
                 }
             }
-
             //Get sprite
             TextureAtlasSprite texture = FMLClientHandler.instance().getClient().getTextureMapBlocks().getAtlasSprite(fluidIcon.toString());
-
-            if (texture != null)
+            //bind texture
+            FMLClientHandler.instance().getClient().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+            final int textureSize = 16;
+            int start = 0;
+            int renderY;
+            while (drawSize != 0)
             {
-                //bind texture
-                FMLClientHandler.instance().getClient().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-
-                final int textureSize = 16;
-                int start = 0;
-                if (fluidIcon != null)
+                if (drawSize > textureSize)
                 {
-                    int renderY = textureSize;
-                    while (renderY != 0 && drawSize != 0)
-                    {
-                        if (drawSize > textureSize)
-                        {
-                            renderY = textureSize;
-                            drawSize -= textureSize;
-                        }
-                        else
-                        {
-                            renderY = drawSize;
-                            drawSize = 0;
-                        }
-
-                        this.drawTexturedModalRect(x + col, y + line + 58 - renderY - start, texture, width, textureSize - (textureSize - renderY));
-                        start = start + textureSize;
-                    }
+                    renderY = textureSize;
+                    drawSize -= textureSize;
                 }
+                else
+                {
+                    renderY = drawSize;
+                    drawSize = 0;
+                }
+
+                this.drawTexturedModalRect(x + col, y + line + 58 - renderY - start, texture, width, textureSize - (textureSize - renderY));
+                start = start + textureSize;
             }
         }
     }
 
 
-    private void drawFluidTank(int x, int y, IFluidTank tank)
-    {
-
-            //Get data
-            final float scale = tank.getFluidAmount() / (float) tank.getCapacity();
-            final FluidStack fluidStack = tank.getFluid();
-
-            //Reset color
-            GlStateManager.color(1, 1, 1, 1);
-
-
-            //Draw fluid
+    private void drawFluidTank(int x, int y, IFluidTank tank) {
+        //Get data
+        final float scale = tank.getFluidAmount() / (float) tank.getCapacity();
+        final FluidStack fluidStack = tank.getFluid();
+        //Reset color
+        GlStateManager.color(1, 1, 1, 1);
+        //Draw fluid
         int meterHeight = 55;
-        if (fluidStack != null)
-            {
+        if (fluidStack != null) {
                 this.drawFluid(this.guiLeft + x -1, this.guiTop + y, -3, 1, 14, (int) ((meterHeight - 1) * scale), fluidStack);
-            }
-
-            //Draw lines
-            this.mc.renderEngine.bindTexture(GUI);
+        }
+        //Draw lines
+        this.mc.renderEngine.bindTexture(GUI);
         int meterWidth = 14;
         this.drawTexturedModalRect(this.guiLeft + x, this.guiTop + y, 176, 35, meterWidth, meterHeight);
-
-            //Reset color
-            setColor(null);
-
+        //Reset color
+        GlStateManager.color(1, 1, 1, 1);
     }
-
-    private void setColor(Color color)
-    {
-        if (color == null)
-        {
-            GlStateManager.color(1, 1, 1, 1);
-        }
-        else
-        {
-            GlStateManager.color(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f);
-        }
-    }
-
 
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
@@ -226,6 +227,16 @@ public class GuiReplicator extends GuiContainer {
                 Minecraft.getMinecraft().getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 //Sending packet to server
                 PacketHandler.INSTANCE.sendToServer(new PacketShowNext() );
+            } else if(xAxis >= 148 && xAxis <= 167 && yAxis >= 7 && yAxis <= 27) {
+                //Playing Click sound
+                Minecraft.getMinecraft().getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                //Sending packet to server
+                PacketHandler.INSTANCE.sendToServer(new PacketChangeSettingsReplicatorServer(!te.isActiveClient(), te.isCurrentClientMode()) );
+            } else if(xAxis >= 148 && xAxis <= 167 && yAxis >= 31 && yAxis <= 51) {
+                //Playing Click sound
+                Minecraft.getMinecraft().getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                //Sending packet to server
+                PacketHandler.INSTANCE.sendToServer(new PacketChangeSettingsReplicatorServer(te.isActiveClient(), !te.isCurrentClientMode()) );
             }
         }
     }

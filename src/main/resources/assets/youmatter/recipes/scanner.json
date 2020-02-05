@@ -1,0 +1,23 @@
+{
+  "result": {
+    "item": "scanner"
+  },
+  "pattern": [
+    "cMc",
+    "MTM",
+    "TMT"
+  ],
+  "type": "forge:ore_shaped",
+  "key": {
+    "c": {
+      "item": "youmatter:compute_module"
+    },
+    "M": {
+      "item": "youmatter:machine_casing"
+    },
+    "T": {
+      "item": "youmatter:transistor"
+    }
+
+  }
+}

@@ -15,6 +15,8 @@ public class PacketUpdateReplicatorClient implements IMessage {
     private int energy;
     private int progress;
     private NBTTagCompound tank;
+    private boolean isActivated;
+    private boolean mode;
 
     @Override
     public void fromBytes(ByteBuf buf) {
@@ -22,6 +24,8 @@ public class PacketUpdateReplicatorClient implements IMessage {
         energy = buf.readInt();
         progress = buf.readInt();
         tank = ByteBufUtils.readTag(buf);
+        isActivated = buf.readBoolean();
+        mode = buf.readBoolean();
     }
 
     @Override
@@ -30,16 +34,20 @@ public class PacketUpdateReplicatorClient implements IMessage {
         buf.writeInt(energy);
         buf.writeInt(progress);
         ByteBufUtils.writeTag(buf, tank);
+        buf.writeBoolean(isActivated);
+        buf.writeBoolean(mode);
     }
 
     public PacketUpdateReplicatorClient() {
     }
 
-    public PacketUpdateReplicatorClient(int fluidAmount, int energy, int progress, NBTTagCompound tank) {
+    public PacketUpdateReplicatorClient(int fluidAmount, int energy, int progress, NBTTagCompound tank, boolean isActivated, boolean mode) {
         this.fluidAmount = fluidAmount;
         this.energy = energy;
         this.progress = progress;
         this.tank = tank;
+        this.isActivated = isActivated;
+        this.mode = mode;
     }
 
     public static class Handler implements IMessageHandler<PacketUpdateReplicatorClient, IMessage> {
@@ -54,7 +62,7 @@ public class PacketUpdateReplicatorClient implements IMessage {
             EntityPlayer player = Minecraft.getMinecraft().player;
 
             if (player.openContainer instanceof IReplicatorStateContainer) {
-                ((IReplicatorStateContainer) player.openContainer).sync(message.fluidAmount, message.energy, message.progress, message.tank);
+                ((IReplicatorStateContainer) player.openContainer).sync(message.fluidAmount, message.energy, message.progress, message.tank, message.isActivated, message.mode);
             }
         }
 

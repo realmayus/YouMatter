@@ -6,24 +6,19 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
+import realmayus.youmatter.items.ThumbdriveItem;
 import realmayus.youmatter.network.PacketHandler;
 import realmayus.youmatter.network.PacketUpdateEncoderClient;
 
 public class ContainerEncoder extends Container implements IEncoderStateContainer {
     public TileEncoder te;
 
-    /**
-     * 0 = Ignore Redstone
-     * 1 = Active on Redstone
-     * 2 = Not active on Redstone
-     */
-    public int redstoneBehaviour = 0;
-    public boolean isEnabled = true;
 
-    public ContainerEncoder(IInventory playerInventory, TileEncoder te) {
+    ContainerEncoder(IInventory playerInventory, TileEncoder te) {
         this.te = te;
         addPlayerSlots(playerInventory);
         addCustomSlots();
@@ -66,6 +61,38 @@ public class ContainerEncoder extends Container implements IEncoderStateContaine
 
         addSlotToContainer(new SlotItemHandler(itemHandler, 1, 90, 39));
     }
+
+    /**
+     * This is actually needed in order to achieve shift click functionality in the Controller GUI. If this method isn't overridden, the game crashes.
+     */
+    @Override
+    public ItemStack transferStackInSlot(EntityPlayer playerIn, int index) {
+        ItemStack itemstack = ItemStack.EMPTY;
+        Slot slot = this.inventorySlots.get(index);
+
+        if (slot != null && slot.getHasStack() && slot.getStack().getItem() instanceof ThumbdriveItem) {
+            ItemStack itemstack1 = slot.getStack();
+            itemstack = itemstack1.copy();
+
+            if (index == 36) { //originating slot is custom slot
+                if (!this.mergeItemStack(itemstack1, 0, 36, true)) {
+                    return ItemStack.EMPTY; // Inventory is full, can't transfer item!
+                }
+            } else if (!this.mergeItemStack(itemstack1, 36, 37, false)) { //move from inv to custom slot
+                return ItemStack.EMPTY; // custom slot is full, can't transfer item!
+            }
+
+            if (itemstack1.isEmpty()) {
+                slot.putStack(ItemStack.EMPTY);
+            } else {
+                slot.onSlotChanged();
+            }
+        }
+
+        return itemstack;
+    }
+
+
 
     @Override
     public void sync(int energy, int progress) {

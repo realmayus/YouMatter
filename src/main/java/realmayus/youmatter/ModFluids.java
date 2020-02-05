@@ -27,5 +27,5 @@ public class ModFluids {
             .setGaseous(false)
             .setLuminosity(9)
             .setViscosity(1000)
-            .setTemperature(300);
+            .setTemperature(10);
 }

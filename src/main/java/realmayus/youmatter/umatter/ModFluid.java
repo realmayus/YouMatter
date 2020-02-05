@@ -98,4 +98,5 @@ public class ModFluid extends Fluid {
             return false;
         return block.getDefaultState().getMaterial() == getMaterial();
     }
+
 }

@@ -5,6 +5,8 @@ import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.block.statemap.StateMap;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
@@ -19,7 +21,7 @@ import realmayus.youmatter.creator.BlockCreator;
 import realmayus.youmatter.creator.TileCreator;
 import realmayus.youmatter.encoder.BlockEncoder;
 import realmayus.youmatter.encoder.TileEncoder;
-import realmayus.youmatter.items.ThumbdriveItem;
+import realmayus.youmatter.items.*;
 import realmayus.youmatter.replicator.BlockReplicator;
 import realmayus.youmatter.replicator.TileReplicator;
 import realmayus.youmatter.scanner.BlockScanner;
@@ -50,6 +52,7 @@ public class RegistryHandler {
         GameRegistry.registerTileEntity(TileEncoder.class, new ResourceLocation("youmatter", "te_encoder"));
     }
 
+
     @SubscribeEvent
     public static void addItems(RegistryEvent.Register<Item> event) {
         event.getRegistry().register(ModItems.UMATTER_BLOCK.setRegistryName(YouMatter.MODID,"umatter_block"));
@@ -60,8 +63,17 @@ public class RegistryHandler {
         event.getRegistry().register(new ItemBlock(ModBlocks.ENCODER).setRegistryName(YouMatter.MODID, "encoder"));
         event.getRegistry().register(new ItemBlock(ModBlocks.CREATOR).setRegistryName(YouMatter.MODID, "creator"));
         event.getRegistry().register(new ThumbdriveItem().setRegistryName(YouMatter.MODID, "thumb_drive").setCreativeTab(YouMatter.creativeTab));
+        event.getRegistry().register(new ComputeModuleItem().setRegistryName(YouMatter.MODID, "compute_module").setCreativeTab(YouMatter.creativeTab));
+        event.getRegistry().register(new TransistorItem().setRegistryName(YouMatter.MODID, "transistor").setCreativeTab(YouMatter.creativeTab));
+        event.getRegistry().register(new TransistorRawItem().setRegistryName(YouMatter.MODID, "transistor_raw").setCreativeTab(YouMatter.creativeTab));
+        event.getRegistry().register(new MachineCasingItem().setRegistryName(YouMatter.MODID, "machine_casing").setCreativeTab(YouMatter.creativeTab));
+        event.getRegistry().register(new BlackHoleItem().setRegistryName(YouMatter.MODID, "black_hole").setCreativeTab(YouMatter.creativeTab));
     }
 
+    @SubscribeEvent
+    public static void addRecipes(RegistryEvent.Register<IRecipe> event) {
+        GameRegistry.addSmelting(ModItems.TRANSISTOR_RAW, new ItemStack(ModItems.TRANSISTOR, 1), 1.5f);
+    }
     /**
      * Will be called by Forge automatically when it's time.
      * Stolen from Cadiboo https://gist.github.com/Cadiboo/3f5cdb785affc069af2fa5fdf2d70358

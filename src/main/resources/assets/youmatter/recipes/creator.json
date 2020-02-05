@@ -1,0 +1,28 @@
+{
+  "result": {
+    "item": "creator"
+  },
+  "pattern": [
+    "MOc",
+    "OBO",
+    "bOb"
+  ],
+  "type": "forge:ore_shaped",
+  "key": {
+    "M": {
+      "item": "youmatter:machine_casing"
+    },
+    "O": {
+      "item": "minecraft:obsidian"
+    },
+    "c": {
+      "item": "youmatter:compute_module"
+    },
+    "B": {
+      "item": "youmatter:black_hole"
+    },
+    "b": {
+      "item": "minecraft:bucket"
+    }
+  }
+}

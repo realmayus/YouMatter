@@ -11,6 +11,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
@@ -20,12 +21,13 @@ import realmayus.youmatter.util.IGuiTile;
 import realmayus.youmatter.util.MyEnergyStorage;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TileEncoder extends TileEntity implements IGuiTile, ITickable {
 
 
-    boolean processOngoing = false;
-    ItemStack processIS = ItemStack.EMPTY;
+    private List<ItemStack> queue = new ArrayList<>();
 
     @Override
     public Container createContainer(EntityPlayer player) {
@@ -92,9 +94,8 @@ public class TileEncoder extends TileEntity implements IGuiTile, ITickable {
 
     // Calling this method signals incoming data from a neighboring scanner
     public void ignite(ItemStack itemStack) {
-        processOngoing = true;
         if(itemStack != ItemStack.EMPTY && itemStack != null) {
-            processIS = itemStack;
+            queue.add(itemStack);
         }
     }
 
@@ -125,19 +126,19 @@ public class TileEncoder extends TileEntity implements IGuiTile, ITickable {
         this.progress = progress;
     }
 
-    public int getClientProgress() {
+    int getClientProgress() {
         return clientProgress;
     }
 
-    public void setClientProgress(int clientProgress) {
+    void setClientProgress(int clientProgress) {
         this.clientProgress = clientProgress;
     }
 
-    public int getClientEnergy() {
+    int getClientEnergy() {
         return clientEnergy;
     }
 
-    public void setClientEnergy(int clientEnergy) {
+    void setClientEnergy(int clientEnergy) {
         this.clientEnergy = clientEnergy;
     }
 
@@ -160,41 +161,53 @@ public class TileEncoder extends TileEntity implements IGuiTile, ITickable {
         return compound;
     }
 
-    private int currentPartTick = 0;
     @Override
     public void update() {
-        if(processOngoing){
-            if(processIS != ItemStack.EMPTY) {
-                if(this.inputHandler.getStackInSlot(1).getItem() instanceof ThumbdriveItem) {
-                    if (progress < 100) {
-                        if(getEnergy() >= 2048) {
-                            progress = progress + 1;
-                        }
-                    } else {
-                        NBTTagCompound nbt = this.inputHandler.getStackInSlot(1).getTagCompound();
-                        if (nbt != null) {
-                            if(nbt.hasKey("stored_items")) {
-                                NBTTagList list = nbt.getTagList("stored_items", 9);
-                                if(list.tagCount() < 8) {
-                                    list.appendTag(new NBTTagString(processIS.getItem().getCreatorModId(processIS) + ":" + processIS.getItem().getRegistryName()));
+        // only run on server
+        if (!world.isRemote) {
+            if(queue.size() > 0){
+                ItemStack processIS = queue.get(queue.size() - 1);
+                if(processIS != ItemStack.EMPTY) {
+                    if(this.inputHandler.getStackInSlot(1).getItem() instanceof ThumbdriveItem) {
+                        if (progress < 100) {
+                            if(getEnergy() >= 2048) {
+                                NBTTagCompound nbt = this.inputHandler.getStackInSlot(1).getTagCompound();
+                                if (nbt != null) {
+                                    if (nbt.hasKey("stored_items")) {
+                                        NBTTagList list = nbt.getTagList("stored_items", Constants.NBT.TAG_STRING);
+                                        if (list.tagCount() < 8) {
+                                            progress = progress + 1;
+                                        }
+                                    }
+                                } else {
+                                    progress = progress + 1; //doesn't have data stored yet
+                                }
+                            }
+                        } else {
+                            NBTTagCompound nbt = this.inputHandler.getStackInSlot(1).getTagCompound();
+                            if (nbt != null) {
+                                if(nbt.hasKey("stored_items")) {
+                                    NBTTagList list = nbt.getTagList("stored_items", Constants.NBT.TAG_STRING);
+                                    if(list.tagCount() < 8) {
+                                        list.appendTag(new NBTTagString(processIS.getItem().getRegistryName() + ""));
+                                        nbt.setTag("stored_items", list);
+                                    }
+                                } else {
+                                    NBTTagList list = new NBTTagList();
+                                    list.appendTag(new NBTTagString(processIS.getItem().getRegistryName() + ""));
                                     nbt.setTag("stored_items", list);
                                 }
                             } else {
+                                nbt = new NBTTagCompound();
                                 NBTTagList list = new NBTTagList();
-                                list.appendTag(new NBTTagString(processIS.getItem().getCreatorModId(processIS) + ":" + processIS.getItem().getRegistryName()));
+                                list.appendTag(new NBTTagString(processIS.getItem().getRegistryName() + ""));
                                 nbt.setTag("stored_items", list);
+                                this.inputHandler.getStackInSlot(1).setTagCompound(nbt);
                             }
-                        } else {
-                            nbt = new NBTTagCompound();
-                            NBTTagList list = new NBTTagList();
-                            list.appendTag(new NBTTagString(processIS.getItem().getRegistryName() + ""));
-                            nbt.setTag("stored_items", list);
-                            this.inputHandler.getStackInSlot(1).setTagCompound(nbt);
 
+                            queue.remove(processIS);
+                            progress = 0;
                         }
-
-                        processOngoing = false;
-                        progress = 0;
                     }
                 }
             }
@@ -202,9 +215,3 @@ public class TileEncoder extends TileEntity implements IGuiTile, ITickable {
     }
 }
 
-
-//TODO
-//ShiftClick fixen ins inventar
-//texte lokalisieren
-//buttons im replicator
-//tooltip vom thumb drive fixen

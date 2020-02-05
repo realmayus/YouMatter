@@ -6,24 +6,18 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import realmayus.youmatter.encoder.TileEncoder;
+import realmayus.youmatter.items.ThumbdriveItem;
 import realmayus.youmatter.network.PacketHandler;
 import realmayus.youmatter.network.PacketUpdateEncoderClient;
 import realmayus.youmatter.network.PacketUpdateScannerClient;
 
 public class ContainerScanner extends Container implements IScannerStateContainer{
     public TileScanner te;
-
-    /**
-     * 0 = Ignore Redstone
-     * 1 = Active on Redstone
-     * 2 = Not active on Redstone
-     */
-    public int redstoneBehaviour = 0;
-    public boolean isEnabled = true;
 
     public ContainerScanner(IInventory playerInventory, TileScanner te) {
         this.te = te;
@@ -67,6 +61,36 @@ public class ContainerScanner extends Container implements IScannerStateContaine
         IItemHandler itemHandler = this.te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
 
         addSlotToContainer(new SlotItemHandler(itemHandler, 1, 80, 38));
+    }
+
+    /**
+     * This is actually needed in order to achieve shift click functionality in the Controller GUI. If this method isn't overridden, the game crashes.
+     */
+    @Override
+    public ItemStack transferStackInSlot(EntityPlayer playerIn, int index) {
+        ItemStack itemstack = ItemStack.EMPTY;
+        Slot slot = this.inventorySlots.get(index);
+
+        if (slot != null && slot.getHasStack()) {
+            ItemStack itemstack1 = slot.getStack();
+            itemstack = itemstack1.copy();
+
+            if (index == 36) {
+                if (!this.mergeItemStack(itemstack1, 0, 36, true)) {
+                    return ItemStack.EMPTY;
+                }
+            } else if (!this.mergeItemStack(itemstack1, 36, 37, false)) {
+                return ItemStack.EMPTY;
+            }
+
+            if (itemstack1.isEmpty()) {
+                slot.putStack(ItemStack.EMPTY);
+            } else {
+                slot.onSlotChanged();
+            }
+        }
+
+        return itemstack;
     }
 
     @Override

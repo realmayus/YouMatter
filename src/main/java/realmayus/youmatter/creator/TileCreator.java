@@ -3,11 +3,9 @@ package realmayus.youmatter.creator;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagByteArray;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -17,19 +15,18 @@ import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.UniversalBucket;
-import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
 import realmayus.youmatter.ModFluids;
-import realmayus.youmatter.network.PacketHandler;
-import realmayus.youmatter.network.PacketUpdateCreatorClient;
-import realmayus.youmatter.umatter.ModFluid;
 import realmayus.youmatter.util.IGuiTile;
 import realmayus.youmatter.util.MyEnergyStorage;
 
 import javax.annotation.Nonnull;
-import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 
 public class TileCreator extends TileEntity implements IGuiTile, ITickable{
 
@@ -43,8 +40,29 @@ public class TileCreator extends TileEntity implements IGuiTile, ITickable{
         return new GuiCreator(this, new ContainerCreator(player.inventory, this));
     }
 
-    public static final int MAX_UMATTER = 10000;
-    public static final int MAX_STABILIZER = 20000;
+    private static final int MAX_UMATTER = 10000;
+    private static final int MAX_STABILIZER = 10000;
+
+    private boolean isActivatedClient = true;
+    private boolean isActivated = true;
+
+    boolean isActivatedClient() {
+        return isActivatedClient;
+    }
+
+    void setActivatedClient(boolean activatedClient) {
+        isActivatedClient = activatedClient;
+    }
+
+    boolean isActivated() {
+        return isActivated;
+    }
+
+    public void setActivated(boolean activated) {
+        isActivated = activated;
+    }
+
+
 
     private FluidTank uTank = new FluidTank(MAX_UMATTER + 1000) {
         @Override
@@ -64,19 +82,69 @@ public class TileCreator extends TileEntity implements IGuiTile, ITickable{
         }
     };
 
-    public FluidTank getUTank() {
+    FluidTank getUTank() {
         return uTank;
 
     }
 
-    public FluidTank getSTank() {
+    FluidTank getSTank() {
         return sTank;
     }
+
+    private IFluidHandler fluidHandler = new IFluidHandler() {
+        @Override
+        public IFluidTankProperties[] getTankProperties() {
+            return new IFluidTankProperties[0];
+        }
+
+        @Override
+        public int fill(FluidStack resource, boolean doFill) {
+            if (resource.getFluid().equals(ModFluids.STABILIZER)) {
+                if (MAX_STABILIZER + 1000 - getSTank().getFluidAmount() < resource.amount) {
+                    sTank.fill(new FluidStack(resource.getFluid(), MAX_STABILIZER + 1000), doFill);
+                    return MAX_STABILIZER + 1000;
+                } else {
+
+                    sTank.fill(resource, doFill);
+                    return resource.amount;
+                }
+            }
+            return 0;
+        }
+
+        @Nullable
+        @Override
+        public FluidStack drain(FluidStack resource, boolean doDrain) {
+            if (resource.getFluid().equals(ModFluids.UMATTER)) {
+                if (uTank.getFluidAmount() < resource.amount) {
+                    uTank.drain(uTank.getFluid(), doDrain);
+                    return uTank.getFluid();
+                } else {
+                    uTank.drain(resource, doDrain);
+                    return resource;
+                }
+            }
+            return null;
+        }
+
+        @Nullable
+        @Override
+        public FluidStack drain(int maxDrain, boolean doDrain) {
+            if (uTank.getFluidAmount() < maxDrain) {
+                uTank.drain(uTank.getFluid(), doDrain);
+                return uTank.getFluid();
+            } else {
+                uTank.drain(maxDrain, doDrain);
+                return new FluidStack(uTank.getFluid().getFluid(), maxDrain);
+            }
+        }
+
+    };
 
     /**
      * If we are too far away from this tile entity you cannot use it
      */
-    public boolean canInteractWith(EntityPlayer playerIn) {
+    boolean canInteractWith(EntityPlayer playerIn) {
         return !isInvalid() && playerIn.getDistanceSq(pos.add(0.5D, 0.5D, 0.5D)) <= 64D;
     }
 
@@ -87,6 +155,10 @@ public class TileCreator extends TileEntity implements IGuiTile, ITickable{
         }
 
         if(capability == CapabilityEnergy.ENERGY) {
+            return true;
+        }
+
+        if(capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
             return true;
         }
         return super.hasCapability(capability, facing);
@@ -105,6 +177,10 @@ public class TileCreator extends TileEntity implements IGuiTile, ITickable{
 
         }
 
+        if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
+            return CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY.cast(fluidHandler);
+        }
+
         return super.getCapability(capability, facing);
     }
 
@@ -112,7 +188,7 @@ public class TileCreator extends TileEntity implements IGuiTile, ITickable{
     /**
      * Handler for the Input Slots
      */
-    public ItemStackHandler inputHandler = new ItemStackHandler(5) {
+    private ItemStackHandler inputHandler = new ItemStackHandler(5) {
 
         @Override
         public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
@@ -124,6 +200,7 @@ public class TileCreator extends TileEntity implements IGuiTile, ITickable{
             TileCreator.this.markDirty();
         }
     };
+
 
 
 
@@ -143,27 +220,27 @@ public class TileCreator extends TileEntity implements IGuiTile, ITickable{
         return clientProgress;
     }
 
-    public void setClientProgress(int clientProgress) {
+    void setClientProgress(int clientProgress) {
         this.clientProgress = clientProgress;
     }
 
 
 
-    public void setClientUFluidAmount(int clientUFluidAmount) {
+    void setClientUFluidAmount(int clientUFluidAmount) {
         this.clientUFluidAmount = clientUFluidAmount;
     }
-    public void setClientSFluidAmount(int clientSFluidAmount) {
+    void setClientSFluidAmount(int clientSFluidAmount) {
         this.clientSFluidAmount = clientSFluidAmount;
     }
 
     private int clientUFluidAmount = -1;
     private int clientSFluidAmount = -1;
 
-    public int getClientEnergy() {
+    int getClientEnergy() {
         return clientEnergy;
     }
 
-    public void setClientEnergy(int clientEnergy) {
+    void setClientEnergy(int clientEnergy) {
         this.clientEnergy = clientEnergy;
     }
 
@@ -192,6 +269,7 @@ public class TileCreator extends TileEntity implements IGuiTile, ITickable{
         uTank.readFromNBT(tagUTank);
         sTank.readFromNBT(tagSTank);
         myEnergyStorage.setEnergy(compound.getInteger("energy"));
+        isActivated = compound.getBoolean("isActivated");
     }
 
 
@@ -205,16 +283,17 @@ public class TileCreator extends TileEntity implements IGuiTile, ITickable{
         compound.setTag("uTank", tagUTank);
         compound.setTag("sTank", tagSTank);
         compound.setInteger("energy", getEnergy());
+        compound.setBoolean("isActivated", isActivated);
         return compound;
     }
 
-    public void setClientUTank(NBTTagCompound tank) {
+    void setClientUTank(NBTTagCompound tank) {
         FluidTank newTank = new FluidTank(10000).readFromNBT(tank);
         getUTank().setFluid(newTank.getFluid());
         getUTank().setCapacity(newTank.getCapacity());
     }
 
-    public void setClientSTank(NBTTagCompound tank) {
+    void setClientSTank(NBTTagCompound tank) {
         FluidTank newTank = new FluidTank(10000).readFromNBT(tank);
         getSTank().setFluid(newTank.getFluid());
         getSTank().setCapacity(newTank.getCapacity());
@@ -225,10 +304,12 @@ public class TileCreator extends TileEntity implements IGuiTile, ITickable{
     public void update() {
         if (currentPartTick == 40) { // every 2 sec
             if (!world.isRemote) {
-                if (getEnergy() >= 0.3f * 1000000 && sTank.getFluidAmount() >= 125) { // if energy more than 10 % of max energy
-                    sTank.drain(125, true);
-                    uTank.fill(new FluidStack(ModFluids.UMATTER, Math.round((float) 0.000005 * (getEnergy()/3f))), true);
-                    myEnergyStorage.consumePower(Math.round(getEnergy()/3f));
+                if(isActivated()) {
+                    if (getEnergy() >= 0.3f * 1000000 && sTank.getFluidAmount() >= 125) { // if energy more than 10 % of max energy
+                        sTank.drain(125, true);
+                        uTank.fill(new FluidStack(ModFluids.UMATTER, Math.round((float) 0.000005 * (getEnergy()/3f))), true);
+                        myEnergyStorage.consumePower(Math.round(getEnergy()/3f));
+                    }
                 }
             }
             currentPartTick = 0;

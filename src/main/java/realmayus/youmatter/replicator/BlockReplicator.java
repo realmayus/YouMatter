@@ -21,7 +21,7 @@ public class BlockReplicator extends Block {
 
 
     //Creation of a so called "BlockState" for saving the direction the block is placed in
-    public static final PropertyDirection FACING_HORIZ = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
+    private static final PropertyDirection FACING_HORIZ = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
 
 
     public BlockReplicator() {

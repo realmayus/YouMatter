@@ -178,27 +178,32 @@ public class TileScanner extends TileEntity implements IGuiTile, ITickable{
     private int currentPartTick = 0;
     @Override
     public void update() {
-        if(getEnergy() > 2048) {
-            if(currentPartTick >= 20) {
-                if (getNeighborEncoder(this.pos) != null) {
-                    hasEncoder = true;
-                    BlockPos encoderPos = getNeighborEncoder(this.pos);
-                    if (getProgress() < 100) {
-                        setProgress(getProgress() + 1);
-                    } else {
-                        if (encoderPos != null) {
+
+        if(currentPartTick >= 2) {
+            if (getNeighborEncoder(this.pos) != null) {
+                hasEncoder = true;
+                BlockPos encoderPos = getNeighborEncoder(this.pos);
+                if(!inputHandler.getStackInSlot(1).equals(ItemStack.EMPTY)) {
+                    if(getEnergy() > 2048) {
+                        if (getProgress() < 100) {
+                            setProgress(getProgress() + 1);
+                            myEnergyStorage.consumePower(2048);
+                        } else if (encoderPos != null) {
+                            // Notifying the neighboring encoder of this scanner having finished its operation
                             ((TileEncoder)world.getTileEntity(encoderPos)).ignite(this.inputHandler.getStackInSlot(1)); //don't worry, this is already checked by getNeighborEncoder() c:
+                            inputHandler.setStackInSlot(1, ItemStack.EMPTY);
+                            setProgress(0);
                         }
-                        setProgress(0);
                     }
                 } else {
-                    hasEncoder = false;
+                    setProgress(0); // if item was suddenly removed, reset progress to 0
                 }
-                currentPartTick = 0;
             } else {
-                currentPartTick++;
-                myEnergyStorage.consumePower(2048);
+                hasEncoder = false;
             }
+            currentPartTick = 0;
+        } else {
+            currentPartTick++;
         }
     }
 

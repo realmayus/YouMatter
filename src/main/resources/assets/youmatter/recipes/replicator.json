@@ -1,0 +1,29 @@
+{
+  "result": {
+    "item": "replicator"
+  },
+  "pattern": [
+    "cMc",
+    "ene",
+    "MbM"
+  ],
+  "type": "forge:ore_shaped",
+  "key": {
+    "c": {
+      "item": "youmatter:compute_module"
+    },
+    "M": {
+      "item": "youmatter:machine_casing"
+    },
+    "n": {
+      "item": "minecraft:nether_star"
+    },
+    "b": {
+      "item": "minecraft:bucket"
+    },
+    "e": {
+      "item": "minecraft:ender_pearl"
+    }
+
+  }
+}

@@ -2,15 +2,18 @@ package realmayus.youmatter.creator;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Items;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.fluids.UniversalBucket;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
-
+import realmayus.youmatter.ModFluids;
 import realmayus.youmatter.network.PacketHandler;
 import realmayus.youmatter.network.PacketUpdateCreatorClient;
 
@@ -18,13 +21,6 @@ import realmayus.youmatter.network.PacketUpdateCreatorClient;
 public class ContainerCreator extends Container implements ICreatorStateContainer {
     public TileCreator te;
 
-    /**
-     * 0 = Ignore Redstone
-     * 1 = Active on Redstone
-     * 2 = Not active on Redstone
-     */
-    public int redstoneBehaviour = 0;
-    public boolean isEnabled = true;
 
     public ContainerCreator(IInventory playerInventory, TileCreator te) {
         this.te = te;
@@ -37,7 +33,7 @@ public class ContainerCreator extends Container implements ICreatorStateContaine
         super.detectAndSendChanges();
         for(IContainerListener p : listeners) {
             if(p instanceof EntityPlayerMP) {
-                PacketHandler.INSTANCE.sendTo(new PacketUpdateCreatorClient(te.getUTank().getFluidAmount(), te.getSTank().getFluidAmount(), te.getEnergy(), 10, te.getUTank().writeToNBT(new NBTTagCompound()), te.getSTank().writeToNBT(new NBTTagCompound())), (EntityPlayerMP)p);
+                PacketHandler.INSTANCE.sendTo(new PacketUpdateCreatorClient(te.getUTank().getFluidAmount(), te.getSTank().getFluidAmount(), te.getEnergy(), 10, te.getUTank().writeToNBT(new NBTTagCompound()), te.getSTank().writeToNBT(new NBTTagCompound()), te.isActivated()), (EntityPlayerMP)p);
             }
         }
     }
@@ -80,14 +76,58 @@ public class ContainerCreator extends Container implements ICreatorStateContaine
         addSlotToContainer(new SlotItemHandler(itemHandler, 4, 110, 63));
     }
 
+    /**
+     * This is actually needed in order to achieve shift click functionality in the Controller GUI. If this method isn't overridden, the game crashes.
+     */
     @Override
-    public void sync(int uFluidAmount, int sFluidAmount, int energy, int progress, NBTTagCompound uTank, NBTTagCompound sTank) {
+    public ItemStack transferStackInSlot(EntityPlayer playerIn, int index) {
+        ItemStack itemstack = ItemStack.EMPTY;
+        Slot slot = this.inventorySlots.get(index);
+
+        if (slot != null && slot.getHasStack()) {
+            ItemStack itemstack1 = slot.getStack();
+            itemstack = itemstack1.copy();
+
+            if (index >= 37 && index <= 39) { //originating slot is custom slot
+                if (!this.mergeItemStack(itemstack1, 0, 36, true)) {
+                    return ItemStack.EMPTY; // Inventory is full, can't transfer item!
+                }
+            } else {
+                if(itemstack1.getItem() instanceof UniversalBucket) {
+                    UniversalBucket bucket = (UniversalBucket) itemstack1.getItem();
+                    if(bucket.getFluid(itemstack1) != null) {
+                        if (bucket.getFluid(itemstack1).getFluid().equals(ModFluids.STABILIZER)) {
+                            if(!this.mergeItemStack(itemstack1, 36, 37, false)) {
+                                return ItemStack.EMPTY; // custom slot is full, can't transfer item!
+                            }
+                        }
+                    }
+                } else if(itemstack1.getItem().equals(Items.BUCKET)) {
+                    if(!this.mergeItemStack(itemstack1, 38, 39, false)) {
+                        return ItemStack.EMPTY; // custom slot is full, can't transfer item!
+                    }
+                }
+                return ItemStack.EMPTY;
+            }
+
+            if (itemstack1.isEmpty()) {
+                slot.putStack(ItemStack.EMPTY);
+            } else {
+                slot.onSlotChanged();
+            }
+        }
+        return itemstack;
+    }
+
+    @Override
+    public void sync(int uFluidAmount, int sFluidAmount, int energy, int progress, NBTTagCompound uTank, NBTTagCompound sTank, boolean isActivated) {
         te.setClientUFluidAmount(uFluidAmount);
         te.setClientSFluidAmount(sFluidAmount);
         te.setClientEnergy(energy);
         te.setClientProgress(progress);
         te.setClientUTank(uTank);
         te.setClientSTank(sTank);
+        te.setActivatedClient(isActivated);
     }
 
 

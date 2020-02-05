@@ -1,14 +1,14 @@
 [
 {
   "modid": "youmatter",
-  "name": "You Matter",
-  "description": "Remember that purple fluid from IC²? Well, here you have it.",
+  "name": "YouMatter",
+  "description": "Remember that purple fluid from IC²? Well, here you have it as a standalone mod without having to include this bulky relic from the past.",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "https://mayus.me",
   "updateUrl": "",
   "authorList": ["realmayus"],
-  "credits": "no u",
+  "credits": "",
   "logoFile": "",
   "screenshots": [],
   "dependencies": []

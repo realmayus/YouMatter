@@ -1,5 +1,6 @@
 package realmayus.youmatter.items;
 
+import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -13,6 +14,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.Constants;
 import realmayus.youmatter.YouMatter;
 
 import javax.annotation.Nullable;
@@ -28,36 +30,14 @@ public class ThumbdriveItem extends Item {
     }
 
     @Override
-    public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
-        ItemStack stack = player.getHeldItem(hand);
-        stack.setTagCompound(new NBTTagCompound());
-
-        NBTTagCompound nbt = stack.getTagCompound();
-        NBTTagList list = new NBTTagList();
-
-
-        list.appendTag(new NBTTagString("youmatter:replicator"));
-
-        list.appendTag(new NBTTagString("youmatter:thumb_drive"));
-
-
-        assert nbt != null;
-        nbt.setTag("stored_items", list); //todo rename
-
-        player.sendMessage(new TextComponentString("Loaded NBT Data."));
-
-        return super.onItemUseFirst(player, world, pos, side, hitX, hitY, hitZ, hand);
-    }
-
-    @Override
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
         if(stack.hasTagCompound()) {
             if(stack.getTagCompound() != null) {
                 if (stack.getTagCompound().hasKey("stored_items")) {
-                    tooltip.add("§5Data stored.");
-                    tooltip.add("(" + stack.getTagCompound().getTagList("stored_items", 9).tagCount() + "/8 KB used)"); //todo fix (always shows 0/8KB used)e
+                    tooltip.add(I18n.format("youmatter.tooltip.dataStored"));
+                    tooltip.add(I18n.format("youmatter.tooltip.remainingSpace", stack.getTagCompound().getTagList("stored_items", Constants.NBT.TAG_STRING).tagCount(), 8));
                 } else {
-                    tooltip.add("§cNo Data stored.");
+                    tooltip.add(I18n.format("youmatter.tooltip.noDataStored"));
                 }
             }
         }

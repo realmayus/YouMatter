@@ -17,6 +17,7 @@ public class PacketUpdateCreatorClient implements IMessage {
     private int progress;
     private NBTTagCompound uTank;
     private NBTTagCompound sTank;
+    private boolean isActivated;
 
     @Override
     public void fromBytes(ByteBuf buf) {
@@ -26,6 +27,7 @@ public class PacketUpdateCreatorClient implements IMessage {
         progress = buf.readInt();
         uTank = ByteBufUtils.readTag(buf);
         sTank = ByteBufUtils.readTag(buf);
+        isActivated = buf.readBoolean();
     }
 
     @Override
@@ -36,18 +38,20 @@ public class PacketUpdateCreatorClient implements IMessage {
         buf.writeInt(progress);
         ByteBufUtils.writeTag(buf, uTank);
         ByteBufUtils.writeTag(buf, sTank);
+        buf.writeBoolean(isActivated);
     }
 
     public PacketUpdateCreatorClient() {
     }
 
-    public PacketUpdateCreatorClient(int uFluidAmount, int sFluidAmount, int energy, int progress, NBTTagCompound uTank, NBTTagCompound sTank) {
+    public PacketUpdateCreatorClient(int uFluidAmount, int sFluidAmount, int energy, int progress, NBTTagCompound uTank, NBTTagCompound sTank, boolean isActivated) {
         this.uFluidAmount = uFluidAmount;
         this.sFluidAmount = sFluidAmount;
         this.energy = energy;
         this.progress = progress;
         this.uTank = uTank;
         this.sTank = sTank;
+        this.isActivated = isActivated;
     }
 
     public static class Handler implements IMessageHandler<PacketUpdateCreatorClient, IMessage> {
@@ -62,7 +66,7 @@ public class PacketUpdateCreatorClient implements IMessage {
             EntityPlayer player = Minecraft.getMinecraft().player;
 
             if (player.openContainer instanceof ICreatorStateContainer) {
-                ((ICreatorStateContainer) player.openContainer).sync(message.uFluidAmount, message.sFluidAmount, message.energy, message.progress, message.uTank, message.sTank);
+                ((ICreatorStateContainer) player.openContainer).sync(message.uFluidAmount, message.sFluidAmount, message.energy, message.progress, message.uTank, message.sTank, message.isActivated);
             }
         }
 

@@ -2,10 +2,13 @@ package realmayus.youmatter.encoder;
 
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.util.Constants;
 import realmayus.youmatter.YouMatter;
 import realmayus.youmatter.items.ThumbdriveItem;
-import realmayus.youmatter.scanner.ContainerScanner;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,7 +16,7 @@ import java.util.stream.Stream;
 
 public class GuiEncoder extends GuiContainer {
     private static final int WIDTH = 176;
-    private static final int HEIGHT = 165;
+    private static final int HEIGHT = 168;
 
     private TileEncoder te;
 
@@ -45,10 +48,16 @@ public class GuiEncoder extends GuiContainer {
 
         if (!(te.inputHandler.getStackInSlot(1).getItem() instanceof ThumbdriveItem)) {
             drawTexturedModalRect(16, 59, 176, 66, 16, 16);
+        } else {
+            NBTTagCompound nbt = te.inputHandler.getStackInSlot(1).getTagCompound();
+            if (nbt != null) {
+                NBTTagList list = nbt.getTagList("stored_items", Constants.NBT.TAG_STRING);
+                if (list.tagCount() >= 8) {
+                    drawTexturedModalRect(16, 59, 176, 66, 16, 16);
+                }
+            }
         }
-
-            //TODO Localize
-        this.fontRenderer.drawString("Encoder", 8, 6, 4210752);
+        this.fontRenderer.drawString(I18n.format("youmatter.guiname.encoder"), 8, 6, 4210752);
     }
 
     private void drawProgressDisplayChain(int progress) {
@@ -106,18 +115,25 @@ public class GuiEncoder extends GuiContainer {
         int yAxis = (mouseY - (height - ySize) / 2);
 
         if(xAxis >= 141 && xAxis <= 156 && yAxis >= 37 && yAxis <= 57) {
-
-            //TODO localize diz
-            drawTooltip(mouseX, mouseY, Stream.of("§6Energy", "Stored: " + te.getClientEnergy() + " FE").collect(Collectors.toList()));
+            drawTooltip(mouseX, mouseY, Stream.of(I18n.format("youmatter.gui.energy.title"), I18n.format("youmatter.gui.energy.description", te.getClientEnergy())).collect(Collectors.toList()));
         }
 
-        if (!(te.inputHandler.getStackInSlot(1).getItem() instanceof ThumbdriveItem)) {
-            if (xAxis >= 16 && xAxis <= 32 && yAxis >= 59 && yAxis <= 75) {
-                //TODO localize diz
-                drawTooltip(mouseX, mouseY, Stream.of("§cYou need to insert a thumbdrive first.").collect(Collectors.toList()));
+        if (xAxis >= 16 && xAxis <= 32 && yAxis >= 59 && yAxis <= 75) {
+            if (te.inputHandler.getStackInSlot(1).getItem() instanceof ThumbdriveItem) {
+                NBTTagCompound nbt = te.inputHandler.getStackInSlot(1).getTagCompound();
+                if (nbt != null) {
+                    NBTTagList list = nbt.getTagList("stored_items", Constants.NBT.TAG_STRING);
+                    if (list.tagCount() >= 8) {
+                        drawTooltip(mouseX, mouseY, Stream.of(I18n.format("youmatter.warning.encoder2")).collect(Collectors.toList()));
+                    }
+                }
+            } else {
+                drawTooltip(mouseX, mouseY, Stream.of(I18n.format("youmatter.warning.encoder1")).collect(Collectors.toList()));
 
             }
+
         }
+
     }
 
     private void drawTooltip(int x, int y, List<String> tooltips)

@@ -6,10 +6,14 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.fluids.UniversalBucket;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
+import realmayus.youmatter.ModFluids;
+import realmayus.youmatter.items.ThumbdriveItem;
 import realmayus.youmatter.network.PacketHandler;
 import realmayus.youmatter.network.PacketUpdateReplicatorClient;
 import realmayus.youmatter.util.DisplaySlot;
@@ -17,15 +21,7 @@ import realmayus.youmatter.util.DisplaySlot;
 public class ContainerReplicator extends Container implements IReplicatorStateContainer {
     public TileReplicator te;
 
-    /**
-     * 0 = Ignore Redstone
-     * 1 = Active on Redstone
-     * 2 = Not active on Redstone
-     */
-    public int redstoneBehaviour = 0;
-    public boolean isEnabled = true;
-
-    public ContainerReplicator(IInventory playerInventory, TileReplicator te) {
+    ContainerReplicator(IInventory playerInventory, TileReplicator te) {
         this.te = te;
         addPlayerSlots(playerInventory);
         addCustomSlots();
@@ -36,7 +32,7 @@ public class ContainerReplicator extends Container implements IReplicatorStateCo
         super.detectAndSendChanges();
         for(IContainerListener p : listeners) {
             if(p instanceof EntityPlayerMP) {
-                PacketHandler.INSTANCE.sendTo(new PacketUpdateReplicatorClient(te.getTank().getFluidAmount(), te.getEnergy(), 10, te.getTank().writeToNBT(new NBTTagCompound())), (EntityPlayerMP)p);
+                PacketHandler.INSTANCE.sendTo(new PacketUpdateReplicatorClient(te.getTank().getFluidAmount(), te.getEnergy(), te.getProgress(), te.getTank().writeToNBT(new NBTTagCompound()), te.isActive(), te.isCurrentMode()), (EntityPlayerMP)p);
             }
         }
     }
@@ -81,11 +77,53 @@ public class ContainerReplicator extends Container implements IReplicatorStateCo
     }
 
     @Override
-    public void sync(int fluidAmount, int energy, int progress, NBTTagCompound tank) {
+    public ItemStack transferStackInSlot(EntityPlayer playerIn, int index) {
+        ItemStack itemstack = ItemStack.EMPTY;
+        Slot slot = this.inventorySlots.get(index);
+
+        if (slot != null && slot.getHasStack()) {
+            ItemStack itemstack1 = slot.getStack();
+            itemstack = itemstack1.copy();
+
+            if (index >= 36 && index <= 40) { //originating slot is custom slot
+                if (!this.mergeItemStack(itemstack1, 0, 36, true)) {
+                    return ItemStack.EMPTY; // Inventory is full, can't transfer item!
+                }
+            } else {
+                if (itemstack1.getItem() instanceof ThumbdriveItem) {
+                    if(!this.mergeItemStack(itemstack1, 36, 37, false)) {
+                        return ItemStack.EMPTY; // custom slot is full, can't transfer item!
+                    }
+                } else if(itemstack1.getItem() instanceof UniversalBucket) {
+                    UniversalBucket bucket = (UniversalBucket) itemstack1.getItem();
+                    if(bucket.getFluid(itemstack1) != null) {
+                        if (bucket.getFluid(itemstack1).getFluid().equals(ModFluids.UMATTER)) {
+                            if(!this.mergeItemStack(itemstack1, 39, 40, false)) {
+                                return ItemStack.EMPTY; // custom slot is full, can't transfer item!
+                            }
+                        }
+                    }
+                }
+                return ItemStack.EMPTY;
+            }
+
+            if (itemstack1.isEmpty()) {
+                slot.putStack(ItemStack.EMPTY);
+            } else {
+                slot.onSlotChanged();
+            }
+        }
+        return itemstack;
+    }
+
+    @Override
+    public void sync(int fluidAmount, int energy, int progress, NBTTagCompound tank, boolean isActivated, boolean mode) {
         te.setClientFluidAmount(fluidAmount);
         te.setClientEnergy(energy);
         te.setClientProgress(progress);
         te.setClientTank(tank);
+        te.setCurrentClientMode(mode);
+        te.setActiveClient(isActivated);
     }
 
 }

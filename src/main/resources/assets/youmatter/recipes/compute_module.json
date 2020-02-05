@@ -1,0 +1,23 @@
+{
+  "result": {
+    "item": "compute_module"
+  },
+  "pattern": [
+    "wTw",
+    "TGT",
+    "wTw"
+  ],
+  "type": "forge:ore_shaped",
+  "key": {
+    "w": {
+      "type": "forge:ore_dict",
+      "ore": "slabWood"
+    },
+    "T": {
+      "item": "youmatter:transistor"
+    },
+    "G": {
+      "item": "minecraft:gold_ingot"
+    }
+  }
+}
