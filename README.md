@@ -1,4 +1,4 @@
-![](https://cf.way2muchnoise.eu/title/youmatter_Get_Today!.svg)
+![](https://cf.way2muchnoise.eu/title/361476_Get_Today!.svg)
 ![YouMatter](https://raw.githubusercontent.com/realmayus/YouMatter/master/banner.png)
 
 You know that fluid called "UU-Matter" from IndustrialCraft2, don't you? Well, here you have it as a standalone mod.
