@@ -50,6 +50,7 @@ IC² is outdated, has many bugs and often is just included in modpacks because o
   
   ### Compute Module
   ![s](https://i.imgur.com/1tM0aRY.png)
+    <br>
   **Note:** You can use any wooden slabs in this recipe.
   
 </details>
