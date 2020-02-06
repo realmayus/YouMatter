@@ -42,7 +42,7 @@ public class TileEncoder extends TileEntity implements IGuiTile, ITickable {
     /**
      * If we are too far away from this tile entity you cannot use it
      */
-    public boolean canInteractWith(EntityPlayer playerIn) {
+    boolean canInteractWith(EntityPlayer playerIn) {
         return !isInvalid() && playerIn.getDistanceSq(pos.add(0.5D, 0.5D, 0.5D)) <= 64D;
     }
 
@@ -78,7 +78,7 @@ public class TileEncoder extends TileEntity implements IGuiTile, ITickable {
     /**
      * Handler for the Input Slots
      */
-    public ItemStackHandler inputHandler = new ItemStackHandler(5) {
+    ItemStackHandler inputHandler = new ItemStackHandler(5) {
 
         @Override
         public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
@@ -189,18 +189,18 @@ public class TileEncoder extends TileEntity implements IGuiTile, ITickable {
                                 if(nbt.hasKey("stored_items")) {
                                     NBTTagList list = nbt.getTagList("stored_items", Constants.NBT.TAG_STRING);
                                     if(list.tagCount() < 8) {
-                                        list.appendTag(new NBTTagString(processIS.getItem().getRegistryName() + ""));
+                                        list.appendTag(new NBTTagString(processIS.getItem().getRegistryName() + "|" + processIS.getMetadata()));
                                         nbt.setTag("stored_items", list);
                                     }
                                 } else {
                                     NBTTagList list = new NBTTagList();
-                                    list.appendTag(new NBTTagString(processIS.getItem().getRegistryName() + ""));
+                                    list.appendTag(new NBTTagString(processIS.getItem().getRegistryName() + "|" + processIS.getMetadata()));
                                     nbt.setTag("stored_items", list);
                                 }
                             } else {
                                 nbt = new NBTTagCompound();
                                 NBTTagList list = new NBTTagList();
-                                list.appendTag(new NBTTagString(processIS.getItem().getRegistryName() + ""));
+                                list.appendTag(new NBTTagString(processIS.getItem().getRegistryName() + "|" + processIS.getMetadata()));
                                 nbt.setTag("stored_items", list);
                                 this.inputHandler.getStackInSlot(1).setTagCompound(nbt);
                             }

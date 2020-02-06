@@ -34,6 +34,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class TileReplicator extends TileEntity implements IGuiTile, ITickable{
 
@@ -248,7 +249,9 @@ public class TileReplicator extends TileEntity implements IGuiTile, ITickable{
                                 if (nbt != null) {
                                     if(nbt instanceof NBTTagString) {
                                         NBTTagString item = (NBTTagString) nbt;
-                                        ItemStack newitem = new ItemStack(Item.getByNameOrId(item.getString()));
+                                        String registry_name = item.getString().substring(0, item.getString().indexOf("|"));
+                                        int metadata = Integer.parseInt(item.getString().substring(item.getString().indexOf("|") + 1));
+                                        ItemStack newitem = new ItemStack(Objects.requireNonNull(Item.getByNameOrId(registry_name)), 1, metadata);
                                         cachedItems.add(newitem);
                                     }
                                 }
@@ -331,7 +334,7 @@ public class TileReplicator extends TileEntity implements IGuiTile, ITickable{
         }
     }
 
-    public int getClientFluidAmount() {
+    int getClientFluidAmount() {
         return clientFluidAmount;
     }
 
