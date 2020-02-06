@@ -1,3 +1,4 @@
+[![Download on CF](https://cf.way2muchnoise.eu/title/361476_Get_on%20CF.svg?badge_style=for_the_badge)](https://www.curseforge.com/minecraft/mc-mods/youmatter)[![forthebadge](https://forthebadge.com/images/badges/made-with-java.svg)](https://forthebadge.com) [![forthebadge](https://forthebadge.com/images/badges/mom-made-pizza-rolls.svg)](https://forthebadge.com)
 ![YouMatter](https://raw.githubusercontent.com/realmayus/YouMatter/master/banner.png)
 
 You know that fluid called "UU-Matter" from IndustrialCraft2, don't you? Well, here you have it as a standalone mod.
@@ -55,4 +56,4 @@ IC² is outdated, has many bugs and often is just included in modpacks because o
   
 </details>
 
-For more updates about the mod, feel free to [join my discord server.](http://discord.mayus.me)
+For more updates about the mod, feel free to [join my discord server.](https://discordapp.com/invite/53FQpTQ)
