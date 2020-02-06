@@ -21,10 +21,10 @@ public class YMConfig {
     @Config.Comment(value = "Overrides: Set your desired required U-Matter values for each item. Especially handy when used in conjunction with useAsBlacklist = false.")
     public static HashMap<String, Integer> overrides = new HashMap<String, Integer>() {{
         put("minecraft:diamond", 2500);
-        put("minecraft:gold_ingot", 100);
+        put("minecraft:nether_star", 5000);
     }};
 
-    @Config.Comment(value = "How much U-Matter should you need for one item to be duplicated (that is not overridden)")
+    @Config.Comment(value = "How much U-Matter (in mB) should you need for one item to be duplicated (that is not overridden)")
     public static int uMatterPerItem = 1000;
 
 
