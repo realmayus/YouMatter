@@ -21,4 +21,6 @@ public class DisplaySlot extends SlotItemHandler {
     public boolean canTakeStack(EntityPlayer playerIn) {
         return false;
     }
+
+
 }

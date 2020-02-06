@@ -27,6 +27,7 @@ import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
 import realmayus.youmatter.ModFluids;
 import realmayus.youmatter.YMConfig;
+import realmayus.youmatter.util.CustomInvWrapper;
 import realmayus.youmatter.util.IGuiTile;
 import realmayus.youmatter.util.MyEnergyStorage;
 
@@ -207,7 +208,7 @@ public class TileReplicator extends TileEntity implements IGuiTile, ITickable{
         }
     };
 
-    private CombinedInvWrapper combinedHandler = new CombinedInvWrapper(inputHandler, outputHandler);
+    private CustomInvWrapper combinedHandler = new CustomInvWrapper(inputHandler, outputHandler);
 
     private List<ItemStack> cachedItems;
 

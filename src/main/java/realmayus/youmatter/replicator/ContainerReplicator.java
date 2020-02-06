@@ -68,7 +68,7 @@ public class ContainerReplicator extends Container implements IReplicatorStateCo
         addSlotToContainer(new SlotItemHandler(itemHandler, 0, 150, 61));
         // Output slot
         addSlotToContainer(new SlotItemHandler(itemHandler, 1, 89, 61));
-        // Item to replicate slot
+        // Item Display slot
         addSlotToContainer(new DisplaySlot(itemHandler, 2, 89, 18));
         // bucket input slot
         addSlotToContainer(new SlotItemHandler(itemHandler, 3, 47, 19));
