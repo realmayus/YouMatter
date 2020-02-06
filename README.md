@@ -1,4 +1,4 @@
-![](https://cf.way2muchnoise.eu/title/361476_Get_Today!.svg) [![forthebadge](https://forthebadge.com/images/badges/made-with-java.svg)](https://forthebadge.com) [![forthebadge](https://forthebadge.com/images/badges/mom-made-pizza-rolls.svg)](https://forthebadge.com)
+![](https://cf.way2muchnoise.eu/title/361476_Download_now.svg?badge_style=for_the_badge) [![forthebadge](https://forthebadge.com/images/badges/made-with-java.svg)](https://forthebadge.com) [![forthebadge](https://forthebadge.com/images/badges/mom-made-pizza-rolls.svg)](https://forthebadge.com)
 ![YouMatter](https://raw.githubusercontent.com/realmayus/YouMatter/master/banner.png)
 
 You know that fluid called "UU-Matter" from IndustrialCraft2, don't you? Well, here you have it as a standalone mod.
