@@ -1,5 +1,5 @@
 [![Download on CF](https://cf.way2muchnoise.eu/title/361476_Get_on%20CF.svg?badge_style=for_the_badge)](https://www.curseforge.com/minecraft/mc-mods/youmatter)[![forthebadge](https://forthebadge.com/images/badges/made-with-java.svg)](https://forthebadge.com) [![forthebadge](https://forthebadge.com/images/badges/mom-made-pizza-rolls.svg)](https://forthebadge.com)
-![YouMatter](https://raw.githubusercontent.com/realmayus/YouMatter/master/banner.png)
+![YouMatter](https://i.imgur.com/nNAFIs0.png)
 
 You know that fluid called "UU-Matter" from IndustrialCraft2, don't you? Well, here you have it as a standalone mod.
 I added some quirks that make it slightly less overpowered, such as adding an extra requirement for producing U-Matter.
