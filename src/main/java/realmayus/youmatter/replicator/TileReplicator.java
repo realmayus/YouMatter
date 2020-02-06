@@ -237,9 +237,13 @@ public class TileReplicator extends TileEntity implements IGuiTile, ITickable{
                 }
                 ItemStack thumbdrive = inputHandler.getStackInSlot(0);
                 if (thumbdrive.equals(ItemStack.EMPTY)){
+                    if(progress > 0) {
+                        getTank().fill(new FluidStack(ModFluids.UMATTER, getUMatterAmountForItem(currentItem.getItem())), true); // give the user its umatter back!
+                    }
                     combinedHandler.setStackInSlot(2, ItemStack.EMPTY);
                     cachedItems = null;
                     currentIndex = 0;
+                    progress = 0;
                 } else {
                     if (thumbdrive.hasTagCompound()) {
                         if(thumbdrive.getTagCompound() != null) {
