@@ -285,6 +285,9 @@ public class TileReplicator extends TileEntity implements IGuiTile, ITickable{
                                         if (currentItem.isItemEqual(combinedHandler.getStackInSlot(2))) { // Check if selected item hasn't changed
                                             progress++;
                                         } else {
+                                            if (progress > 0) { // progress was over 0 (= already drained U-matter) and then aborted
+                                                getTank().fill(new FluidStack(ModFluids.UMATTER, getUMatterAmountForItem(currentItem.getItem())), true); // give the user its umatter back!
+                                            }
                                             progress = 0; // abort if not
                                         }
                                     }
