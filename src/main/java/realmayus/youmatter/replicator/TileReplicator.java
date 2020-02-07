@@ -237,7 +237,7 @@ public class TileReplicator extends TileEntity implements IGuiTile, ITickable{
                     }
                 }
                 ItemStack thumbdrive = inputHandler.getStackInSlot(0);
-                if (thumbdrive.equals(ItemStack.EMPTY)){
+                if (thumbdrive.isItemEqual(ItemStack.EMPTY)){
                     if(progress > 0) {
                         getTank().fill(new FluidStack(ModFluids.UMATTER, getUMatterAmountForItem(currentItem.getItem())), true); // give the user its umatter back!
                     }
@@ -264,8 +264,8 @@ public class TileReplicator extends TileEntity implements IGuiTile, ITickable{
                             }
                             renderItem(cachedItems, currentIndex);
                             if(progress == 0) {
-                                if (!combinedHandler.getStackInSlot(2).equals(ItemStack.EMPTY)) {
-                                    if(combinedHandler.getStackInSlot(1).equals(ItemStack.EMPTY)) {
+                                if (!combinedHandler.getStackInSlot(2).isItemEqual(ItemStack.EMPTY)) {
+                                    if(combinedHandler.getStackInSlot(1).isItemEqual(ItemStack.EMPTY)) {
                                         if (isActive) {
                                             currentItem = cachedItems.get(currentIndex);
                                             if(tank.getFluidAmount() >= getUMatterAmountForItem(currentItem.getItem())) {
@@ -279,7 +279,7 @@ public class TileReplicator extends TileEntity implements IGuiTile, ITickable{
                             } else {
                                 if(isActive) {
                                     if(progress >= 100) {
-                                        if(!combinedHandler.getStackInSlot(2).equals(ItemStack.EMPTY)) {
+                                        if(!combinedHandler.getStackInSlot(2).isItemEqual(ItemStack.EMPTY)) {
                                             if(!currentMode) { //if mode is single run, then pause machine
                                                 isActive = false;
                                             }

@@ -32,6 +32,3 @@ public class CustomInvWrapper extends CombinedInvWrapper {
         }
     }
 }
-
-
-//TODO compare ItemStacks using forge's methods

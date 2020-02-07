@@ -183,7 +183,7 @@ public class TileScanner extends TileEntity implements IGuiTile, ITickable{
             if (getNeighborEncoder(this.pos) != null) {
                 hasEncoder = true;
                 BlockPos encoderPos = getNeighborEncoder(this.pos);
-                if(!inputHandler.getStackInSlot(1).equals(ItemStack.EMPTY)) {
+                if(!inputHandler.getStackInSlot(1).isItemEqual(ItemStack.EMPTY)) {
                     if(getEnergy() > 2048) {
                         if (getProgress() < 100) {
                             setProgress(getProgress() + 1);
