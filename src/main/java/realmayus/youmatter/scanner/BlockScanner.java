@@ -13,7 +13,6 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import realmayus.youmatter.YouMatter;
-import realmayus.youmatter.util.IGuiTile;
 
 import javax.annotation.Nullable;
 
@@ -21,10 +20,8 @@ public class BlockScanner extends Block {
 
     private static final PropertyDirection FACING_HORIZ = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
 
-
     public BlockScanner() {
         super(Material.IRON);
-
         setTranslationKey(YouMatter.MODID + ".scanner");
         setHarvestLevel("pickaxe", 1);
         setDefaultState(getBlockState().getBaseState().withProperty(FACING_HORIZ, EnumFacing.NORTH));
@@ -52,18 +49,13 @@ public class BlockScanner extends Block {
             return true;
         }
         TileEntity te = world.getTileEntity(pos);
-        if (!(te instanceof IGuiTile)) { return false; }
-
         if(!player.isSneaking()) {
             player.openGui(YouMatter.instance, 0, world, pos.getX(), pos.getY(), pos.getZ());
         } else {
             return false;
         }
-
         return true;
     }
-
-
 
     /**
      * Returning the BlockState for the direction so the Block actually shows the texture correctly.

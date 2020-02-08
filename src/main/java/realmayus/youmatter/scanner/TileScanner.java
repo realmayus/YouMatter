@@ -17,14 +17,13 @@ import net.minecraftforge.items.wrapper.CombinedInvWrapper;
 import realmayus.youmatter.YMConfig;
 import realmayus.youmatter.encoder.BlockEncoder;
 import realmayus.youmatter.encoder.TileEncoder;
-import realmayus.youmatter.util.IGuiTile;
 import realmayus.youmatter.util.MyEnergyStorage;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class TileScanner extends TileEntity implements IGuiTile, ITickable{
+public class TileScanner extends TileEntity implements  ITickable{
 
     public TileScanner() {
     }
@@ -48,16 +47,6 @@ public class TileScanner extends TileEntity implements IGuiTile, ITickable{
     }
 
     public boolean hasEncoderClient = false;
-
-    @Override
-    public Container createContainer(EntityPlayer player) {
-        return new ContainerScanner(player.inventory, this);
-    }
-
-    @Override
-    public GuiContainer createGui(EntityPlayer player) {
-        return new GuiScanner(this, new ContainerScanner(player.inventory, this));
-    }
 
     /**
      * If we are too far away from this tile entity you cannot use it

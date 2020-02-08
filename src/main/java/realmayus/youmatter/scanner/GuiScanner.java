@@ -18,7 +18,7 @@ public class GuiScanner extends GuiContainer {
 
     private static final ResourceLocation GUI = new ResourceLocation(YouMatter.MODID, "textures/gui/scanner.png");
 
-    GuiScanner(TileScanner tileEntity, ContainerScanner container) {
+    public GuiScanner(TileScanner tileEntity, ContainerScanner container) {
         super(container);
 
         xSize = WIDTH;

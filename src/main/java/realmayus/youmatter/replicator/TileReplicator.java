@@ -26,11 +26,9 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
-import net.minecraftforge.items.wrapper.CombinedInvWrapper;
 import realmayus.youmatter.ModFluids;
 import realmayus.youmatter.YMConfig;
 import realmayus.youmatter.util.CustomInvWrapper;
-import realmayus.youmatter.util.IGuiTile;
 import realmayus.youmatter.util.MyEnergyStorage;
 
 import javax.annotation.Nonnull;
@@ -39,7 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class TileReplicator extends TileEntity implements IGuiTile, ITickable{
+public class TileReplicator extends TileEntity implements  ITickable{
     public TileReplicator() {
     }
 
@@ -96,18 +94,6 @@ public class TileReplicator extends TileEntity implements IGuiTile, ITickable{
 
     FluidTank getTank() {
         return tank;
-    }
-
-
-    @Override
-    public Container createContainer(EntityPlayer player) {
-        return new ContainerReplicator(player.inventory, this);
-    }
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public GuiContainer createGui(EntityPlayer player) {
-        return new GuiReplicator(this, new ContainerReplicator(player.inventory, this));
     }
 
     /**

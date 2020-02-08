@@ -1,7 +1,6 @@
 package realmayus.youmatter.creator;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.BlockStateContainer;
@@ -14,7 +13,6 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import realmayus.youmatter.YouMatter;
-import realmayus.youmatter.util.IGuiTile;
 
 import javax.annotation.Nullable;
 
@@ -53,7 +51,6 @@ public class BlockCreator extends Block {
             return true;
         }
         TileEntity te = world.getTileEntity(pos);
-        if (!(te instanceof IGuiTile)) { return false; }
 
         if(!player.isSneaking()) {
             player.openGui(YouMatter.instance, 0, world, pos.getX(), pos.getY(), pos.getZ());

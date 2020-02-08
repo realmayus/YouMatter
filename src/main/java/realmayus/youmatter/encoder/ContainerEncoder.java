@@ -18,7 +18,7 @@ public class ContainerEncoder extends Container implements IEncoderStateContaine
     public TileEncoder te;
 
 
-    ContainerEncoder(IInventory playerInventory, TileEncoder te) {
+    public ContainerEncoder(IInventory playerInventory, TileEncoder te) {
         this.te = te;
         addPlayerSlots(playerInventory);
         addCustomSlots();

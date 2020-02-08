@@ -17,28 +17,16 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
 import realmayus.youmatter.items.ThumbdriveItem;
-import realmayus.youmatter.util.IGuiTile;
 import realmayus.youmatter.util.MyEnergyStorage;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TileEncoder extends TileEntity implements IGuiTile, ITickable {
+public class TileEncoder extends TileEntity implements  ITickable {
     public TileEncoder() {
     }
-
     private List<ItemStack> queue = new ArrayList<>();
-
-    @Override
-    public Container createContainer(EntityPlayer player) {
-        return new ContainerEncoder(player.inventory, this);
-    }
-
-    @Override
-    public GuiContainer createGui(EntityPlayer player) {
-        return new GuiEncoder(this, new ContainerEncoder(player.inventory, this));
-    }
 
     /**
      * If we are too far away from this tile entity you cannot use it

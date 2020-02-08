@@ -22,25 +22,14 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
 import realmayus.youmatter.ModFluids;
-import realmayus.youmatter.util.IGuiTile;
 import realmayus.youmatter.util.MyEnergyStorage;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class TileCreator extends TileEntity implements IGuiTile, ITickable{
+public class TileCreator extends TileEntity implements  ITickable{
 
     public TileCreator() {
-    }
-
-    @Override
-    public Container createContainer(EntityPlayer player) {
-        return new ContainerCreator(player.inventory, this);
-    }
-
-    @Override
-    public GuiContainer createGui(EntityPlayer player) {
-        return new GuiCreator(this, new ContainerCreator(player.inventory, this));
     }
 
     private static final int MAX_UMATTER = 10000;

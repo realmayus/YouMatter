@@ -34,7 +34,7 @@ public class GuiReplicator extends GuiContainer {
 
     private static final ResourceLocation GUI = new ResourceLocation(YouMatter.MODID, "textures/gui/replicator.png");
 
-    GuiReplicator(TileReplicator tileEntity, ContainerReplicator container) {
+    public GuiReplicator(TileReplicator tileEntity, ContainerReplicator container) {
         super(container);
 
         xSize = WIDTH;

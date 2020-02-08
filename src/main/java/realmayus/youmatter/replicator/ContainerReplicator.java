@@ -21,7 +21,7 @@ import realmayus.youmatter.util.DisplaySlot;
 public class ContainerReplicator extends Container implements IReplicatorStateContainer {
     public TileReplicator te;
 
-    ContainerReplicator(IInventory playerInventory, TileReplicator te) {
+    public ContainerReplicator(IInventory playerInventory, TileReplicator te) {
         this.te = te;
         addPlayerSlots(playerInventory);
         addCustomSlots();

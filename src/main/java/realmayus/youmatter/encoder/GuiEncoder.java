@@ -22,7 +22,7 @@ public class GuiEncoder extends GuiContainer {
 
     private static final ResourceLocation GUI = new ResourceLocation(YouMatter.MODID, "textures/gui/encoder.png");
 
-    GuiEncoder(TileEncoder tileEntity, ContainerEncoder container) {
+    public GuiEncoder(TileEncoder tileEntity, ContainerEncoder container) {
         super(container);
 
         xSize = WIDTH;
