@@ -10,6 +10,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.fluids.FluidStack;
@@ -22,10 +23,14 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
 import realmayus.youmatter.ModFluids;
+import realmayus.youmatter.encoder.BlockEncoder;
+import realmayus.youmatter.encoder.TileEncoder;
+import realmayus.youmatter.replicator.TileReplicator;
 import realmayus.youmatter.util.MyEnergyStorage;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.*;
 
 public class TileCreator extends TileEntity implements  ITickable{
 
@@ -303,6 +308,16 @@ public class TileCreator extends TileEntity implements  ITickable{
                         myEnergyStorage.consumePower(Math.round(getEnergy()/3f));
                     }
                 }
+
+                //Auto-outputting U-Matter
+                Object[] neighborTE = getNeighborTileEntity(pos);
+                if(neighborTE != null){
+                    if (uTank.getFluidAmount() >= 500) {
+                        uTank.drain(Objects.requireNonNull(world.getTileEntity((BlockPos)neighborTE[0])).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, (EnumFacing)neighborTE[1]).fill(new FluidStack(ModFluids.UMATTER, 500), true), true);
+                    } else {
+                        uTank.drain(Objects.requireNonNull(world.getTileEntity((BlockPos)neighborTE[0])).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, (EnumFacing)neighborTE[1]).fill(new FluidStack(ModFluids.UMATTER, uTank.getFluidAmount()), true), true);
+                    }
+                }
             }
             currentPartTick = 0;
         } else if ((currentPartTick % 5) == 0) { // every five ticks
@@ -330,10 +345,43 @@ public class TileCreator extends TileEntity implements  ITickable{
                         }
                     }
                 }
+
             }
             currentPartTick++;
         } else {
             currentPartTick++;
         }
+    }
+
+    private Object[] getNeighborTileEntity(BlockPos creatorPos) {
+        HashMap<BlockPos, EnumFacing> foundPos = new HashMap<>();
+        for(EnumFacing facing : EnumFacing.VALUES) {
+            if(world.getTileEntity(creatorPos.offset(facing)) != null) {
+                if (Objects.requireNonNull(world.getTileEntity(creatorPos.offset(facing))).hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, facing)) {
+                    foundPos.put(creatorPos.offset(facing), facing);
+                }
+            }
+        }
+
+        // Prioritize Replicator
+        for (Map.Entry<BlockPos, EnumFacing> entry : foundPos.entrySet()) {
+            if (world.getTileEntity( entry.getKey()) instanceof TileReplicator) {
+                if(Objects.requireNonNull(world.getTileEntity(entry.getKey())).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, entry.getValue()).fill(new FluidStack(ModFluids.UMATTER, 500), false) > 0) {
+                    //Replicator can take fluid
+                    return new Object[] {entry.getKey(), entry.getValue()}; // position, facing
+                }
+            }
+        }
+
+        // Replicator not found / can't take fluid, now trying other blocks
+        for (Map.Entry<BlockPos, EnumFacing> entry : foundPos.entrySet()) {
+            if(Objects.requireNonNull(world.getTileEntity(entry.getKey())).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, entry.getValue()).fill(new FluidStack(ModFluids.UMATTER, 500), false) > 0) {
+                //Tile can take fluid
+                return new Object[] {entry.getKey(), entry.getValue()}; // position, facing
+            }
+        }
+
+        // found nothing
+        return null;
     }
 }
