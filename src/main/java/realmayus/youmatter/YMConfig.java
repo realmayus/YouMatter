@@ -9,14 +9,12 @@ import java.util.Map;
 @Config(modid = YouMatter.MODID)
 public class YMConfig {
 
-//    @Config.Comment(value = "Thanks for using YouMatter. If you need any help with the mod, please don't hesitate to join my discord server: https://realmayus.xyz/discord")
-//    public static boolean Hover_For_Info = true;
-//
-//    @Config.Comment(value = "Use specialItems as black (true) or as whitelist (false). Whitelist means, that you can only duplicate those items in that list. Blacklist is vice-versa.")
-//    public static boolean useAsBlacklist = true;
-//
-//    @Config.Comment(value = "List of items that are being treated specially. See useAsBlacklist for further details.")
-//    public static String[] specialItems = new String[] {"minecraft:iron_ingot"};
+
+    @Config.Comment(value = "Use specialItems as black (true) or as whitelist (false). Whitelist means, that you can only duplicate those items in that list. Blacklist is vice-versa.")
+    public static boolean useAsBlacklist = false;
+
+    @Config.Comment(value = "List of items that are being treated specially. See useAsBlacklist for further details.")
+    public static String[] itemList = new String[] {"minecraft:dragon_egg"};
 
     @Config.Comment(value = "Overrides: Set your desired required U-Matter values for each item. Especially handy when used in conjunction with useAsBlacklist = false.")
     public static HashMap<String, Integer> overrides = new HashMap<String, Integer>() {{

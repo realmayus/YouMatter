@@ -14,12 +14,15 @@ import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
+import realmayus.youmatter.YMConfig;
 import realmayus.youmatter.encoder.BlockEncoder;
 import realmayus.youmatter.encoder.TileEncoder;
 import realmayus.youmatter.util.IGuiTile;
 import realmayus.youmatter.util.MyEnergyStorage;
 
 import javax.annotation.Nonnull;
+import java.util.Arrays;
+import java.util.Objects;
 
 public class TileScanner extends TileEntity implements IGuiTile, ITickable{
 
@@ -178,12 +181,11 @@ public class TileScanner extends TileEntity implements IGuiTile, ITickable{
     private int currentPartTick = 0;
     @Override
     public void update() {
-
         if(currentPartTick >= 2) {
             if (getNeighborEncoder(this.pos) != null) {
                 hasEncoder = true;
                 BlockPos encoderPos = getNeighborEncoder(this.pos);
-                if(!inputHandler.getStackInSlot(1).isItemEqual(ItemStack.EMPTY)) {
+                if(!inputHandler.getStackInSlot(1).isEmpty() && isItemAllowed(inputHandler.getStackInSlot(1))) {
                     if(getEnergy() > 2048) {
                         if (getProgress() < 100) {
                             setProgress(getProgress() + 1);
@@ -207,6 +209,20 @@ public class TileScanner extends TileEntity implements IGuiTile, ITickable{
         }
     }
 
+    private boolean isItemAllowed(ItemStack itemStack) {
+            //If list should act as a blacklist AND it contains the item, disallow scanning
+        if (YMConfig.useAsBlacklist && Arrays.stream(YMConfig.itemList).anyMatch(s -> s.equalsIgnoreCase(Objects.requireNonNull(itemStack.getItem().getRegistryName()).toString()))) {
+            return false;
+
+            //If list should act as a whitelist AND it DOESN'T contain the item, disallow scanning
+        } else if (!(YMConfig.useAsBlacklist) && Arrays.stream(YMConfig.itemList).noneMatch(s -> s.equalsIgnoreCase(Objects.requireNonNull(itemStack.getItem().getRegistryName()).toString()))) {
+            return false;
+
+            //Else:
+        } else {
+            return true;
+        }
+    }
     private BlockPos getNeighborEncoder(BlockPos scannerPos) {
         for(EnumFacing facing : EnumFacing.VALUES) {
             if(world.getBlockState(scannerPos.offset(facing)).getBlock() instanceof BlockEncoder) {
