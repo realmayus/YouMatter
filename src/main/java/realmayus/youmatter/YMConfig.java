@@ -16,7 +16,7 @@ public class YMConfig {
     @Config.Comment(value = "List of items that are being treated specially. See useAsBlacklist for further details.")
     public static String[] itemList = new String[] {"minecraft:dragon_egg"};
 
-    @Config.Comment(value = "Overrides: Set your desired required U-Matter values for each item. Especially handy when used in conjunction with useAsBlacklist = false.")
+    @Config.Comment(value = "Overrides: Set your desired required U-Matter values for each item. These do not apply when you e.g. have whitelist on but it doesn't include the desired override.")
     public static HashMap<String, Integer> overrides = new HashMap<String, Integer>() {{
         put("minecraft:diamond", 2500);
         put("minecraft:nether_star", 5000);
