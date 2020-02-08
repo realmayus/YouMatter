@@ -1,4 +1,4 @@
-[![Download on CF](https://cf.way2muchnoise.eu/title/361476_Get_on%20CF.svg?badge_style=for_the_badge)](https://www.curseforge.com/minecraft/mc-mods/youmatter)
+[![Download on CF](http://cf.way2muchnoise.eu/title/361476_Get_on%20CF.svg?badge_style=for_the_badge)](https://www.curseforge.com/minecraft/mc-mods/youmatter)
 
 [![forthebadge](https://forthebadge.com/images/badges/made-with-java.svg)](https://forthebadge.com) [![forthebadge](https://forthebadge.com/images/badges/mom-made-pizza-rolls.svg)](https://forthebadge.com)
 
