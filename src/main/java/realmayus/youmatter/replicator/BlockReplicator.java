@@ -84,7 +84,12 @@ public class BlockReplicator extends Block {
 
     @Override
     public IBlockState getStateFromMeta(int meta) {
-        return this.getDefaultState().withProperty(FACING_HORIZ, EnumFacing.byIndex(meta & 7));
+        EnumFacing enumFacing = EnumFacing.byIndex(meta);
+        if (enumFacing.getAxis() == EnumFacing.Axis.Y)
+        {
+            enumFacing = EnumFacing.NORTH;
+        }
+        return this.getDefaultState().withProperty(FACING_HORIZ, enumFacing);
     }
 
     @Override

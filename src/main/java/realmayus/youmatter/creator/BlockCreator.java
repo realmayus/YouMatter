@@ -82,7 +82,14 @@ public class BlockCreator extends Block {
 
     @Override
     public IBlockState getStateFromMeta(int meta) {
-        return this.getDefaultState().withProperty(FACING_HORIZ, EnumFacing.byIndex(meta & 7));
+        EnumFacing enumfacing = EnumFacing.byIndex(meta);
+
+        if (enumfacing.getAxis() == EnumFacing.Axis.Y)
+        {
+            enumfacing = EnumFacing.NORTH;
+        }
+
+        return this.getDefaultState().withProperty(FACING_HORIZ, enumfacing);
     }
 
     @Override
