@@ -6,11 +6,13 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import realmayus.youmatter.encoder.IEncoderStateContainer;
 
 public class PacketUpdateEncoderClient implements IMessage {
-    private int energy;
-    private int progress;
+    public int energy;
+    public int progress;
 
     @Override
     public void fromBytes(ByteBuf buf) {
@@ -33,19 +35,16 @@ public class PacketUpdateEncoderClient implements IMessage {
     }
 
     public static class Handler implements IMessageHandler<PacketUpdateEncoderClient, IMessage> {
-
         @Override
         public IMessage onMessage(PacketUpdateEncoderClient message, MessageContext ctx) {
             Minecraft.getMinecraft().addScheduledTask(() -> handle(message, ctx));
             return null;
         }
 
+        @SideOnly(Side.CLIENT)
         private void handle(PacketUpdateEncoderClient message, MessageContext ctx) {
-            EntityPlayer player = Minecraft.getMinecraft().player;
+            ClientPacketHandlers.handlePacketUpdateEncoderClient(message);
 
-            if (player.openContainer instanceof IEncoderStateContainer) {
-                ((IEncoderStateContainer) player.openContainer).sync(message.energy, message.progress);
-            }
         }
 
 

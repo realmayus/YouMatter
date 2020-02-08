@@ -25,7 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TileEncoder extends TileEntity implements IGuiTile, ITickable {
-
+    public TileEncoder() {
+    }
 
     private List<ItemStack> queue = new ArrayList<>();
 

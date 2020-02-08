@@ -8,15 +8,17 @@ import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import realmayus.youmatter.replicator.IReplicatorStateContainer;
 
 public class PacketUpdateReplicatorClient implements IMessage {
-    private int fluidAmount;
-    private int energy;
-    private int progress;
-    private NBTTagCompound tank;
-    private boolean isActivated;
-    private boolean mode;
+    public int fluidAmount;
+    public int energy;
+    public int progress;
+    public NBTTagCompound tank;
+    public boolean isActivated;
+    public boolean mode;
 
     @Override
     public void fromBytes(ByteBuf buf) {
@@ -58,12 +60,9 @@ public class PacketUpdateReplicatorClient implements IMessage {
             return null;
         }
 
+        @SideOnly(Side.CLIENT)
         private void handle(PacketUpdateReplicatorClient message, MessageContext ctx) {
-            EntityPlayer player = Minecraft.getMinecraft().player;
-
-            if (player.openContainer instanceof IReplicatorStateContainer) {
-                ((IReplicatorStateContainer) player.openContainer).sync(message.fluidAmount, message.energy, message.progress, message.tank, message.isActivated, message.mode);
-            }
+            ClientPacketHandlers.handlePacketUpdateReplicatorClient(message);
         }
 
 

@@ -8,16 +8,18 @@ import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import realmayus.youmatter.creator.ICreatorStateContainer;
 
 public class PacketUpdateCreatorClient implements IMessage {
-    private int uFluidAmount;
-    private int sFluidAmount;
-    private int energy;
-    private int progress;
-    private NBTTagCompound uTank;
-    private NBTTagCompound sTank;
-    private boolean isActivated;
+    public int uFluidAmount;
+    public int sFluidAmount;
+    public int energy;
+    public int progress;
+    public NBTTagCompound uTank;
+    public NBTTagCompound sTank;
+    public boolean isActivated;
 
     @Override
     public void fromBytes(ByteBuf buf) {
@@ -62,12 +64,11 @@ public class PacketUpdateCreatorClient implements IMessage {
             return null;
         }
 
+        @SideOnly(Side.CLIENT)
         private void handle(PacketUpdateCreatorClient message, MessageContext ctx) {
-            EntityPlayer player = Minecraft.getMinecraft().player;
+            ClientPacketHandlers.handlePacketUpdateCreatorClient(message);
 
-            if (player.openContainer instanceof ICreatorStateContainer) {
-                ((ICreatorStateContainer) player.openContainer).sync(message.uFluidAmount, message.sFluidAmount, message.energy, message.progress, message.uTank, message.sTank, message.isActivated);
-            }
+
         }
 
 

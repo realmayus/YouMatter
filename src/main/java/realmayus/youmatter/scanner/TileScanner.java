@@ -26,6 +26,9 @@ import java.util.Objects;
 
 public class TileScanner extends TileEntity implements IGuiTile, ITickable{
 
+    public TileScanner() {
+    }
+
     public boolean hasEncoder = false;
 
     public boolean getHasEncoder() {

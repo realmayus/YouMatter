@@ -22,6 +22,8 @@ import net.minecraftforge.fluids.UniversalBucket;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
@@ -38,7 +40,8 @@ import java.util.List;
 import java.util.Objects;
 
 public class TileReplicator extends TileEntity implements IGuiTile, ITickable{
-
+    public TileReplicator() {
+    }
 
     private boolean currentMode = true;  //true = loop; false = one time
 
@@ -102,6 +105,7 @@ public class TileReplicator extends TileEntity implements IGuiTile, ITickable{
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public GuiContainer createGui(EntityPlayer player) {
         return new GuiReplicator(this, new ContainerReplicator(player.inventory, this));
     }

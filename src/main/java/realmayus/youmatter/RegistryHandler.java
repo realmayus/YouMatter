@@ -76,23 +76,4 @@ public class RegistryHandler {
     public static void addRecipes(RegistryEvent.Register<IRecipe> event) {
         GameRegistry.addSmelting(ModItems.TRANSISTOR_RAW, new ItemStack(ModItems.TRANSISTOR, 1), 1.5f);
     }
-
-
-    /**
-     * Will be called by Forge automatically when it's time.
-     * Stolen from Cadiboo https://gist.github.com/Cadiboo/3f5cdb785affc069af2fa5fdf2d70358
-     */
-    @SubscribeEvent
-    public static void onRegisterModelsEvent(@Nonnull final ModelRegistryEvent event) {
-        setStateMappers();
-        ForgeRegistries.ITEMS.getValues().stream()
-                .filter(item -> item.getRegistryName().getNamespace().equals(YouMatter.MODID))
-                .forEach(item -> ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(item.getRegistryName(), "normal")));
-    }
-
-    @SideOnly(Side.CLIENT)
-    public static void setStateMappers() {
-        ModelLoader.setCustomStateMapper(ModBlocks.UMATTER_BLOCK, new StateMap.Builder().ignore(ModBlocks.UMATTER_BLOCK.LEVEL).build());
-        ModelLoader.setCustomStateMapper(ModBlocks.STABILIZER_BLOCK, new StateMap.Builder().ignore(ModBlocks.STABILIZER_BLOCK.LEVEL).build());
-    }
 }

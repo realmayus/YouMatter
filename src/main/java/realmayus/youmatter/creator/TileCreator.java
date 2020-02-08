@@ -30,6 +30,9 @@ import javax.annotation.Nullable;
 
 public class TileCreator extends TileEntity implements IGuiTile, ITickable{
 
+    public TileCreator() {
+    }
+
     @Override
     public Container createContainer(EntityPlayer player) {
         return new ContainerCreator(player.inventory, this);
