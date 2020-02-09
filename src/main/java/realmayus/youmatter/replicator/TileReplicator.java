@@ -110,13 +110,11 @@ public class TileReplicator extends TileEntity implements  ITickable{
 
         @Override
         public int fill(FluidStack resource, boolean doFill) {
-            if(resource.getFluid().equals(ModFluids.UMATTER)) {
+            if (resource.getFluid().equals(ModFluids.UMATTER)) {
                 if (MAX_UMATTER - getTank().getFluidAmount() < resource.amount) {
-                    tank.fill(new FluidStack(resource.getFluid(), MAX_UMATTER), doFill);
-                    return MAX_UMATTER;
+                    return tank.fill(new FluidStack(resource.getFluid(), MAX_UMATTER), doFill);
                 } else {
-                    tank.fill(resource, doFill);
-                    return resource.amount;
+                    return tank.fill(resource, doFill);
                 }
             }
             return 0;
