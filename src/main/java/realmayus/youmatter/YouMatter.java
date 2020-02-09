@@ -1,45 +1,40 @@
 package realmayus.youmatter;
 
-import net.minecraft.client.renderer.block.statemap.StateMap;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.storage.loot.LootTableList;
-import net.minecraftforge.client.model.ModelLoader;
+
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fluids.FluidRegistry;
+
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
+import net.minecraftforge.fml.ExtensionPoint;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.Mod.EventHandler;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.common.registry.GameRegistry;
+
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
+
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.network.NetworkRegistry;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import realmayus.youmatter.items.TransistorItem;
-import realmayus.youmatter.items.TransistorRawItem;
 import realmayus.youmatter.network.PacketHandler;
-import realmayus.youmatter.umatter.ModFluid;
 import realmayus.youmatter.util.GuiHandler;
 import realmayus.youmatter.util.LootHandler;
 
-@Mod(modid = YouMatter.MODID, name = YouMatter.NAME, version = YouMatter.VERSION)
+@Mod(YouMatter.MODID)
+@Mod.EventBusSubscriber(bus= Bus.MOD)
 public class YouMatter
 {
     public static final String MODID = "youmatter";
-    public static final String NAME = "You Matter";
-    public static final String VERSION = "1.0";
 
-    private static Logger logger;
+    private static final Logger logger = LogManager.getLogger();
 
-    public static Logger getLogger() {
-        return logger;
-    }
-    static {
-        FluidRegistry.enableUniversalBucket();
-    }
+//    static {
+//        FluidRegistry.enableUniversalBucket();
+//    }
 
     public static CreativeTabs creativeTab = new CreativeTabs("youmatter") {
         @Override
@@ -55,19 +50,14 @@ public class YouMatter
         }
     };
 
-    @Mod.Instance
-    public static YouMatter instance;
-
-    @EventHandler
-    public void preInit(FMLPreInitializationEvent event) {
-        logger = event.getModLog();
+    @SubscribeEvent
+    public void preInit(FMLCommonSetupEvent event) {
         PacketHandler.registerMessages();
     }
 
-    @EventHandler
+    @SubscribeEvent
     public void init(FMLInitializationEvent event) {
-        NetworkRegistry.INSTANCE.registerGuiHandler(YouMatter.instance, new GuiHandler());
-        MinecraftForge.EVENT_BUS.register(new LootHandler());
+        FMLJavaModLoadingContext.get().getModEventBus()ExtensionPoint.GUIFACTORY, ...)        MinecraftForge.EVENT_BUS.register(new LootHandler());
         LootTableList.register(new ResourceLocation(YouMatter.MODID, "inject/end_city_treasure"));
     }
 }
