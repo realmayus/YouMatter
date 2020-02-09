@@ -1,31 +1,40 @@
 package realmayus.youmatter.scanner;
 
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.Container;
+
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ITickable;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
-import net.minecraftforge.items.wrapper.CombinedInvWrapper;
+import realmayus.youmatter.ObjectHolders;
 import realmayus.youmatter.YMConfig;
 import realmayus.youmatter.encoder.BlockEncoder;
 import realmayus.youmatter.encoder.TileEncoder;
 import realmayus.youmatter.util.MyEnergyStorage;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class TileScanner extends TileEntity implements  ITickable{
+public class ScannerTile extends TileEntity implements ITickableTileEntity, INamedContainerProvider {
 
-    public TileScanner() {
+
+
+    public ScannerTile() {
+        super(ObjectHolders.SCANNER_TILE_ENTITY_TYPE);
     }
 
     public boolean hasEncoder = false;
@@ -48,72 +57,41 @@ public class TileScanner extends TileEntity implements  ITickable{
 
     public boolean hasEncoderClient = false;
 
-    /**
-     * If we are too far away from this tile entity you cannot use it
-     */
-    public boolean canInteractWith(EntityPlayer playerIn) {
-        return !isInvalid() && playerIn.getDistanceSq(pos.add(0.5D, 0.5D, 0.5D)) <= 64D;
-    }
 
     @Override
-    public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
-        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            return true;
-        }
-
-        if(capability == CapabilityEnergy.ENERGY) {
-            return true;
-        }
-        return super.hasCapability(capability, facing);
-
-
+    public ITextComponent getDisplayName() {
+        return new StringTextComponent(getType().getRegistryName().getPath());
     }
 
+    @Nullable
     @Override
-    public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(combinedHandler);
-        }
-
-        if(capability == CapabilityEnergy.ENERGY) {
-            return CapabilityEnergy.ENERGY.cast(myEnergyStorage);
-
-        }
-
-        return super.getCapability(capability, facing);
+    public Container createMenu(int i, PlayerInventory playerInventory, PlayerEntity playerEntity) {
+        return new ScannerContainer(i, world, pos, playerInventory, playerEntity);
     }
 
+    @Nonnull
+    @Override
+    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
+        if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+            return LazyOptional.of(() -> inventory).cast();
+        }
+
+        if(cap == CapabilityEnergy.ENERGY) {
+            return LazyOptional.of(() -> myEnergyStorage).cast();
+
+        }
+        return super.getCapability(cap, side);
+    }
 
     /**
      * Handler for the Input Slots
      */
-    public ItemStackHandler inputHandler = new ItemStackHandler(5) {
-
-        @Override
-        public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
-            return true;
-        }
-
+    public ItemStackHandler inventory = new ItemStackHandler(5) {
         @Override
         protected void onContentsChanged(int slot) {
-            TileScanner.this.markDirty();
+            ScannerTile.this.markDirty();
         }
     };
-
-
-
-    /**
-     * Handler for the Output Slots
-     */
-    private ItemStackHandler outputHandler = new ItemStackHandler(5) {
-        @Override
-        protected void onContentsChanged(int slot) {
-            TileScanner.this.markDirty();
-        }
-    };
-
-    private CombinedInvWrapper combinedHandler = new CombinedInvWrapper(inputHandler, outputHandler);
-
 
     private int clientEnergy = -1;
     private int clientProgress = -1;
@@ -149,43 +127,40 @@ public class TileScanner extends TileEntity implements  ITickable{
         return myEnergyStorage.getEnergyStored();
     }
 
-
-
-
-
-
     private MyEnergyStorage myEnergyStorage = new MyEnergyStorage(1000000, Integer.MAX_VALUE);
 
-    @Override
-    public void readFromNBT(NBTTagCompound compound) {
-        super.readFromNBT(compound);
 
+
+    @Override
+    public void read(CompoundNBT compound) {
+        super.read(compound);
     }
 
 
     @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound compound) {
-        super.writeToNBT(compound);
+    public CompoundNBT write(CompoundNBT compound) {
+        super.write(compound);
 
         return compound;
     }
 
+
     private int currentPartTick = 0;
     @Override
-    public void update() {
+    public void tick() {
         if(currentPartTick >= 2) {
             if (getNeighborEncoder(this.pos) != null) {
                 hasEncoder = true;
                 BlockPos encoderPos = getNeighborEncoder(this.pos);
-                if(!inputHandler.getStackInSlot(1).isEmpty() && isItemAllowed(inputHandler.getStackInSlot(1))) {
+                if(!inventory.getStackInSlot(1).isEmpty() && isItemAllowed(inventory.getStackInSlot(1))) {
                     if(getEnergy() > 2048) {
                         if (getProgress() < 100) {
                             setProgress(getProgress() + 1);
                             myEnergyStorage.consumePower(2048);
                         } else if (encoderPos != null) {
                             // Notifying the neighboring encoder of this scanner having finished its operation
-                            ((TileEncoder)world.getTileEntity(encoderPos)).ignite(this.inputHandler.getStackInSlot(1)); //don't worry, this is already checked by getNeighborEncoder() c:
-                            inputHandler.setStackInSlot(1, ItemStack.EMPTY);
+                            ((TileEncoder)world.getTileEntity(encoderPos)).ignite(this.inventory.getStackInSlot(1)); //don't worry, this is already checked by getNeighborEncoder() c:
+                            inventory.setStackInSlot(1, ItemStack.EMPTY);
                             setProgress(0);
                         }
                     }
@@ -216,11 +191,11 @@ public class TileScanner extends TileEntity implements  ITickable{
         }
     }
     private BlockPos getNeighborEncoder(BlockPos scannerPos) {
-        for(EnumFacing facing : EnumFacing.VALUES) {
-            if(world.getBlockState(scannerPos.offset(facing)).getBlock() instanceof BlockEncoder) {
-                if(world.getTileEntity(scannerPos.offset(facing)) != null) {
-                    if(world.getTileEntity(scannerPos.offset(facing)) instanceof TileEncoder) {
-                        return scannerPos.offset(facing);
+        for(Direction direction : Direction.values()) {
+            if(world.getBlockState(scannerPos.offset(direction)).getBlock() instanceof BlockEncoder) {
+                if(world.getTileEntity(scannerPos.offset(direction)) != null) {
+                    if(world.getTileEntity(scannerPos.offset(direction)) instanceof TileEncoder) {
+                        return scannerPos.offset(direction);
                     }
                 }
             }

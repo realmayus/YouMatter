@@ -175,4 +175,14 @@ processResources {
     from(sourceSets.main.resources.srcDirs) {
         exclude 'META-INF/mods.toml'
     }
+
+    rename '(.+_at.cfg)','META-INF/$1'
+}
+
+jar {
+
+    manifest {
+
+        attributes 'FMLAT': 'youmatter_at.cfg'
+    }
 }

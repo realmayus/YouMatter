@@ -1,6 +1,6 @@
 package realmayus.youmatter.util;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -14,18 +14,18 @@ import realmayus.youmatter.encoder.TileEncoder;
 import realmayus.youmatter.replicator.ContainerReplicator;
 import realmayus.youmatter.replicator.GuiReplicator;
 import realmayus.youmatter.replicator.TileReplicator;
-import realmayus.youmatter.scanner.ContainerScanner;
-import realmayus.youmatter.scanner.GuiScanner;
-import realmayus.youmatter.scanner.TileScanner;
+import realmayus.youmatter.scanner.ScannerContainer;
+import realmayus.youmatter.scanner.ScannerScreen;
+import realmayus.youmatter.scanner.ScannerTile;
 
-public class GuiHandler implements IGuiHandler {
-
+public class GuiHandler /*implements IGuiHandler*/ {
+/*
     @Override
-    public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
+    public Object getServerGuiElement(int ID, PlayerEntity player, World world, int x, int y, int z) {
         BlockPos pos = new BlockPos(x, y, z);
         TileEntity te = world.getTileEntity(pos);
-        if (te instanceof TileScanner) {
-            return new ContainerScanner(player.inventory, (TileScanner)te);
+        if (te instanceof ScannerTile) {
+            return new ScannerContainer(player.inventory, (ScannerTile)te);
         } else if (te instanceof TileReplicator) {
             return new ContainerReplicator(player.inventory, (TileReplicator) te);
         } else if (te instanceof TileEncoder) {
@@ -37,11 +37,11 @@ public class GuiHandler implements IGuiHandler {
     }
 
     @Override
-    public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
+    public Object getClientGuiElement(int ID, PlayerEntity player, World world, int x, int y, int z) {
         BlockPos pos = new BlockPos(x, y, z);
         TileEntity te = world.getTileEntity(pos);
-        if (te instanceof TileScanner) {
-            return new GuiScanner((TileScanner) te, new ContainerScanner(player.inventory, (TileScanner) te));
+        if (te instanceof ScannerTile) {
+            return new ScannerScreen((ScannerTile) te, new ScannerContainer(player.inventory, (ScannerTile) te));
         } else if (te instanceof TileReplicator) {
             return new GuiReplicator((TileReplicator) te, new ContainerReplicator(player.inventory, (TileReplicator) te));
         } else if (te instanceof TileEncoder) {
@@ -50,5 +50,5 @@ public class GuiHandler implements IGuiHandler {
             return new GuiCreator((TileCreator) te, new ContainerCreator(player.inventory, (TileCreator) te));
         }
         return null;
-    }
+    }*/
 }

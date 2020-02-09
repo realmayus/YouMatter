@@ -1,71 +1,56 @@
 package realmayus.youmatter.network;
 
 import io.netty.buffer.ByteBuf;
+import javafx.geometry.Side;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import realmayus.youmatter.replicator.IReplicatorStateContainer;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fml.network.NetworkEvent;
 
-public class PacketUpdateReplicatorClient implements IMessage {
+import java.util.function.Supplier;
+
+
+public class PacketUpdateReplicatorClient {
     public int fluidAmount;
     public int energy;
     public int progress;
-    public NBTTagCompound tank;
+    public FluidStack fluidStack;
     public boolean isActivated;
     public boolean mode;
 
-    @Override
-    public void fromBytes(ByteBuf buf) {
+
+    public PacketUpdateReplicatorClient(PacketBuffer buf) {
         fluidAmount = buf.readInt();
         energy = buf.readInt();
         progress = buf.readInt();
-        tank = ByteBufUtils.readTag(buf);
         isActivated = buf.readBoolean();
         mode = buf.readBoolean();
+        fluidStack = buf.readFluidStack();
     }
 
-    @Override
-    public void toBytes(ByteBuf buf) {
-        buf.writeInt(fluidAmount);
-        buf.writeInt(energy);
-        buf.writeInt(progress);
-        ByteBufUtils.writeTag(buf, tank);
-        buf.writeBoolean(isActivated);
-        buf.writeBoolean(mode);
-    }
-
-    public PacketUpdateReplicatorClient() {
-    }
-
-    public PacketUpdateReplicatorClient(int fluidAmount, int energy, int progress, NBTTagCompound tank, boolean isActivated, boolean mode) {
+    public PacketUpdateReplicatorClient(Integer fluidAmount, Integer energy, Integer progress, Boolean isActivated, Boolean mode, FluidStack fluidStack) {
         this.fluidAmount = fluidAmount;
         this.energy = energy;
         this.progress = progress;
-        this.tank = tank;
         this.isActivated = isActivated;
         this.mode = mode;
+        this.fluidStack = fluidStack;
     }
 
-    public static class Handler implements IMessageHandler<PacketUpdateReplicatorClient, IMessage> {
-
-        @Override
-        public IMessage onMessage(PacketUpdateReplicatorClient message, MessageContext ctx) {
-            Minecraft.getMinecraft().addScheduledTask(() -> handle(message, ctx));
-            return null;
-        }
-
-        @SideOnly(Side.CLIENT)
-        private void handle(PacketUpdateReplicatorClient message, MessageContext ctx) {
-            ClientPacketHandlers.handlePacketUpdateReplicatorClient(message);
-        }
-
-
+    void encode(PacketBuffer buf) {
+        buf.writeInt(fluidAmount);
+        buf.writeInt(energy);
+        buf.writeInt(progress);
+        buf.writeBoolean(isActivated);
+        buf.writeBoolean(mode);
+        buf.writeFluidStack(fluidStack);
     }
 
+    void handle(Supplier<NetworkEvent.Context> ctx) {
+        ctx.get().enqueueWork(() -> {
+            ClientPacketHandlers.handlePacketUpdateReplicatorClient(this);
+        });
+        ctx.get().setPacketHandled(true);
+    }
 }

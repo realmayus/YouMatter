@@ -1,52 +1,41 @@
 package realmayus.youmatter.network;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import realmayus.youmatter.creator.ICreatorStateContainer;
+import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fml.network.NetworkEvent;
 
-public class PacketUpdateCreatorClient implements IMessage {
+import java.util.function.Supplier;
+
+public class PacketUpdateCreatorClient {
     public int uFluidAmount;
     public int sFluidAmount;
     public int energy;
     public int progress;
-    public NBTTagCompound uTank;
-    public NBTTagCompound sTank;
+    public FluidStack uTank;
+    public FluidStack sTank;
     public boolean isActivated;
 
-    @Override
-    public void fromBytes(ByteBuf buf) {
-        uFluidAmount = buf.readInt();
-        sFluidAmount = buf.readInt();
-        energy = buf.readInt();
-        progress = buf.readInt();
-        uTank = ByteBufUtils.readTag(buf);
-        sTank = ByteBufUtils.readTag(buf);
-        isActivated = buf.readBoolean();
-    }
-
-    @Override
-    public void toBytes(ByteBuf buf) {
+    public void encode(PacketBuffer buf) {
         buf.writeInt(uFluidAmount);
         buf.writeInt(sFluidAmount);
         buf.writeInt(energy);
         buf.writeInt(progress);
-        ByteBufUtils.writeTag(buf, uTank);
-        ByteBufUtils.writeTag(buf, sTank);
+        buf.writeFluidStack(uTank);
+        buf.writeFluidStack(sTank);
         buf.writeBoolean(isActivated);
     }
 
-    public PacketUpdateCreatorClient() {
+    public PacketUpdateCreatorClient(PacketBuffer buf) {
+        uFluidAmount = buf.readInt();
+        sFluidAmount = buf.readInt();
+        energy = buf.readInt();
+        progress = buf.readInt();
+        uTank = buf.readFluidStack();
+        sTank = buf.readFluidStack();
+        isActivated = buf.readBoolean();
     }
 
-    public PacketUpdateCreatorClient(int uFluidAmount, int sFluidAmount, int energy, int progress, NBTTagCompound uTank, NBTTagCompound sTank, boolean isActivated) {
+    public PacketUpdateCreatorClient(int uFluidAmount, int sFluidAmount, int energy, int progress, FluidStack uTank, FluidStack sTank, boolean isActivated) {
         this.uFluidAmount = uFluidAmount;
         this.sFluidAmount = sFluidAmount;
         this.energy = energy;
@@ -56,22 +45,10 @@ public class PacketUpdateCreatorClient implements IMessage {
         this.isActivated = isActivated;
     }
 
-    public static class Handler implements IMessageHandler<PacketUpdateCreatorClient, IMessage> {
-
-        @Override
-        public IMessage onMessage(PacketUpdateCreatorClient message, MessageContext ctx) {
-            Minecraft.getMinecraft().addScheduledTask(() -> handle(message, ctx));
-            return null;
-        }
-
-        @SideOnly(Side.CLIENT)
-        private void handle(PacketUpdateCreatorClient message, MessageContext ctx) {
-            ClientPacketHandlers.handlePacketUpdateCreatorClient(message);
-
-
-        }
-
-
+    void handle(Supplier<NetworkEvent.Context> ctx) {
+        ctx.get().enqueueWork(() -> {
+            ClientPacketHandlers.handlePacketUpdateCreatorClient(this);
+        });
+        ctx.get().setPacketHandled(true);
     }
-
 }
