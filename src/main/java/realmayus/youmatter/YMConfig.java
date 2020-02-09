@@ -24,6 +24,4 @@ public class YMConfig {
 
     @Config.Comment(value = "How much U-Matter (in mB) should you need for one item to be duplicated (that is not overridden)")
     public static int uMatterPerItem = 1000;
-
-
 }

@@ -267,6 +267,8 @@ public class TileCreator extends TileEntity implements  ITickable{
         sTank.readFromNBT(tagSTank);
         myEnergyStorage.setEnergy(compound.getInteger("energy"));
         isActivated = compound.getBoolean("isActivated");
+        inputHandler.deserializeNBT((NBTTagCompound) compound.getTag("itemsIN"));
+        outputHandler.deserializeNBT((NBTTagCompound) compound.getTag("itemsOUT"));
     }
 
 
@@ -281,6 +283,8 @@ public class TileCreator extends TileEntity implements  ITickable{
         compound.setTag("sTank", tagSTank);
         compound.setInteger("energy", getEnergy());
         compound.setBoolean("isActivated", isActivated);
+        compound.setTag("itemsIN", inputHandler.serializeNBT());
+        compound.setTag("itemsOUT", outputHandler.serializeNBT());
         return compound;
     }
 

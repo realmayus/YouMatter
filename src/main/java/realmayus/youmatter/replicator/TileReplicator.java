@@ -389,7 +389,10 @@ public class TileReplicator extends TileEntity implements  ITickable{
         tank.readFromNBT(compound.getCompoundTag("tank"));
         myEnergyStorage.setEnergy(compound.getInteger("energy"));
         setActive(compound.getBoolean("isActive"));
+        setProgress(compound.getInteger("progress"));
         setCurrentMode(compound.getBoolean("mode"));
+        inputHandler.deserializeNBT((NBTTagCompound) compound.getTag("itemsIN"));
+        outputHandler.deserializeNBT((NBTTagCompound) compound.getTag("itemsOUT"));
     }
 
     @Override
@@ -401,6 +404,9 @@ public class TileReplicator extends TileEntity implements  ITickable{
         compound.setInteger("energy", getEnergy());
         compound.setBoolean("isActive", isActive);
         compound.setBoolean("mode", isCurrentMode());
+        compound.setInteger("progress", getProgress());
+        compound.setTag("itemsIN", inputHandler.serializeNBT());
+        compound.setTag("itemsOUT", outputHandler.serializeNBT());
         return compound;
     }
 }
