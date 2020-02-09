@@ -2,13 +2,13 @@ package realmayus.youmatter.creator;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+
+
 import net.minecraft.world.chunk.BlockStateContainer;
 import realmayus.youmatter.YouMatter;
 
 import javax.annotation.Nullable;
+import java.util.stream.IntStream;
 
 public class BlockCreator extends Block {
     //Creation of a so called "BlockState" for saving the direction the block is placed in
@@ -91,4 +91,15 @@ public class BlockCreator extends Block {
         return state.getValue(FACING_HORIZ).getIndex();
     }
 
+    @Override
+    public void breakBlock( World worldIn, BlockPos pos, IBlockState state ){
+        TileEntity te = worldIn.getTileEntity(pos);
+        if(te instanceof TileCreator){
+            IItemHandler itemStackHandler = te.getCapability( CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+            if (itemStackHandler != null) {
+                IntStream.range(0, itemStackHandler.getSlots()).forEach(i -> worldIn.spawnEntity(new EntityItem(worldIn, pos.getX(), pos.getY(), pos.getZ(), itemStackHandler.getStackInSlot(i))));
+            }
+        }
+        super.breakBlock(worldIn, pos, state);
+    }
 }

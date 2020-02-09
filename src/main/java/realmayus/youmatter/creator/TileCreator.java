@@ -37,8 +37,8 @@ public class TileCreator extends TileEntity implements  ITickable{
     public TileCreator() {
     }
 
-    private static final int MAX_UMATTER = 10000;
-    private static final int MAX_STABILIZER = 10000;
+    private static final int MAX_UMATTER = 11000;
+    private static final int MAX_STABILIZER = 11000;
 
     private boolean isActivatedClient = true;
     private boolean isActivated = true;
@@ -61,7 +61,7 @@ public class TileCreator extends TileEntity implements  ITickable{
 
 
 
-    private FluidTank uTank = new FluidTank(MAX_UMATTER + 1000) {
+    private FluidTank uTank = new FluidTank(MAX_UMATTER) {
         @Override
         protected void onContentsChanged() {
             IBlockState state = world.getBlockState(pos);
@@ -70,7 +70,7 @@ public class TileCreator extends TileEntity implements  ITickable{
         }
     };
 
-    private FluidTank sTank = new FluidTank(MAX_STABILIZER + 1000) {
+    private FluidTank sTank = new FluidTank(MAX_STABILIZER) {
         @Override
         protected void onContentsChanged() {
             IBlockState state = world.getBlockState(pos);
@@ -97,13 +97,10 @@ public class TileCreator extends TileEntity implements  ITickable{
         @Override
         public int fill(FluidStack resource, boolean doFill) {
             if (resource.getFluid().equals(ModFluids.STABILIZER)) {
-                if (MAX_STABILIZER + 1000 - getSTank().getFluidAmount() < resource.amount) {
-                    sTank.fill(new FluidStack(resource.getFluid(), MAX_STABILIZER + 1000), doFill);
-                    return MAX_STABILIZER + 1000;
+                if (MAX_STABILIZER - getSTank().getFluidAmount() < resource.amount) {
+                    return sTank.fill(new FluidStack(resource.getFluid(), MAX_STABILIZER), doFill);
                 } else {
-
-                    sTank.fill(resource, doFill);
-                    return resource.amount;
+                    return sTank.fill(resource, doFill);
                 }
             }
             return 0;
@@ -267,6 +264,8 @@ public class TileCreator extends TileEntity implements  ITickable{
         sTank.readFromNBT(tagSTank);
         myEnergyStorage.setEnergy(compound.getInteger("energy"));
         isActivated = compound.getBoolean("isActivated");
+        inputHandler.deserializeNBT((NBTTagCompound) compound.getTag("itemsIN"));
+        outputHandler.deserializeNBT((NBTTagCompound) compound.getTag("itemsOUT"));
     }
 
 
@@ -281,17 +280,19 @@ public class TileCreator extends TileEntity implements  ITickable{
         compound.setTag("sTank", tagSTank);
         compound.setInteger("energy", getEnergy());
         compound.setBoolean("isActivated", isActivated);
+        compound.setTag("itemsIN", inputHandler.serializeNBT());
+        compound.setTag("itemsOUT", outputHandler.serializeNBT());
         return compound;
     }
 
     void setClientUTank(NBTTagCompound tank) {
-        FluidTank newTank = new FluidTank(10000).readFromNBT(tank);
+        FluidTank newTank = new FluidTank(10500).readFromNBT(tank);
         getUTank().setFluid(newTank.getFluid());
         getUTank().setCapacity(newTank.getCapacity());
     }
 
     void setClientSTank(NBTTagCompound tank) {
-        FluidTank newTank = new FluidTank(10000).readFromNBT(tank);
+        FluidTank newTank = new FluidTank(10500).readFromNBT(tank);
         getSTank().setFluid(newTank.getFluid());
         getSTank().setCapacity(newTank.getCapacity());
     }
@@ -336,7 +337,7 @@ public class TileCreator extends TileEntity implements  ITickable{
                         UniversalBucket bucket = (UniversalBucket) this.inputHandler.getStackInSlot(1).getItem();
                         if (bucket.getFluid(this.inputHandler.getStackInSlot(1)) != null) {
                             if (bucket.getFluid(this.inputHandler.getStackInSlot(1)).getFluid().equals(ModFluids.STABILIZER)) {
-                                if (getSTank().getFluidAmount() + 1000 < getUTank().getCapacity()) {
+                                if (getSTank().getFluidAmount() < getUTank().getCapacity()) {
                                     getSTank().fill(new FluidStack(ModFluids.STABILIZER, 1000), true);
                                     this.inputHandler.setStackInSlot(1, ItemStack.EMPTY);
                                     this.combinedHandler.insertItem(2, new ItemStack(Items.BUCKET, 1), false);

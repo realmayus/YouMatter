@@ -6,15 +6,20 @@ import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 import realmayus.youmatter.YouMatter;
+import realmayus.youmatter.creator.TileCreator;
 
 import javax.annotation.Nullable;
+import java.util.stream.IntStream;
 
 public class BlockScanner extends Block {
 
@@ -89,5 +94,17 @@ public class BlockScanner extends Block {
     @Override
     public int getMetaFromState(IBlockState state) {
         return state.getValue(FACING_HORIZ).getIndex();
+    }
+
+    @Override
+    public void breakBlock( World worldIn, BlockPos pos, IBlockState state ){
+        TileEntity te = worldIn.getTileEntity(pos);
+        if(te instanceof TileScanner){
+            IItemHandler itemStackHandler = te.getCapability( CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+            if (itemStackHandler != null) {
+                IntStream.range(0, itemStackHandler.getSlots()).forEach(i -> worldIn.spawnEntity(new EntityItem(worldIn, pos.getX(), pos.getY(), pos.getZ(), itemStackHandler.getStackInSlot(i))));
+            }
+        }
+        super.breakBlock(worldIn, pos, state);
     }
 }
