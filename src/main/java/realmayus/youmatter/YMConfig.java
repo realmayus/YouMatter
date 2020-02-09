@@ -11,7 +11,7 @@ public class YMConfig {
 
 
     @Config.Comment(value = "Use specialItems as black (true) or as whitelist (false). Whitelist means, that you can only duplicate those items in that list. Blacklist is vice-versa.")
-    public static boolean useAsBlacklist = false;
+    public static boolean useAsBlacklist = true;
 
     @Config.Comment(value = "List of items that are being treated specially. See useAsBlacklist for further details.")
     public static String[] itemList = new String[] {"minecraft:dragon_egg"};
