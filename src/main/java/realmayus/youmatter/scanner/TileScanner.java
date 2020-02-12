@@ -149,38 +149,34 @@ public class TileScanner extends TileEntity implements  ITickable{
         return myEnergyStorage.getEnergyStored();
     }
 
-
-
-
-
-
     private MyEnergyStorage myEnergyStorage = new MyEnergyStorage(1000000, Integer.MAX_VALUE);
 
     @Override
     public void readFromNBT(NBTTagCompound compound) {
         super.readFromNBT(compound);
-        setProgress(compound.getInteger("progress"));
-        myEnergyStorage.setEnergy(compound.getInteger("energy"));
-        inputHandler.deserializeNBT((NBTTagCompound) compound.getTag("itemsIN"));
-        outputHandler.deserializeNBT((NBTTagCompound) compound.getTag("itemsOUT"));
-    }
+        if (compound.hasKey("progress")) {
+            setProgress(compound.getInteger("progress"));
+        }
+        if (compound.hasKey("energy")) {
+            myEnergyStorage.setEnergy(compound.getInteger("energy"));
+        }
+        if (compound.hasKey("itemsIN"))  {
+            inputHandler.deserializeNBT((NBTTagCompound) compound.getTag("itemsIN"));
+        }
+        if (compound.hasKey("itemsOUT"))  {
+            outputHandler.deserializeNBT((NBTTagCompound) compound.getTag("itemsOUT"));
+        }
 
+    }
 
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
         super.writeToNBT(compound);
-        if (compound.hasKey("progress")) {
-            compound.setInteger("progress", getProgress());
-        }
-        if (compound.hasKey("energy")) {
-            compound.setInteger("energy", getEnergy());
-        }
-        if (compound.hasKey("itemsIN")) {
-            compound.setTag("itemsIN", inputHandler.serializeNBT());
-        }
-        if (compound.hasKey("itemsOUT")) {
-            compound.setTag("itemsOUT", outputHandler.serializeNBT());
-        }
+        compound.setInteger("progress", getProgress());
+        compound.setInteger("energy", getEnergy());
+        compound.setTag("itemsIN", inputHandler.serializeNBT());
+        compound.setTag("itemsOUT", outputHandler.serializeNBT());
+
         return compound;
     }
 
