@@ -225,7 +225,7 @@ public class TileReplicator extends TileEntity implements  ITickable{
                     }
                 }
                 ItemStack thumbdrive = inputHandler.getStackInSlot(0);
-                if (thumbdrive.isItemEqual(ItemStack.EMPTY)){
+                if (thumbdrive.isEmpty()){
                     if(progress > 0) {
                         getTank().fill(new FluidStack(ModFluids.UMATTER, getUMatterAmountForItem(currentItem.getItem())), true); // give the user its umatter back!
                     }
@@ -262,7 +262,6 @@ public class TileReplicator extends TileEntity implements  ITickable{
                                             }
                                         }
                                     }
-
                                 }
                             } else {
                                 if(isActive) {
@@ -293,6 +292,7 @@ public class TileReplicator extends TileEntity implements  ITickable{
                 }
             }
         }
+
         currentPartTick++;
     }
 
@@ -384,13 +384,27 @@ public class TileReplicator extends TileEntity implements  ITickable{
     @Override
     public void readFromNBT(NBTTagCompound compound) {
         super.readFromNBT(compound);
-        tank.readFromNBT(compound.getCompoundTag("tank"));
-        myEnergyStorage.setEnergy(compound.getInteger("energy"));
-        setActive(compound.getBoolean("isActive"));
-        setProgress(compound.getInteger("progress"));
-        setCurrentMode(compound.getBoolean("mode"));
-        inputHandler.deserializeNBT((NBTTagCompound) compound.getTag("itemsIN"));
-        outputHandler.deserializeNBT((NBTTagCompound) compound.getTag("itemsOUT"));
+        if (compound.hasKey("tank")){
+            tank.readFromNBT(compound.getCompoundTag("tank"));
+        }
+        if (compound.hasKey("energy")){
+            myEnergyStorage.setEnergy(compound.getInteger("energy"));
+        }
+        if (compound.hasKey("isActive")) {
+            setActive(compound.getBoolean("isActive"));
+        }
+        if (compound.hasKey("progress")) {
+            setProgress(compound.getInteger("progress"));
+        }
+        if (compound.hasKey("mode")) {
+            setCurrentMode(compound.getBoolean("mode"));
+        }
+        if (compound.hasKey("itemsIN")) {
+            inputHandler.deserializeNBT((NBTTagCompound) compound.getTag("itemsIN"));
+        }
+        if (compound.hasKey("itemsOUT")) {
+            outputHandler.deserializeNBT((NBTTagCompound) compound.getTag("itemsOUT"));
+        }
     }
 
     @Override

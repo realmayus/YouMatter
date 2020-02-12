@@ -140,10 +140,18 @@ public class TileEncoder extends TileEntity implements  ITickable {
     @Override
     public void readFromNBT(NBTTagCompound compound) {
         super.readFromNBT(compound);
-        setProgress(compound.getInteger("progress"));
-        myEnergyStorage.setEnergy(compound.getInteger("energy"));
-        inputHandler.deserializeNBT((NBTTagCompound) compound.getTag("itemsIN"));
-        outputHandler.deserializeNBT((NBTTagCompound) compound.getTag("itemsOUT"));
+        if(compound.hasKey("progress")) {
+            setProgress(compound.getInteger("progress"));
+        }
+        if(compound.hasKey("energy")) {
+            myEnergyStorage.setEnergy(compound.getInteger("energy"));
+        }
+        if(compound.hasKey("itemsIN")) {
+            inputHandler.deserializeNBT((NBTTagCompound) compound.getTag("itemsIN"));
+        }
+        if(compound.hasKey("itemsOUT")) {
+            outputHandler.deserializeNBT((NBTTagCompound) compound.getTag("itemsOUT"));
+        }
     }
 
 

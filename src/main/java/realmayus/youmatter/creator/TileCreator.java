@@ -129,7 +129,11 @@ public class TileCreator extends TileEntity implements  ITickable{
                 return uTank.getFluid();
             } else {
                 uTank.drain(maxDrain, doDrain);
-                return new FluidStack(uTank.getFluid().getFluid(), maxDrain);
+                if(uTank.getFluid().getFluid() != null) {
+                    return new FluidStack(uTank.getFluid().getFluid(), maxDrain);
+                } else {
+                    return null;
+                }
             }
         }
 
@@ -258,14 +262,26 @@ public class TileCreator extends TileEntity implements  ITickable{
     @Override
     public void readFromNBT(NBTTagCompound compound) {
         super.readFromNBT(compound);
-        NBTTagCompound tagUTank = compound.getCompoundTag("uTank");
-        NBTTagCompound tagSTank = compound.getCompoundTag("sTank");
-        uTank.readFromNBT(tagUTank);
-        sTank.readFromNBT(tagSTank);
-        myEnergyStorage.setEnergy(compound.getInteger("energy"));
-        isActivated = compound.getBoolean("isActivated");
-        inputHandler.deserializeNBT((NBTTagCompound) compound.getTag("itemsIN"));
-        outputHandler.deserializeNBT((NBTTagCompound) compound.getTag("itemsOUT"));
+        if (compound.hasKey("uTank")) {
+            NBTTagCompound tagUTank = compound.getCompoundTag("uTank");
+            uTank.readFromNBT(tagUTank);
+        }
+        if (compound.hasKey("sTank")) {
+            NBTTagCompound tagSTank = compound.getCompoundTag("sTank");
+            sTank.readFromNBT(tagSTank);
+        }
+        if (compound.hasKey("energy")) {
+            myEnergyStorage.setEnergy(compound.getInteger("energy"));
+        }
+        if (compound.hasKey("isActivated")) {
+            isActivated = compound.getBoolean("isActivated");
+        }
+        if (compound.hasKey("itemsIN")) {
+            inputHandler.deserializeNBT((NBTTagCompound) compound.getTag("itemsIN"));
+        }
+        if (compound.hasKey("itemsOUT")) {
+            outputHandler.deserializeNBT((NBTTagCompound) compound.getTag("itemsOUT"));
+        }
     }
 
 
