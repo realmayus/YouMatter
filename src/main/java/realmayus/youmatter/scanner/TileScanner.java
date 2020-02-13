@@ -174,9 +174,16 @@ public class TileScanner extends TileEntity implements  ITickable{
         super.writeToNBT(compound);
         compound.setInteger("progress", getProgress());
         compound.setInteger("energy", getEnergy());
-        compound.setTag("itemsIN", inputHandler.serializeNBT());
-        compound.setTag("itemsOUT", outputHandler.serializeNBT());
-
+        if (inputHandler != null) {
+            if (inputHandler.serializeNBT() != null) {
+                compound.setTag("itemsIN", inputHandler.serializeNBT());
+            }
+        }
+        if (outputHandler != null) {
+            if (outputHandler.serializeNBT() != null) {
+                compound.setTag("itemsOUT", outputHandler.serializeNBT());
+            }
+        }
         return compound;
     }
 

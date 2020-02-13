@@ -124,16 +124,14 @@ public class TileCreator extends TileEntity implements  ITickable{
         @Nullable
         @Override
         public FluidStack drain(int maxDrain, boolean doDrain) {
-            if (uTank.getFluidAmount() < maxDrain) {
-                uTank.drain(uTank.getFluid(), doDrain);
-                return uTank.getFluid();
-            } else {
-                uTank.drain(maxDrain, doDrain);
+            if(uTank.getFluid() != null) {
                 if(uTank.getFluid().getFluid() != null) {
-                    return new FluidStack(uTank.getFluid().getFluid(), maxDrain);
+                    return uTank.drain(uTank.getFluid(), doDrain);
                 } else {
                     return null;
                 }
+            } else {
+                return null;
             }
         }
 
@@ -296,8 +294,16 @@ public class TileCreator extends TileEntity implements  ITickable{
         compound.setTag("sTank", tagSTank);
         compound.setInteger("energy", getEnergy());
         compound.setBoolean("isActivated", isActivated);
-        compound.setTag("itemsIN", inputHandler.serializeNBT());
-        compound.setTag("itemsOUT", outputHandler.serializeNBT());
+        if (inputHandler != null) {
+            if (inputHandler.serializeNBT() != null) {
+                compound.setTag("itemsIN", inputHandler.serializeNBT());
+            }
+        }
+        if (outputHandler != null) {
+            if (outputHandler.serializeNBT() != null) {
+                compound.setTag("itemsOUT", outputHandler.serializeNBT());
+            }
+        }
         return compound;
     }
 

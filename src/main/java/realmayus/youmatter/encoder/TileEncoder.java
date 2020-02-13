@@ -4,6 +4,7 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
@@ -13,6 +14,7 @@ import net.minecraft.util.ITickable;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.fml.common.asm.transformers.ItemStackTransformer;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
@@ -152,6 +154,20 @@ public class TileEncoder extends TileEntity implements  ITickable {
         if(compound.hasKey("itemsOUT")) {
             outputHandler.deserializeNBT((NBTTagCompound) compound.getTag("itemsOUT"));
         }
+        if(compound.hasKey("queue")) {
+            if (compound.getTag("queue") instanceof NBTTagList) {
+                List<ItemStack> queueBuilder = new ArrayList<>();
+                for(NBTBase base: compound.getTagList("queue", Constants.NBT.TAG_COMPOUND)) {
+                    if (base instanceof NBTTagCompound) {
+                        NBTTagCompound nbtTagCompound = (NBTTagCompound) base;
+                        if(!new ItemStack(nbtTagCompound).isEmpty()) {
+                            queueBuilder.add(new ItemStack(nbtTagCompound));
+                        }
+                    }
+                }
+                queue = queueBuilder;
+            }
+        }
     }
 
 
@@ -160,8 +176,25 @@ public class TileEncoder extends TileEntity implements  ITickable {
         super.writeToNBT(compound);
         compound.setInteger("progress", getProgress());
         compound.setInteger("energy", getEnergy());
-        compound.setTag("itemsIN", inputHandler.serializeNBT());
-        compound.setTag("itemsOUT", outputHandler.serializeNBT());
+        if (inputHandler != null) {
+            if (inputHandler.serializeNBT() != null) {
+                compound.setTag("itemsIN", inputHandler.serializeNBT());
+            }
+        }
+        if (outputHandler != null) {
+            if (outputHandler.serializeNBT() != null) {
+                compound.setTag("itemsOUT", outputHandler.serializeNBT());
+            }
+        }
+
+        NBTTagList tempCompoundList = new NBTTagList();
+        for (ItemStack is : queue) {
+            if (!is.isEmpty()) {
+                tempCompoundList.appendTag(is.writeToNBT(new NBTTagCompound()));
+            }
+        }
+        compound.setTag("queue", tempCompoundList);
+
         return compound;
     }
 

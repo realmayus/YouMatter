@@ -236,57 +236,62 @@ public class TileReplicator extends TileEntity implements  ITickable{
                 } else {
                     if (thumbdrive.hasTagCompound()) {
                         if(thumbdrive.getTagCompound() != null) {
-                            NBTTagList taglist = (NBTTagList) thumbdrive.getTagCompound().getTag("stored_items");
-                            cachedItems = new ArrayList<>();
-                            for(NBTBase nbt : taglist) {
-                                if (nbt != null) {
-                                    if(nbt instanceof NBTTagString) {
-                                        NBTTagString item = (NBTTagString) nbt;
-                                        String registry_name = item.getString().substring(0, item.getString().indexOf("|"));
-                                        int metadata = Integer.parseInt(item.getString().substring(item.getString().indexOf("|") + 1));
-                                        ItemStack newitem = new ItemStack(Objects.requireNonNull(Item.getByNameOrId(registry_name)), 1, metadata);
-                                        cachedItems.add(newitem);
-                                    }
-                                }
-
-                            }
-                            renderItem(cachedItems, currentIndex);
-                            if(progress == 0) {
-                                if (!combinedHandler.getStackInSlot(2).isItemEqual(ItemStack.EMPTY)) {
-                                    if(combinedHandler.getStackInSlot(1).isItemEqual(ItemStack.EMPTY)) {
-                                        if (isActive) {
-                                            currentItem = cachedItems.get(currentIndex);
-                                            if(tank.getFluidAmount() >= getUMatterAmountForItem(currentItem.getItem())) {
-                                                tank.drain(getUMatterAmountForItem(currentItem.getItem()), true);
-                                                progress++;
-                                            }
+                            if(thumbdrive.getTagCompound().hasKey("stored_items")) {
+                                NBTTagList taglist = (NBTTagList) thumbdrive.getTagCompound().getTag("stored_items");
+                                cachedItems = new ArrayList<>();
+                                for(NBTBase nbt : taglist) {
+                                    if (nbt != null) {
+                                        if(nbt instanceof NBTTagString) {
+                                            NBTTagString item = (NBTTagString) nbt;
+                                            String registry_name = item.getString().substring(0, item.getString().indexOf("|"));
+                                            int metadata = Integer.parseInt(item.getString().substring(item.getString().indexOf("|") + 1));
+                                            ItemStack newitem = new ItemStack(Objects.requireNonNull(Item.getByNameOrId(registry_name)), 1, metadata);
+                                            cachedItems.add(newitem);
                                         }
                                     }
                                 }
-                            } else {
-                                if(isActive) {
-                                    if(progress >= 100) {
-                                        if(!combinedHandler.getStackInSlot(2).isItemEqual(ItemStack.EMPTY)) {
-                                            if(!currentMode) { //if mode is single run, then pause machine
-                                                isActive = false;
+                                renderItem(cachedItems, currentIndex);
+                                if(progress == 0) {
+                                    if (!combinedHandler.getStackInSlot(2).isEmpty()) {
+                                        if(combinedHandler.getStackInSlot(1).isEmpty()) {
+                                            if (isActive) {
+                                                currentItem = cachedItems.get(currentIndex);
+                                                if(tank.getFluidAmount() >= getUMatterAmountForItem(currentItem.getItem())) {
+                                                    tank.drain(getUMatterAmountForItem(currentItem.getItem()), true);
+                                                    progress++;
+                                                }
                                             }
-                                            combinedHandler.setStackInSlot(1, currentItem);
                                         }
-                                        progress = 0;
-                                    } else {
-                                        if (currentItem.isItemEqual(combinedHandler.getStackInSlot(2))) { // Check if selected item hasn't changed
-                                            progress++;
+                                    }
+                                } else {
+                                    if(isActive) {
+                                        if(progress >= 100) {
+                                            if(!combinedHandler.getStackInSlot(2).isItemEqual(ItemStack.EMPTY)) {
+                                                if(!currentMode) { //if mode is single run, then pause machine
+                                                    isActive = false;
+                                                }
+                                                combinedHandler.setStackInSlot(1, currentItem);
+                                            }
+                                            progress = 0;
                                         } else {
-                                            if (progress > 0) { // progress was over 0 (= already drained U-matter) and then aborted
-                                                getTank().fill(new FluidStack(ModFluids.UMATTER, getUMatterAmountForItem(currentItem.getItem())), true); // give the user its umatter back!
+                                            if (currentItem != null) {
+                                                if (!currentItem.isEmpty()) {
+                                                    if (currentItem.isItemEqual(combinedHandler.getStackInSlot(2))) { // Check if selected item hasn't changed
+                                                        progress++;
+                                                    } else {
+                                                        if (progress > 0) { // progress was over 0 (= already drained U-matter) and then aborted
+                                                            getTank().fill(new FluidStack(ModFluids.UMATTER, getUMatterAmountForItem(currentItem.getItem())), true); // give the user its umatter back!
+                                                        }
+                                                        progress = 0; // abort if not
+                                                    }
+                                                }
                                             }
-                                            progress = 0; // abort if not
                                         }
+                                        myEnergyStorage.consumePower(2048);
                                     }
-
-                                    myEnergyStorage.consumePower(2048);
                                 }
                             }
+
                         }
                     }
                 }
@@ -417,8 +422,16 @@ public class TileReplicator extends TileEntity implements  ITickable{
         compound.setBoolean("isActive", isActive);
         compound.setBoolean("mode", isCurrentMode());
         compound.setInteger("progress", getProgress());
-        compound.setTag("itemsIN", inputHandler.serializeNBT());
-        compound.setTag("itemsOUT", outputHandler.serializeNBT());
+        if (inputHandler != null) {
+            if (inputHandler.serializeNBT() != null) {
+                compound.setTag("itemsIN", inputHandler.serializeNBT());
+            }
+        }
+        if (outputHandler != null) {
+            if (outputHandler.serializeNBT() != null) {
+                compound.setTag("itemsOUT", outputHandler.serializeNBT());
+            }
+        }
         return compound;
     }
 }
