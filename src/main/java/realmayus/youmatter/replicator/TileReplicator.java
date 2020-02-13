@@ -20,6 +20,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.UniversalBucket;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.fluids.capability.FluidTankProperties;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import net.minecraftforge.fml.relauncher.Side;
@@ -105,7 +106,9 @@ public class TileReplicator extends TileEntity implements  ITickable{
     private IFluidHandler fluidHandler = new IFluidHandler() {
         @Override
         public IFluidTankProperties[] getTankProperties() {
-            return new IFluidTankProperties[0];
+            IFluidTankProperties[] fluidTankProperties = new IFluidTankProperties[1];
+            fluidTankProperties[0] = new FluidTankProperties(tank.getFluid(), MAX_UMATTER, true, false);
+            return fluidTankProperties;
         }
 
         @Override
@@ -281,7 +284,9 @@ public class TileReplicator extends TileEntity implements  ITickable{
                                             if (currentItem != null) {
                                                 if (!currentItem.isEmpty()) {
                                                     if (currentItem.isItemEqual(combinedHandler.getStackInSlot(2))) { // Check if selected item hasn't changed
-                                                        progress++;
+                                                        if(combinedHandler.getStackInSlot(1).isEmpty()) { //check if output slot is still empty
+                                                            progress++;
+                                                        }
                                                     } else {
                                                         if (progress > 0) { // progress was over 0 (= already drained U-matter) and then aborted
                                                             getTank().fill(new FluidStack(ModFluids.UMATTER, getUMatterAmountForItem(currentItem.getItem())), true); // give the user its umatter back!
@@ -290,7 +295,7 @@ public class TileReplicator extends TileEntity implements  ITickable{
                                                     }
                                                 }
                                             } else {
-                                                if(cachedItems.get(currentIndex) != null) {
+                                                if(cachedItems.get(currentIndex) != null) { //in case the current item isn't loaded yet -> this happens when reloading the world, see issue #31 on GitHub
                                                     currentItem = cachedItems.get(currentIndex);
                                                 }
                                             }

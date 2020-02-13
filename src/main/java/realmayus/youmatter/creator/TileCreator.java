@@ -17,6 +17,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.UniversalBucket;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.fluids.capability.FluidTankProperties;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -90,8 +91,11 @@ public class TileCreator extends TileEntity implements  ITickable{
 
     private IFluidHandler fluidHandler = new IFluidHandler() {
         @Override
-        public IFluidTankProperties[] getTankProperties() {
-            return new IFluidTankProperties[0];
+        public IFluidTankProperties[] getTankProperties() { // Need this in order for mechanism pipes to work
+            IFluidTankProperties[] fluidTankProperties = new IFluidTankProperties[2];
+            fluidTankProperties[1] = new FluidTankProperties(uTank.getFluid(), MAX_UMATTER, false, true);
+            fluidTankProperties[0] = new FluidTankProperties(sTank.getFluid(), MAX_STABILIZER, true, false);
+            return fluidTankProperties;
         }
 
         @Override
