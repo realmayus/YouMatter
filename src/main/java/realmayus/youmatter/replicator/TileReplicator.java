@@ -227,7 +227,11 @@ public class TileReplicator extends TileEntity implements  ITickable{
                 ItemStack thumbdrive = inputHandler.getStackInSlot(0);
                 if (thumbdrive.isEmpty()){
                     if(progress > 0) {
-                        getTank().fill(new FluidStack(ModFluids.UMATTER, getUMatterAmountForItem(currentItem.getItem())), true); // give the user its umatter back!
+                        if (currentItem != null) {
+                            if(!currentItem.isEmpty()) {
+                                getTank().fill(new FluidStack(ModFluids.UMATTER, getUMatterAmountForItem(currentItem.getItem())), true); // give the user its umatter back!
+                            }
+                        }
                     }
                     combinedHandler.setStackInSlot(2, ItemStack.EMPTY);
                     cachedItems = null;
@@ -285,13 +289,16 @@ public class TileReplicator extends TileEntity implements  ITickable{
                                                         progress = 0; // abort if not
                                                     }
                                                 }
+                                            } else {
+                                                if(cachedItems.get(currentIndex) != null) {
+                                                    currentItem = cachedItems.get(currentIndex);
+                                                }
                                             }
                                         }
                                         myEnergyStorage.consumePower(2048);
                                     }
                                 }
                             }
-
                         }
                     }
                 }
