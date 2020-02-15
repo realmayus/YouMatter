@@ -50,7 +50,7 @@ public class ScannerContainer extends Container implements IScannerStateContaine
 
     @Override
     public boolean canInteractWith(PlayerEntity playerIn) {
-        return isWithinUsableDistance(IWorldPosCallable.of(te.getWorld(), te.getPos()), playerEntity, ObjectHolders.SCANNER);
+        return true;
     }
 
     private void addPlayerSlots(int leftCol, int topRow) {

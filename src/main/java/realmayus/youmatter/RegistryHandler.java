@@ -1,6 +1,7 @@
 package realmayus.youmatter;
 
 import net.minecraft.block.Block;
+import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
@@ -22,6 +23,7 @@ public class RegistryHandler {
         event.getRegistry().register(new ScannerBlock().setRegistryName(YouMatter.MODID, "scanner"));
     }
 
+    @SubscribeEvent
     public static void addTE(RegistryEvent.Register<TileEntityType<?>> event) {
         event.getRegistry().register(TileEntityType.Builder.create(ScannerTile::new, ObjectHolders.SCANNER).build(null).setRegistryName(YouMatter.MODID, "scanner"));
     }

@@ -1,12 +1,12 @@
 {
-  "model": "block/cube",
+  "parent": "block/cube",
   "textures": {
-    "particle": "youmatter:block/scanner_side",
-    "north": "youmatter:block/scanner_side",
-    "south": "youmatter:block/scanner_side",
-    "west": "youmatter:block/scanner_side",
-    "east": "youmatter:block/scanner_side",
-    "up": "youmatter:block/generic_side",
-    "down": "youmatter:block/generic_side"
+      "particle": "youmatter:block/scanner_side",
+      "north": "youmatter:block/scanner_side",
+      "south": "youmatter:block/scanner_side",
+      "west": "youmatter:block/scanner_side",
+      "east": "youmatter:block/scanner_side",
+      "up": "youmatter:block/generic_side",
+      "down": "youmatter:block/generic_side"
   }
 }

@@ -143,11 +143,6 @@ public class ScannerTile extends TileEntity implements INamedContainerProvider {
         return myEnergyStorage.getEnergyStored();
     }
 
-
-
-
-
-
     private MyEnergyStorage myEnergyStorage = new MyEnergyStorage(1000000, Integer.MAX_VALUE);
 
     @Override
@@ -155,8 +150,8 @@ public class ScannerTile extends TileEntity implements INamedContainerProvider {
         super.read(compound);
         setProgress(compound.getInt("progress"));
         myEnergyStorage.setEnergy(compound.getInt("energy"));
-        inputHandler.deserializeNBT((CompoundNBT) compound.get("itemsIN"));
-        outputHandler.deserializeNBT((CompoundNBT) compound.get("itemsOUT"));
+//        inputHandler.deserializeNBT((CompoundNBT) compound.get("itemsIN"));
+//        outputHandler.deserializeNBT((CompoundNBT) compound.get("itemsOUT"));
     }
 
 
@@ -165,8 +160,8 @@ public class ScannerTile extends TileEntity implements INamedContainerProvider {
         super.write(compound);
         compound.putInt("progress", getProgress());
         compound.putInt("energy", getEnergy());
-        compound.put("itemsIN", inputHandler.serializeNBT());
-        compound.put("itemsOUT", outputHandler.serializeNBT());
+//        compound.put("itemsIN", inputHandler.serializeNBT());
+//        compound.put("itemsOUT", outputHandler.serializeNBT());
         return compound;
     }
 
@@ -230,10 +225,14 @@ public class ScannerTile extends TileEntity implements INamedContainerProvider {
         return null;
     }
 
+
+
     @Override
     public ITextComponent getDisplayName() {
         return new StringTextComponent("Scanner"); //todo
     }
+
+
 
     @Nullable
     @Override

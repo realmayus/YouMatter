@@ -1,11 +1,9 @@
 package realmayus.youmatter.scanner;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.HorizontalBlock;
-import net.minecraft.block.SoundType;
+import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.state.DirectionProperty;
@@ -17,6 +15,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.network.NetworkHooks;
 import realmayus.youmatter.YouMatter;
 
 import javax.annotation.Nullable;
@@ -32,12 +31,6 @@ public class ScannerBlock extends Block {
         return true;
     }
 
-    @Nullable
-    @Override
-    public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return new ScannerTile();
-    }
-
     /**
      * EVENT that is called when you right-click the block,
      */
@@ -46,13 +39,36 @@ public class ScannerBlock extends Block {
         if (!worldIn.isRemote) {
             INamedContainerProvider containerProvider = getContainer(state, worldIn, pos);
             if (containerProvider != null) {
-                player.openContainer(containerProvider);
+                if (player instanceof ServerPlayerEntity) {
+                    NetworkHooks.openGui((ServerPlayerEntity) player, containerProvider, pos);
+                }
             }
         }
         return true;
     }
 
-//
+    @Nullable
+    @Override
+    public INamedContainerProvider getContainer(BlockState state, World worldIn, BlockPos pos) {
+        TileEntity te = worldIn.getTileEntity(pos);
+
+        return te instanceof ScannerTile ? (INamedContainerProvider)te : null;
+    }
+
+//    @Nullable
+//    @Override
+//    public TileEntity createNewTileEntity(IBlockReader worldIn) {
+//        return new ScannerTile();
+//    }
+
+    @Nullable
+    @Override
+    public TileEntity createTileEntity(BlockState state, IBlockReader world) {
+        return new ScannerTile();
+    }
+
+
+    //
 //    @Override
 //    public void breakBlock( World worldIn, BlockPos pos, IBlockState state ){
 //        TileEntity te = worldIn.getTileEntity(pos);
