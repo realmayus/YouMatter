@@ -1,24 +1,33 @@
-package realmayus.youmatter.creator;
+package realmayus.youmatter.scanner;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-
-
-import net.minecraft.world.chunk.BlockStateContainer;
+import net.minecraft.block.properties.PropertyDirection;
+import net.minecraft.block.state.BlockStateContainer;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 import realmayus.youmatter.YouMatter;
+import realmayus.youmatter.creator.TileCreator;
 
 import javax.annotation.Nullable;
 import java.util.stream.IntStream;
 
-public class BlockCreator extends Block {
-    //Creation of a so called "BlockState" for saving the direction the block is placed in
+public class BlockScanner extends Block {
+
     private static final PropertyDirection FACING_HORIZ = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
 
-
-    public BlockCreator() {
+    public BlockScanner() {
         super(Material.IRON);
-
-        setTranslationKey(YouMatter.MODID + ".creator");
+        setTranslationKey(YouMatter.MODID + ".scanner");
         setHarvestLevel("pickaxe", 1);
         setDefaultState(getBlockState().getBaseState().withProperty(FACING_HORIZ, EnumFacing.NORTH));
         setHardness(5.0F);
@@ -32,7 +41,7 @@ public class BlockCreator extends Block {
     @Nullable
     @Override
     public TileEntity createTileEntity(World world, IBlockState state) {
-        return new TileCreator();
+        return new TileScanner();
     }
 
 
@@ -45,17 +54,13 @@ public class BlockCreator extends Block {
             return true;
         }
         TileEntity te = world.getTileEntity(pos);
-
         if(!player.isSneaking()) {
             player.openGui(YouMatter.instance, 0, world, pos.getX(), pos.getY(), pos.getZ());
         } else {
             return false;
         }
-
         return true;
     }
-
-
 
     /**
      * Returning the BlockState for the direction so the Block actually shows the texture correctly.
@@ -94,7 +99,7 @@ public class BlockCreator extends Block {
     @Override
     public void breakBlock( World worldIn, BlockPos pos, IBlockState state ){
         TileEntity te = worldIn.getTileEntity(pos);
-        if(te instanceof TileCreator){
+        if(te instanceof TileScanner){
             IItemHandler itemStackHandler = te.getCapability( CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
             if (itemStackHandler != null) {
                 IntStream.range(0, itemStackHandler.getSlots()).forEach(i -> worldIn.spawnEntity(new EntityItem(worldIn, pos.getX(), pos.getY(), pos.getZ(), itemStackHandler.getStackInSlot(i))));
