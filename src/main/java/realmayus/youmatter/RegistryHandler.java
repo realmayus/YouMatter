@@ -29,7 +29,7 @@ public class RegistryHandler {
     @SubscribeEvent
     public static void addItems(RegistryEvent.Register<Item> event) {
         event.getRegistry().register(new BlockItem(ObjectHolders.SCANNER, new Item.Properties().group(YouMatter.ITEM_GROUP)).setRegistryName(YouMatter.MODID, "scanner"));
-        event.getRegistry().register(new Item(new Item.Properties().group(YouMatter.ITEM_GROUP)).setRegistryName(ObjectHolders.SCANNER.getRegistryName()));
+//        event.getRegistry().register(new Item(new Item.Properties().group(YouMatter.ITEM_GROUP)).setRegistryName(ObjectHolders.SCANNER.getRegistryName()));
     }
 
     @SubscribeEvent
