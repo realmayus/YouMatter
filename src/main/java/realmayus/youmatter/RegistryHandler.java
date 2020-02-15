@@ -36,7 +36,7 @@ public class RegistryHandler {
 
     @SubscribeEvent
     public static void registerContainerTypes(RegistryEvent.Register<ContainerType<?>> event) {
-        IForgeContainerType.create((windowId, inv, data) -> new ScannerContainer(windowId, inv.player.world, data.readBlockPos(), inv, inv.player)).setRegistryName(YouMatter.MODID + ":scannercontainertype");
+        event.getRegistry().register(IForgeContainerType.create((windowId, inv, data) -> new ScannerContainer(windowId, inv.player.world, data.readBlockPos(), inv, inv.player)).setRegistryName(YouMatter.MODID + ":scannercontainertype"));
     }
 
 } //todo furnace recipe
