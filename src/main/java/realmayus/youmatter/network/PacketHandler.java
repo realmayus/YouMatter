@@ -1,6 +1,5 @@
 package realmayus.youmatter.network;
 
-import javafx.geometry.Side;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.simple.SimpleChannel;

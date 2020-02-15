@@ -1,6 +1,7 @@
 package realmayus.youmatter;
 
 
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
@@ -35,8 +36,8 @@ public class YouMatter
 //    static {
 //        FluidRegistry.enableUniversalBucket();
 //    }
-
-    public static CreativeTabs creativeTab = new CreativeTabs("youmatter") {
+/*
+    public static ItemTab creativeTab = new CreativeTabs("youmatter") {
         @Override
         public ItemStack createIcon() {
             return FluidUtil.getFilledBucket(new FluidStack(ModFluids.UMATTER, 1));
@@ -48,6 +49,13 @@ public class YouMatter
             items.add(FluidUtil.getFilledBucket(new FluidStack(ModFluids.UMATTER, 1)));
             items.add(FluidUtil.getFilledBucket(new FluidStack(ModFluids.STABILIZER, 1)));
         }
+    };*/
+
+    public static ItemGroup ITEM_GROUP = new ItemGroup("YouMatter") { //todo localize
+        @Override
+        public ItemStack createIcon() {
+            return null;
+        }
     };
 
     @SubscribeEvent
@@ -55,9 +63,4 @@ public class YouMatter
         PacketHandler.registerMessages();
     }
 
-    @SubscribeEvent
-    public void init(FMLInitializationEvent event) {
-        FMLJavaModLoadingContext.get().getModEventBus()ExtensionPoint.GUIFACTORY, ...)        MinecraftForge.EVENT_BUS.register(new LootHandler());
-        LootTableList.register(new ResourceLocation(YouMatter.MODID, "inject/end_city_treasure"));
-    }
 }
