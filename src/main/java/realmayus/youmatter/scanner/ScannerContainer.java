@@ -3,14 +3,15 @@ package realmayus.youmatter.scanner;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.IContainerListener;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IWorldPosCallable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
@@ -40,9 +41,9 @@ public class ScannerContainer extends Container implements IScannerStateContaine
     @Override
     public void detectAndSendChanges() {
         super.detectAndSendChanges();
-        for(IContainerListener p : field_75149_d) { //todo
+        for(IContainerListener p : this.listeners) { //todo
             if(p instanceof PlayerEntity) {
-                PacketHandler.INSTANCE.sendTo(new PacketUpdateScannerClient(te.getEnergy(), te.getProgress(), te.getHasEncoder()), (EntityPlayerMP)p);
+                PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) p), new PacketUpdateScannerClient(te.getEnergy(), te.getProgress(), te.getHasEncoder()));
             }
         }
     }

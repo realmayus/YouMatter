@@ -1,19 +1,16 @@
 {
-  "forge_marker": 1,
-  "defaults": {
-    "model": "cube",
-    "textures": {
-      "particle": "youmatter:blocks/scanner_side",
-      "north": "youmatter:blocks/scanner_side",
-      "south": "youmatter:blocks/scanner_side",
-      "west": "youmatter:blocks/scanner_side",
-      "east": "youmatter:blocks/scanner_side",
-      "up": "youmatter:blocks/generic_side",
-      "down": "youmatter:blocks/generic_side"
-    }
-  },
   "variants": {
-    "": [{}],
+    "": [{
+      "model": "block/cube_all",
+      "textures": {
+        "particle": "youmatter:blocks/scanner_side",
+        "north": "youmatter:blocks/scanner_side",
+        "south": "youmatter:blocks/scanner_side",
+        "west": "youmatter:blocks/scanner_side",
+        "east": "youmatter:blocks/scanner_side",
+        "up": "youmatter:blocks/generic_side",
+        "down": "youmatter:blocks/generic_side"
+      }}],
     "inventory": [{}],
     "facing": {
       "north": {},

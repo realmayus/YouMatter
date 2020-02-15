@@ -28,7 +28,7 @@ minecraft {
     mappings channel: 'snapshot', version: '20200119-1.14.4'
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
     
-    // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     // Default run configurations.
     // These can be tweaked, removed, or duplicated as needed.
@@ -40,7 +40,7 @@ minecraft {
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
 
             // Recommended logging level for the console
-            property 'forge.logging.console.level', 'debug'
+            property 'forge.logging.console.level', 'info'
 
             mods {
                 examplemod {
@@ -56,7 +56,7 @@ minecraft {
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
 
             // Recommended logging level for the console
-            property 'forge.logging.console.level', 'debug'
+            property 'forge.logging.console.level', 'info'
 
             mods {
                 examplemod {
@@ -72,7 +72,7 @@ minecraft {
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
 
             // Recommended logging level for the console
-            property 'forge.logging.console.level', 'debug'
+            property 'forge.logging.console.level', 'info'
 
             args '--mod', 'examplemod', '--all', '--output', file('src/generated/resources/')
 
@@ -176,13 +176,4 @@ processResources {
         exclude 'META-INF/mods.toml'
     }
 
-    rename '(.+_at.cfg)','META-INF/$1'
-}
-
-jar {
-
-    manifest {
-
-        attributes 'FMLAT': 'youmatter_at.cfg'
-    }
 }

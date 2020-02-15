@@ -20,8 +20,6 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import realmayus.youmatter.ObjectHolders;
 import realmayus.youmatter.YMConfig;
-import realmayus.youmatter.encoder.BlockEncoder;
-import realmayus.youmatter.encoder.TileEncoder;
 import realmayus.youmatter.util.MyEnergyStorage;
 
 import javax.annotation.Nonnull;
@@ -128,14 +126,11 @@ public class ScannerTile extends TileEntity implements ITickableTileEntity, INam
     }
 
     private MyEnergyStorage myEnergyStorage = new MyEnergyStorage(1000000, Integer.MAX_VALUE);
-
-
-
+    
     @Override
     public void read(CompoundNBT compound) {
         super.read(compound);
     }
-
 
     @Override
     public CompoundNBT write(CompoundNBT compound) {
@@ -143,7 +138,6 @@ public class ScannerTile extends TileEntity implements ITickableTileEntity, INam
 
         return compound;
     }
-
 
     private int currentPartTick = 0;
     @Override
@@ -159,7 +153,8 @@ public class ScannerTile extends TileEntity implements ITickableTileEntity, INam
                             myEnergyStorage.consumePower(2048);
                         } else if (encoderPos != null) {
                             // Notifying the neighboring encoder of this scanner having finished its operation
-                            ((TileEncoder)world.getTileEntity(encoderPos)).ignite(this.inventory.getStackInSlot(1)); //don't worry, this is already checked by getNeighborEncoder() c:
+//                            ((TileEncoder)world.getTileEntity(encoderPos)).ignite(this.inventory.getStackInSlot(1)); //don't worry, this is already checked by getNeighborEncoder() c:
+                            System.out.println("IGNITED"); //TODO remove
                             inventory.setStackInSlot(1, ItemStack.EMPTY);
                             setProgress(0);
                         }
@@ -191,15 +186,15 @@ public class ScannerTile extends TileEntity implements ITickableTileEntity, INam
         }
     }
     private BlockPos getNeighborEncoder(BlockPos scannerPos) {
-        for(Direction direction : Direction.values()) {
-            if(world.getBlockState(scannerPos.offset(direction)).getBlock() instanceof BlockEncoder) {
-                if(world.getTileEntity(scannerPos.offset(direction)) != null) {
-                    if(world.getTileEntity(scannerPos.offset(direction)) instanceof TileEncoder) {
-                        return scannerPos.offset(direction);
-                    }
-                }
-            }
-        }
+//        for(Direction direction : Direction.values()) {
+//            if(world.getBlockState(scannerPos.offset(direction)).getBlock() instanceof BlockEncoder) {
+//                if(world.getTileEntity(scannerPos.offset(direction)) != null) {
+//                    if(world.getTileEntity(scannerPos.offset(direction)) instanceof TileEncoder) {
+//                        return scannerPos.offset(direction);
+//                    }
+//                }
+//            }
+//        }
 
         return null;
     }

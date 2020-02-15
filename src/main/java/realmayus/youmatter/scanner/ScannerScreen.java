@@ -6,6 +6,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import realmayus.youmatter.YouMatter;
 
 import java.util.List;
@@ -34,12 +35,12 @@ public class ScannerScreen extends ContainerScreen<ScannerContainer> {
         int yAxis = (mouseY - (height - HEIGHT) / 2);
 
         if (xAxis >= 141 && xAxis <= 156 && yAxis >= 37 && yAxis <= 57) {
-            drawTooltip(mouseX, mouseY, Stream.of(I18n.format("youmatter.gui.energy.title"), I18n.format("youmatter.gui.energy.description", te.getClientEnergy())).collect(Collectors.toList()));
+            drawTooltip(mouseX, mouseY, Stream.of(new TranslationTextComponent("youmatter.gui.energy.title").getFormattedText(), new TranslationTextComponent("youmatter.gui.energy.description", te.getClientEnergy()).getFormattedText()).collect(Collectors.toList()));
         }
 
         if (!te.getHasEncoderClient()) {
             if (xAxis >= 16 && xAxis <= 32 && yAxis >= 59 && yAxis <= 75) {
-                drawTooltip(mouseX, mouseY, Stream.of(I18n.format("youmatter.warning.scanner1"), I18n.format("youmatter.warning.scanner2"), I18n.format("youmatter.warning.scanner3")).collect(Collectors.toList()));
+                drawTooltip(mouseX, mouseY, Stream.of(new TranslationTextComponent("youmatter.warning.scanner1").getFormattedText(), new TranslationTextComponent("youmatter.warning.scanner2").getFormattedText(), new TranslationTextComponent("youmatter.warning.scanner3").getFormattedText()).collect(Collectors.toList()));
 
             }
         }
@@ -54,7 +55,7 @@ public class ScannerScreen extends ContainerScreen<ScannerContainer> {
         if(!te.getHasEncoderClient()) {
             this.blit(16, 59, 176, 101, 16, 16);
         }
-        drawString(font, I18n.format("youmatter.guiname.scanner"), 8, 6, 4210752);
+        drawString(font, new TranslationTextComponent("youmatter.guiname.scanner").getFormattedText(), 8, 6, 4210752);
     }
 
     @Override

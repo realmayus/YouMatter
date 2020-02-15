@@ -1,42 +1,31 @@
 package realmayus.youmatter.network;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import realmayus.youmatter.replicator.ContainerReplicator;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fml.network.NetworkEvent;
+//import realmayus.youmatter.replicator.ContainerReplicator;
 
-public class PacketShowNext implements IMessage {
+import java.util.function.Supplier;
 
-    @Override
-    public void fromBytes(ByteBuf buf) {
+public class PacketShowNext {
 
+    public PacketShowNext(PacketBuffer buf) {
     }
-
-    @Override
-    public void toBytes(ByteBuf buf) {
-
-    }
-
     public PacketShowNext() {
     }
 
-    public static class Handler implements IMessageHandler<PacketShowNext, IMessage> {
+    void encode(PacketBuffer buf) {
 
-        @Override
-        public IMessage onMessage(PacketShowNext message, MessageContext ctx) {
-            // This is the player the packet was sent to the server from
-            EntityPlayerMP serverPlayer = ctx.getServerHandler().player;
-            serverPlayer.getServerWorld().addScheduledTask(() -> {
-                if (serverPlayer.openContainer instanceof ContainerReplicator) {
-                    ContainerReplicator openContainer = (ContainerReplicator) serverPlayer.openContainer;
-                    openContainer.te.renderNext();
-                }
-            });
-            // No response packet
-            return null;
-        }
     }
 
+    void handle(Supplier<NetworkEvent.Context> ctx) {
+//        ctx.get().enqueueWork(() -> {
+//            ServerPlayerEntity player = ctx.get().getSender();
+//            if (player.openContainer instanceof ContainerReplicator) {
+//                ContainerReplicator openContainer = (ContainerReplicator) player.openContainer;
+//                openContainer.te.renderNext();
+//            }
+//        });
+//        TODO: setHandled
+    }
 }

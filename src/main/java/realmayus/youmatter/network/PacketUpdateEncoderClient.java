@@ -30,9 +30,7 @@ public class PacketUpdateEncoderClient {
             ClientPacketHandlers.handlePacketUpdateEncoderClient(this);
         });
         ctx.get().setPacketHandled(true);
-
-    }﻿
-
+    }
 }
 //todo make sure that sync works correctly
 //todo need to revamp some packets

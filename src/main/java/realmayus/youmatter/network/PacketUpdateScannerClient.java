@@ -35,6 +35,5 @@ public class PacketUpdateScannerClient {
         });
         ctx.get().setPacketHandled(true);
 
-    }﻿
-
+    }
 }

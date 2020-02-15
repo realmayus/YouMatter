@@ -1,6 +1,6 @@
 package realmayus.youmatter.util;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
@@ -18,7 +18,7 @@ public class DisplaySlot extends SlotItemHandler {
     }
 
     @Override
-    public boolean canTakeStack(EntityPlayer playerIn) {
+    public boolean canTakeStack(PlayerEntity playerIn) {
         return false;
     }
 

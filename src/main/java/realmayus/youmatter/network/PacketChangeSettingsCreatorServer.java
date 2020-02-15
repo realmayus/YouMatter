@@ -1,47 +1,37 @@
 package realmayus.youmatter.network;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import realmayus.youmatter.creator.ContainerCreator;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fml.network.NetworkEvent;
+//import realmayus.youmatter.creator.ContainerCreator;
+import java.util.function.Supplier;
 
-public class PacketChangeSettingsCreatorServer implements IMessage {
+public class PacketChangeSettingsCreatorServer{
 
     private boolean isActivated;
 
-    @Override
-    public void fromBytes(ByteBuf buf) {
+
+    public PacketChangeSettingsCreatorServer(PacketBuffer buf) {
         isActivated = buf.readBoolean();
-    }
-
-    @Override
-    public void toBytes(ByteBuf buf) {
-        buf.writeBoolean(isActivated);
-    }
-
-    public PacketChangeSettingsCreatorServer() {
     }
 
     public PacketChangeSettingsCreatorServer(boolean isActivated) {
         this.isActivated = isActivated;
     }
 
-    public static class Handler implements IMessageHandler<PacketChangeSettingsCreatorServer, IMessage> {
+    void encode(PacketBuffer buf) {
+        buf.writeBoolean(isActivated);
+    }
 
-        @Override
-        public IMessage onMessage(PacketChangeSettingsCreatorServer message, MessageContext ctx) {
-            // This is the player the packet was sent to the server from
-            EntityPlayerMP serverPlayer = ctx.getServerHandler().player;
-            serverPlayer.getServerWorld().addScheduledTask(() -> {
-                if (serverPlayer.openContainer instanceof ContainerCreator) {
-                    ContainerCreator openContainer = (ContainerCreator) serverPlayer.openContainer;
-                    openContainer.te.setActivated(message.isActivated);
-                }
-            });
-            // No response packet
-            return null;
-        }
+    void handle(Supplier<NetworkEvent.Context> ctx) {
+//        // This is the player the packet was sent to the server from
+//        ctx.get().enqueueWork(() -> {
+//            ServerPlayerEntity player = ctx.get().getSender();
+//            if (player.openContainer instanceof ContainerCreator) {
+//                ContainerCreator openContainer = (ContainerCreator) player.openContainer;
+//                openContainer.te.setActivated(message.isActivated);
+//            }
+//        });
+//        ctx.get().setPacketHandled(true);
     }
 }
