@@ -26,7 +26,7 @@ public class ScannerTile extends TileEntity implements INamedContainerProvider {
     public boolean hasEncoder = false;
 
     public ScannerTile() {
-        super(ObjectHolders.SCANNER_TILE_ENTITY_TYPE);
+        super(ObjectHolders.SCANNER_TILE);
     }
 
     public boolean getHasEncoder() {

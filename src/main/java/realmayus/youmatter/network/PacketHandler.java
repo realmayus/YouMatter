@@ -3,6 +3,7 @@ package realmayus.youmatter.network;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
+import org.apache.logging.log4j.Level;
 import realmayus.youmatter.YouMatter;
 
 public class PacketHandler {
@@ -12,6 +13,7 @@ public class PacketHandler {
     private static int nextID() {return ID++;}
 
     public static void registerMessages() {
+        YouMatter.logger.log(Level.INFO, "Registered Packets");
         INSTANCE = NetworkRegistry.newSimpleChannel(new ResourceLocation(YouMatter.MODID, "youmatter"), () -> "1.0", s -> true, s -> true);
 
         //To: Client

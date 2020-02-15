@@ -13,6 +13,6 @@ public class ClientRegistry {
     @SubscribeEvent
     public static void onFMLClientSetup(FMLClientSetupEvent event)
     {
-        ScreenManager.registerFactory(ObjectHolders.SCANNER_CONTAINER_TYPE, ScannerScreen::new);
+        ScreenManager.registerFactory(ObjectHolders.SCANNER_CONTAINER, ScannerScreen::new);
     }
 }

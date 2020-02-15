@@ -22,28 +22,29 @@ import realmayus.youmatter.network.PacketUpdateScannerClient;
 
 public class ScannerContainer extends Container implements IScannerStateContainer {
 
-    private ScannerTile te;
+    public ScannerTile te;
     private PlayerEntity playerEntity;
     private IItemHandler playerInventory;
 
 
     public ScannerContainer(int windowId, World world, BlockPos pos, PlayerInventory playerInventory, PlayerEntity player) {
-        super(ObjectHolders.SCANNER_CONTAINER_TYPE, windowId);
+        super(ObjectHolders.SCANNER_CONTAINER, windowId);
         te = world.getTileEntity(pos) instanceof ScannerTile ? (ScannerTile) world.getTileEntity(pos) : null;
         this.playerEntity = player;
         this.playerInventory = new InvWrapper(playerInventory);
 
-        addPlayerSlots(10, 70);
+        addPlayerSlots(this.playerInventory);
         addCustomSlots();
-
     }
 
     @Override
     public void detectAndSendChanges() {
         super.detectAndSendChanges();
-        for(IContainerListener p : this.listeners) { //todo
-            if(p instanceof PlayerEntity) {
-                PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) p), new PacketUpdateScannerClient(te.getEnergy(), te.getProgress(), te.getHasEncoder()));
+        for(IContainerListener p : this.listeners) {
+            if(p != null) {
+                if (p instanceof ServerPlayerEntity) {
+                    PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) p), new PacketUpdateScannerClient(te.getEnergy(), te.getProgress(), te.getHasEncoder()));
+                }
             }
         }
     }
@@ -53,34 +54,28 @@ public class ScannerContainer extends Container implements IScannerStateContaine
         return true;
     }
 
-    private void addPlayerSlots(int leftCol, int topRow) {
-        // Player inventory
-        addSlotBox(playerInventory, 9, leftCol, topRow, 9, 18, 3, 18);
 
-        // Hotbar
-        topRow += 58;
-        addSlotRange(playerInventory, 0, leftCol, topRow, 9, 18);
+    private void addPlayerSlots(IItemHandler iItemHandler) {
+        // Slots for the main inventory
+        for (int row = 0; row < 3; ++row) {
+            for (int col = 0; col < 9; ++col) {
+                int x = col * 18 + 8;
+                int y = row * 18 + 85;
+                addSlot(new SlotItemHandler(iItemHandler, col + row * 9 + 9, x, y));
+            }
+        }
+        // Slots for the hotbar
+        for (int row = 0; row < 9; ++row) {
+            int x = 8 + row * 18;
+            int y = 143;
+            addSlot(new SlotItemHandler(iItemHandler, row, x, y));
+        }
     }
 
     private void addCustomSlots() {
         te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(h -> addSlot(new SlotItemHandler(h, 1, 80, 38)));
     }
 
-    private int addSlotRange(IItemHandler handler, int index, int x, int y, int amount, int dx) {
-        for (int i = 0 ; i < amount ; i++) {
-            addSlot(new SlotItemHandler(handler, index, x, y));
-            x += dx;
-            index++;
-        }
-        return index;
-    }
-
-    private void addSlotBox(IItemHandler handler, int index, int x, int y, int horAmount, int dx, int verAmount, int dy) {
-        for (int j = 0 ; j < verAmount ; j++) {
-            index = addSlotRange(handler, index, x, y, horAmount, dx);
-            y += dy;
-        }
-    }
 
     /**
      * This is actually needed in order to achieve shift click functionality in the Controller GUI. If this method isn't overridden, the game crashes.

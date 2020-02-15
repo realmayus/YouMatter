@@ -31,7 +31,7 @@ public class ObjectHolders {
     public static BlackHoleItem BLACK_HOLE_ITEM;
 
     @ObjectHolder(YouMatter.MODID + ":scanner")
-    public static ContainerType<ScannerContainer> SCANNER_CONTAINER_TYPE;
+    public static ContainerType<ScannerContainer> SCANNER_CONTAINER;
     @ObjectHolder(YouMatter.MODID + ":scanner")
-    public static TileEntityType<ScannerTile> SCANNER_TILE_ENTITY_TYPE;
+    public static TileEntityType<ScannerTile> SCANNER_TILE;
 }

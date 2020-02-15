@@ -23,6 +23,7 @@ public class ScannerScreen extends ContainerScreen<ScannerContainer> {
 
     public ScannerScreen(ScannerContainer container, PlayerInventory inv, ITextComponent name) {
         super(container, inv, name);
+        this.te = container.te;
     }
 
     @Override
@@ -92,11 +93,11 @@ public class ScannerScreen extends ContainerScreen<ScannerContainer> {
         this.minecraft.getTextureManager().bindTexture(GUI);
 
         if(energy == 0) {
-            this.blit(141, 36, 176, 21, 15, 20);
+            this.blit(141, 35, 176, 21, 15, 20);
         } else {
             double percentage = energy * 100 / 1000000;  // i know this is dumb
             float percentagef = (float) percentage / 100; // but it works.
-            this.blit(141, 36, 176, 0, 15, Math.round(20 * percentagef)); // it's not really intended that the bolt fills from the top but it looks cool tbh.
+            this.blit(141, 35, 176, 0, 15, Math.round(20 * percentagef)); // it's not really intended that the bolt fills from the top but it looks cool tbh.
 
         }
     }
