@@ -1,11 +1,10 @@
 package realmayus.youmatter;
 
 
-
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.registries.ObjectHolder;
-import realmayus.youmatter.items.*;
+import realmayus.youmatter.items.BlackHoleItem;
 import realmayus.youmatter.scanner.ScannerBlock;
 import realmayus.youmatter.scanner.ScannerContainer;
 import realmayus.youmatter.scanner.ScannerTile;
@@ -18,7 +17,7 @@ public class ObjectHolders {
 //    public static final BlockReplicator REPLICATOR = null;
 //    public static final BlockCreator CREATOR = null;
     @ObjectHolder(YouMatter.MODID + ":scanner")
-    public static final ScannerBlock SCANNER = null;
+    public static ScannerBlock SCANNER;
 //    public static final BlockEncoder ENCODER = null;
 //
 //    public static final ThumbdriveItem THUMB_DRIVE = null;
@@ -29,10 +28,10 @@ public class ObjectHolders {
 //    public static final TransistorItem TRANSISTOR = null;
 //    public static final ComputeModuleItem COMPUTE_MODULE = null;
     @ObjectHolder(YouMatter.MODID + ":black_hole")
-    public static final BlackHoleItem BLACK_HOLE_ITEM = null;
+    public static BlackHoleItem BLACK_HOLE_ITEM;
 
     @ObjectHolder(YouMatter.MODID + ":scanner")
-    public static final ContainerType<ScannerContainer> SCANNER_CONTAINER_TYPE = null;
+    public static ContainerType<ScannerContainer> SCANNER_CONTAINER_TYPE;
     @ObjectHolder(YouMatter.MODID + ":scanner")
-    public static final TileEntityType<ScannerTile> SCANNER_TILE_ENTITY_TYPE = null;
+    public static TileEntityType<ScannerTile> SCANNER_TILE_ENTITY_TYPE;
 }

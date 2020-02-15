@@ -19,16 +19,16 @@ public class RegistryHandler {
 
     @SubscribeEvent
     public static void addBlocksAndFluids(RegistryEvent.Register<Block> event) {
-        event.getRegistry().register(new ScannerBlock());
+        event.getRegistry().register(new ScannerBlock().setRegistryName(YouMatter.MODID, "scanner"));
     }
 
     public static void addTE(RegistryEvent.Register<TileEntityType<?>> event) {
-        event.getRegistry().register(TileEntityType.Builder.create(ScannerTile::new, ObjectHolders.SCANNER).build(null).setRegistryName(ObjectHolders.SCANNER.getRegistryName()));
+        event.getRegistry().register(TileEntityType.Builder.create(ScannerTile::new, ObjectHolders.SCANNER).build(null).setRegistryName(YouMatter.MODID, "scanner"));
     }
 
     @SubscribeEvent
     public static void addItems(RegistryEvent.Register<Item> event) {
-        event.getRegistry().register(new BlockItem(ObjectHolders.SCANNER, new Item.Properties().group(ItemGroup.REDSTONE)).setRegistryName(ObjectHolders.SCANNER.getRegistryName()));
+        event.getRegistry().register(new BlockItem(ObjectHolders.SCANNER, new Item.Properties().group(YouMatter.ITEM_GROUP)).setRegistryName(YouMatter.MODID, "scanner"));
         event.getRegistry().register(new Item(new Item.Properties().group(YouMatter.ITEM_GROUP)).setRegistryName(ObjectHolders.SCANNER.getRegistryName()));
     }
 
