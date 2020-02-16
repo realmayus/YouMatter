@@ -6,6 +6,7 @@ import net.minecraft.entity.player.PlayerEntity;
 //import realmayus.youmatter.creator.ICreatorStateContainer;
 //import realmayus.youmatter.encoder.IEncoderStateContainer;
 //import realmayus.youmatter.replicator.IReplicatorStateContainer;
+import realmayus.youmatter.encoder.IEncoderStateContainer;
 import realmayus.youmatter.scanner.IScannerStateContainer;
 
 public class ClientPacketHandlers {
@@ -26,12 +27,12 @@ public class ClientPacketHandlers {
     }
 
     public static void handlePacketUpdateEncoderClient(PacketUpdateEncoderClient message) {
-//
-//        PlayerEntity player = Minecraft.getInstance().player;
-//
-//        if (player.openContainer instanceof IEncoderStateContainer) {
-//            ((IEncoderStateContainer) player.openContainer).sync(message.energy, message.progress);
-//        }
+
+        PlayerEntity player = Minecraft.getInstance().player;
+
+        if (player.openContainer instanceof IEncoderStateContainer) {
+            ((IEncoderStateContainer) player.openContainer).sync(message.energy, message.progress);
+        }
     }
 
     public static void handlePacketUpdateReplicatorClient(PacketUpdateReplicatorClient message) {

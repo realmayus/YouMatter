@@ -1,35 +1,43 @@
-package realmayus.youmatter.scanner;
+package realmayus.youmatter.creator;
+
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.IContainerListener;
 import net.minecraft.inventory.container.Slot;
+import net.minecraft.item.BucketItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.IWorldPosCallable;
+import net.minecraft.item.Items;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
+
 import net.minecraftforge.items.wrapper.InvWrapper;
+import realmayus.youmatter.ModFluids;
 import realmayus.youmatter.ObjectHolders;
+
 import realmayus.youmatter.network.PacketHandler;
-import realmayus.youmatter.network.PacketUpdateScannerClient;
+import realmayus.youmatter.network.PacketUpdateCreatorClient;
 
-public class ScannerContainer extends Container implements IScannerStateContainer {
 
-    public ScannerTile te;
+
+public class CreatorContainer extends Container implements ICreatorStateContainer {
+
+    public CreatorTile te;
     private PlayerEntity playerEntity;
     private IItemHandler playerInventory;
 
 
-    public ScannerContainer(int windowId, World world, BlockPos pos, PlayerInventory playerInventory, PlayerEntity player) {
-        super(ObjectHolders.SCANNER_CONTAINER, windowId);
-        te = world.getTileEntity(pos) instanceof ScannerTile ? (ScannerTile) world.getTileEntity(pos) : null;
+    public CreatorContainer(int windowId, World world, BlockPos pos, PlayerInventory playerInventory, PlayerEntity player) {
+        super(ObjectHolders.CREATOR_CONTAINER, windowId);
+        te = world.getTileEntity(pos) instanceof CreatorTile ? (CreatorTile) world.getTileEntity(pos) : null;
         this.playerEntity = player;
         this.playerInventory = new InvWrapper(playerInventory);
 
@@ -43,8 +51,8 @@ public class ScannerContainer extends Container implements IScannerStateContaine
         for(IContainerListener p : this.listeners) {
             if(p != null) {
                 if (p instanceof ServerPlayerEntity) {
-                    PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) p), new PacketUpdateScannerClient(te.getEnergy(), te.getProgress(), te.getHasEncoder()));
-                }
+                    //PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) p), new PacketUpdateCreatorClient(te.getEnergy(), te.getClientProgress()));
+                } //TODO
             }
         }
     }
@@ -53,7 +61,6 @@ public class ScannerContainer extends Container implements IScannerStateContaine
     public boolean canInteractWith(PlayerEntity playerIn) {
         return true;
     }
-
 
     private void addPlayerSlots(IItemHandler iItemHandler) {
         // Slots for the main inventory
@@ -73,12 +80,16 @@ public class ScannerContainer extends Container implements IScannerStateContaine
     }
 
     private void addCustomSlots() {
-        te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(h -> addSlot(new SlotItemHandler(h, 1, 80, 37)));
+        te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(h -> {
+                    addSlot(new SlotItemHandler(h, 1, 52, 21));
+                    addSlot(new SlotItemHandler(h, 2, 52, 63));
+                    addSlot(new SlotItemHandler(h, 3, 110, 21));
+                    addSlot(new SlotItemHandler(h, 4, 110, 63));
+                });
     }
 
-
     /**
-     * This is actually needed in order to achieve shift click functionality in the GUI. If this method isn't overridden, the game crashes.
+     * This is actually needed in order to achieve shift click functionality in the Controller GUI. If this method isn't overridden, the game crashes.
      */
     @Override
     public ItemStack transferStackInSlot(PlayerEntity playerIn, int index) {
@@ -89,11 +100,24 @@ public class ScannerContainer extends Container implements IScannerStateContaine
             ItemStack itemstack1 = slot.getStack();
             itemstack = itemstack1.copy();
 
-            if (index == 36) {
+            if (index >= 37 && index <= 39) { //originating slot is custom slot
                 if (!this.mergeItemStack(itemstack1, 0, 36, true)) {
-                    return ItemStack.EMPTY;
+                    return ItemStack.EMPTY; // Inventory is full, can't transfer item!
                 }
-            } else if (!this.mergeItemStack(itemstack1, 36, 37, false)) {
+            } else {
+                if(itemstack1.getItem() instanceof BucketItem) {
+                    BucketItem bucket = (BucketItem) itemstack1.getItem();
+                    bucket.getFluid();
+                    if (bucket.getFluid().getFluid().equals(ModFluids.stabilizer.get())) {
+                        if(!this.mergeItemStack(itemstack1, 36, 37, false)) {
+                            return ItemStack.EMPTY; // custom slot is full, can't transfer item!
+                        }
+                    }
+                } else if(itemstack1.getItem().equals(Items.BUCKET)) {
+                    if(!this.mergeItemStack(itemstack1, 38, 39, false)) {
+                        return ItemStack.EMPTY; // custom slot is full, can't transfer item!
+                    }
+                }
                 return ItemStack.EMPTY;
             }
 
@@ -103,14 +127,20 @@ public class ScannerContainer extends Container implements IScannerStateContaine
                 slot.onSlotChanged();
             }
         }
-
         return itemstack;
     }
 
     @Override
-    public void sync(int energy, int progress, boolean hasEncoder) {
+    public void sync(int uFluidAmount, int sFluidAmount, int energy, int progress, CompoundNBT uTank, CompoundNBT sTank, boolean isActivated) {
+        te.setClientUFluidAmount(uFluidAmount);
+        te.setClientSFluidAmount(sFluidAmount);
         te.setClientEnergy(energy);
         te.setClientProgress(progress);
-        te.setHasEncoderClient(hasEncoder);
+        te.setClientUTank(uTank);
+        te.setClientSTank(sTank);
+        te.setActivatedClient(isActivated);
     }
+
+
+
 }

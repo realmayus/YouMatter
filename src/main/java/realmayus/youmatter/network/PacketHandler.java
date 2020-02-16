@@ -22,7 +22,6 @@ public class PacketHandler {
         INSTANCE.registerMessage(nextID(), PacketUpdateCreatorClient.class, PacketUpdateCreatorClient::encode, PacketUpdateCreatorClient::new, PacketUpdateCreatorClient::handle);
         INSTANCE.registerMessage(nextID(), PacketUpdateEncoderClient.class, PacketUpdateEncoderClient::encode, PacketUpdateEncoderClient::new, PacketUpdateEncoderClient::handle);
 
-
         //To: Server
         INSTANCE.registerMessage(nextID(), PacketShowNext.class, PacketShowNext::encode, PacketShowNext::new, PacketShowNext::handle);
         INSTANCE.registerMessage(nextID(), PacketShowPrevious.class, PacketShowPrevious::encode, PacketShowPrevious::new, PacketShowPrevious::handle);

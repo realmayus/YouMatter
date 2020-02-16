@@ -1,14 +1,13 @@
-package realmayus.youmatter.scanner;
+package realmayus.youmatter.encoder;
+
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.IContainerListener;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.IWorldPosCallable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.PacketDistributor;
@@ -17,19 +16,20 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 import realmayus.youmatter.ObjectHolders;
+import realmayus.youmatter.items.ThumbdriveItem;
 import realmayus.youmatter.network.PacketHandler;
-import realmayus.youmatter.network.PacketUpdateScannerClient;
+import realmayus.youmatter.network.PacketUpdateEncoderClient;
 
-public class ScannerContainer extends Container implements IScannerStateContainer {
+public class EncoderContainer extends Container implements IEncoderStateContainer {
 
-    public ScannerTile te;
+
+    public EncoderTile te;
     private PlayerEntity playerEntity;
     private IItemHandler playerInventory;
 
-
-    public ScannerContainer(int windowId, World world, BlockPos pos, PlayerInventory playerInventory, PlayerEntity player) {
-        super(ObjectHolders.SCANNER_CONTAINER, windowId);
-        te = world.getTileEntity(pos) instanceof ScannerTile ? (ScannerTile) world.getTileEntity(pos) : null;
+    public EncoderContainer(int windowId, World world, BlockPos pos, PlayerInventory playerInventory, PlayerEntity player) {
+        super(ObjectHolders.ENCODER_CONTAINER, windowId);
+        te = world.getTileEntity(pos) instanceof EncoderTile ? (EncoderTile) world.getTileEntity(pos) : null;
         this.playerEntity = player;
         this.playerInventory = new InvWrapper(playerInventory);
 
@@ -43,7 +43,7 @@ public class ScannerContainer extends Container implements IScannerStateContaine
         for(IContainerListener p : this.listeners) {
             if(p != null) {
                 if (p instanceof ServerPlayerEntity) {
-                    PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) p), new PacketUpdateScannerClient(te.getEnergy(), te.getProgress(), te.getHasEncoder()));
+                    PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) p), new PacketUpdateEncoderClient(te.getEnergy(), te.getProgress()));
                 }
             }
         }
@@ -53,7 +53,6 @@ public class ScannerContainer extends Container implements IScannerStateContaine
     public boolean canInteractWith(PlayerEntity playerIn) {
         return true;
     }
-
 
     private void addPlayerSlots(IItemHandler iItemHandler) {
         // Slots for the main inventory
@@ -73,9 +72,8 @@ public class ScannerContainer extends Container implements IScannerStateContaine
     }
 
     private void addCustomSlots() {
-        te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(h -> addSlot(new SlotItemHandler(h, 1, 80, 37)));
+        te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(h -> addSlot(new SlotItemHandler(h, 1, 90, 38)));
     }
-
 
     /**
      * This is actually needed in order to achieve shift click functionality in the GUI. If this method isn't overridden, the game crashes.
@@ -85,16 +83,16 @@ public class ScannerContainer extends Container implements IScannerStateContaine
         ItemStack itemstack = ItemStack.EMPTY;
         Slot slot = this.inventorySlots.get(index);
 
-        if (slot != null && slot.getHasStack()) {
+        if (slot != null && slot.getHasStack() && slot.getStack().getItem() instanceof ThumbdriveItem) {
             ItemStack itemstack1 = slot.getStack();
             itemstack = itemstack1.copy();
 
-            if (index == 36) {
+            if (index == 36) { //originating slot is custom slot
                 if (!this.mergeItemStack(itemstack1, 0, 36, true)) {
-                    return ItemStack.EMPTY;
+                    return ItemStack.EMPTY; // Inventory is full, can't transfer item!
                 }
-            } else if (!this.mergeItemStack(itemstack1, 36, 37, false)) {
-                return ItemStack.EMPTY;
+            } else if (!this.mergeItemStack(itemstack1, 36, 37, false)) { //move from inv to custom slot
+                return ItemStack.EMPTY; // custom slot is full, can't transfer item!
             }
 
             if (itemstack1.isEmpty()) {
@@ -108,9 +106,8 @@ public class ScannerContainer extends Container implements IScannerStateContaine
     }
 
     @Override
-    public void sync(int energy, int progress, boolean hasEncoder) {
+    public void sync(int energy, int progress) {
         te.setClientEnergy(energy);
         te.setClientProgress(progress);
-        te.setHasEncoderClient(hasEncoder);
     }
 }

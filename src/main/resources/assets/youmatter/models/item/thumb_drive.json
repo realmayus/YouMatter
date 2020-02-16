@@ -1,6 +1,6 @@
 {
-  "parent": "item/handheld",
+  "parent": "item/generated",
   "textures": {
-    "layer0": "youmatter:items/thumb_drive"
+    "layer0": "youmatter:item/thumb_drive"
   }
 }

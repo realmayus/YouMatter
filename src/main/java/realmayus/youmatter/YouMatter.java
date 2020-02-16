@@ -35,10 +35,14 @@ public class YouMatter {
         }
     };*/
 
+    public YouMatter() {
+        ModFluids.init();
+    }
+
     public static ItemGroup ITEM_GROUP = new ItemGroup("YouMatter") { //todo localize
         @Override
         public ItemStack createIcon() {
-            return new ItemStack(ObjectHolders.SCANNER, 1);
+            return new ItemStack(ObjectHolders.SCANNER_BLOCK, 1);
         }
     };
 

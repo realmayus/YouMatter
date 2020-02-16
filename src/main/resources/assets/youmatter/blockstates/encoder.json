@@ -1,27 +1,7 @@
 {
-  "forge_marker": 1,
-  "defaults": {
-    "model": "cube",
-    "textures": {
-      "particle": "youmatter:blocks/encoder_side",
-      "north": "youmatter:blocks/encoder_side",
-      "south": "youmatter:blocks/encoder_side",
-      "west": "youmatter:blocks/encoder_side",
-      "east": "youmatter:blocks/encoder_side",
-      "up": "youmatter:blocks/generic_side",
-      "down": "youmatter:blocks/generic_side"
-    }
-  },
   "variants": {
-    "": [{}],
-    "inventory": [{}],
-    "facing": {
-      "north": {},
-      "south": {"y": 180},
-      "west": {"y": 270},
-      "east": {"y": 90},
-      "up": {"x": -90},
-      "down": {"x": 90}
+    "": {
+      "model": "youmatter:block/encoder"
     }
   }
 }
