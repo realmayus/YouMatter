@@ -7,13 +7,20 @@ import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
 import realmayus.youmatter.ObjectHolders;
 import realmayus.youmatter.YMConfig;
+import realmayus.youmatter.util.CustomInvWrapper;
 import realmayus.youmatter.util.MyEnergyStorage;
 
 import javax.annotation.Nonnull;
@@ -48,66 +55,29 @@ public class ScannerTile extends TileEntity implements INamedContainerProvider {
     public boolean hasEncoderClient = false;
 
 
-/*
+    @Nonnull
     @Override
-    public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
-        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            return true;
+    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
+        if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+            return LazyOptional.of(() -> inventory).cast();
         }
 
-        if(capability == CapabilityEnergy.ENERGY) {
-            return true;
+        if(cap == CapabilityEnergy.ENERGY) {
+            return LazyOptional.of(() -> myEnergyStorage).cast();
+
         }
-        return super.hasCapability(capability, facing);
-
-
+        return super.getCapability(cap, side);
     }
-
-    @Override
-    public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(combinedHandler);
-        }
-
-        if(capability == CapabilityEnergy.ENERGY) {
-            return CapabilityEnergy.ENERGY.cast(myEnergyStorage);
-
-        }
-
-        return super.getCapability(capability, facing);
-    }
-*/
 
     /**
      * Handler for the Input Slots
      */
-    public ItemStackHandler inputHandler = new ItemStackHandler(5) {
-
-        @Override
-        public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
-            return true;
-        }
-
+    public ItemStackHandler inventory = new ItemStackHandler(5) {
         @Override
         protected void onContentsChanged(int slot) {
             ScannerTile.this.markDirty();
         }
     };
-
-
-
-    /**
-     * Handler for the Output Slots
-     */
-    private ItemStackHandler outputHandler = new ItemStackHandler(5) {
-        @Override
-        protected void onContentsChanged(int slot) {
-            ScannerTile.this.markDirty();
-        }
-    };
-
-    private CombinedInvWrapper combinedHandler = new CombinedInvWrapper(inputHandler, outputHandler);
-
 
     private int clientEnergy = -1;
     private int clientProgress = -1;

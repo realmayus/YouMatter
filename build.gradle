@@ -109,6 +109,33 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
+    // compile against the JEI API but do not include it at runtime
+    compileOnly fg.deobf("mezz.jei:jei-1.14.4:6.0.0.27:api")
+    // at runtime, use the full JEI jar
+    runtimeOnly fg.deobf("mezz.jei:jei-1.14.4:6.0.0.27")
+
+    implementation fg.deobf("mcjty.theoneprobe:TheOneProbe-1.14:1.14-1.4.37-16")
+
+//    implementation fg.deobf(group: "net.mymod", name: "mymod", version: "1.0.0")
+//    implementation fg.deobf(group: "net.mymod", name: "mymod", version: "1.0.0")
+
+}
+
+repositories {
+    maven {
+        // location of the maven that hosts JEI files
+        name = "Progwml6 maven"
+        url = "https://dvs1.progwml6.com/files/maven/"
+    }
+    maven {
+        // location of a maven mirror for JEI files, as a fallback
+        name = "ModMaven"
+        url = "https://modmaven.k-4u.nl"
+    }
+    maven { // TOP
+        name 'tterrag maven'
+        url "http://maven.tterrag.com/"
+    }
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..

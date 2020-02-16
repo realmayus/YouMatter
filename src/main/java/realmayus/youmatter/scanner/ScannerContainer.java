@@ -73,7 +73,7 @@ public class ScannerContainer extends Container implements IScannerStateContaine
     }
 
     private void addCustomSlots() {
-        te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(h -> addSlot(new SlotItemHandler(h, 1, 80, 38)));
+        te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(h -> addSlot(new SlotItemHandler(h, 1, 80, 37)));
     }
 
 
