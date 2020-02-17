@@ -2,7 +2,6 @@ package realmayus.youmatter.creator;
 
 
 import net.minecraft.block.BlockState;
-import net.minecraft.client.renderer.texture.ITickable;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
@@ -11,6 +10,7 @@ import net.minecraft.item.BucketItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -33,7 +33,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 
-public class CreatorTile extends TileEntity implements ITickable, INamedContainerProvider {
+public class CreatorTile extends TileEntity implements ITickableTileEntity, INamedContainerProvider {
 
     public CreatorTile() {
         super(ObjectHolders.CREATOR_TILE);
@@ -278,6 +278,7 @@ public class CreatorTile extends TileEntity implements ITickable, INamedContaine
     }
 
     private int currentPartTick = 0;
+
     @Override
     public void tick() {
         if (currentPartTick == 40) { // every 2 sec
@@ -313,19 +314,15 @@ public class CreatorTile extends TileEntity implements ITickable, INamedContaine
                     }
                 }
                 if (!this.inventory.getStackInSlot(1).isEmpty()) {
-                    if (this.inventory.getStackInSlot(1).getItem() instanceof BucketItem) {
-                        BucketItem bucket = (BucketItem) this.inventory.getStackInSlot(1).getItem();
-                        if (bucket.equals(ObjectHolders.STABILIZER_BUCKET)) {
-                            if (getSTank().getFluidAmount() < getSTank().getCapacity()) {
-                                getSTank().fill(new FluidStack(ModFluids.stabilizer.get(), 1000), IFluidHandler.FluidAction.EXECUTE);
-                                this.inventory.setStackInSlot(1, ItemStack.EMPTY);
-                                this.inventory.insertItem(2, new ItemStack(Items.BUCKET, 1), false);
-                            }
+                    BucketItem bucket = (BucketItem) this.inventory.getStackInSlot(1).getItem();
+                    if (bucket == ObjectHolders.STABILIZER_BUCKET) {
+                        if (getSTank().getFluidAmount() < getSTank().getCapacity()) {
+                            getSTank().fill(new FluidStack(ModFluids.stabilizer.get(), 1000), IFluidHandler.FluidAction.EXECUTE);
+                            this.inventory.setStackInSlot(1, ItemStack.EMPTY);
+                            this.inventory.insertItem(2, new ItemStack(Items.BUCKET, 1), false);
                         }
-
                     }
                 }
-
             }
             currentPartTick++;
         } else {

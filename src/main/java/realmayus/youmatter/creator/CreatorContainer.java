@@ -14,6 +14,7 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
@@ -51,8 +52,8 @@ public class CreatorContainer extends Container implements ICreatorStateContaine
         for(IContainerListener p : this.listeners) {
             if(p != null) {
                 if (p instanceof ServerPlayerEntity) {
-                    //PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) p), new PacketUpdateCreatorClient(te.getEnergy(), te.getClientProgress()));
-                } //TODO
+                    PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) p), new PacketUpdateCreatorClient(te.getEnergy(), 0, te.getUTank().getFluid(), te.getSTank().getFluid(), te.isActivated()));
+                }
             }
         }
     }
@@ -81,10 +82,10 @@ public class CreatorContainer extends Container implements ICreatorStateContaine
 
     private void addCustomSlots() {
         te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(h -> {
-                    addSlot(new SlotItemHandler(h, 1, 52, 21));
-                    addSlot(new SlotItemHandler(h, 2, 52, 63));
-                    addSlot(new SlotItemHandler(h, 3, 110, 21));
-                    addSlot(new SlotItemHandler(h, 4, 110, 63));
+                    addSlot(new SlotItemHandler(h, 1, 52, 20));
+                    addSlot(new SlotItemHandler(h, 2, 52, 62));
+                    addSlot(new SlotItemHandler(h, 3, 110, 20));
+                    addSlot(new SlotItemHandler(h, 4, 110, 62));
                 });
     }
 
@@ -131,16 +132,10 @@ public class CreatorContainer extends Container implements ICreatorStateContaine
     }
 
     @Override
-    public void sync(int uFluidAmount, int sFluidAmount, int energy, int progress, CompoundNBT uTank, CompoundNBT sTank, boolean isActivated) {
-        te.setClientUFluidAmount(uFluidAmount);
-        te.setClientSFluidAmount(sFluidAmount);
+    public void sync(int energy, int progress, FluidStack uTank, FluidStack sTank, boolean isActivated) {
         te.setClientEnergy(energy);
-        te.setClientProgress(progress);
-        te.setClientUTank(uTank);
-        te.setClientSTank(sTank);
+        te.getUTank().setFluid(uTank);
+        te.getSTank().setFluid(sTank);
         te.setActivatedClient(isActivated);
     }
-
-
-
 }

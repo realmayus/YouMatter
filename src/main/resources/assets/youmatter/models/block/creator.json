@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube",
+  "textures": {
+      "particle": "youmatter:block/creator",
+      "north": "youmatter:block/creator",
+      "south": "youmatter:block/creator",
+      "west": "youmatter:block/creator",
+      "east": "youmatter:block/creator",
+      "up": "youmatter:block/creator",
+      "down": "youmatter:block/creator"
+  }
+}

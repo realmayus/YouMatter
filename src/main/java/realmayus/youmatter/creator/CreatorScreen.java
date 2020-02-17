@@ -1,12 +1,25 @@
 package realmayus.youmatter.creator;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.SimpleSound;
+import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
+import net.minecraft.client.renderer.texture.AtlasTexture;
+import net.minecraft.client.renderer.texture.ITextureObject;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.fluid.EmptyFluid;
+import net.minecraft.fluid.FlowingFluid;
+import net.minecraft.fluid.Fluid;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.ForgeFlowingFluid;
 import net.minecraftforge.fluids.IFluidTank;
 import realmayus.youmatter.ObjectHolders;
 import realmayus.youmatter.YouMatter;
@@ -42,8 +55,8 @@ public class CreatorScreen extends ContainerScreen<CreatorContainer> {
         int relY = (this.height - HEIGHT) / 2;
         this.blit(relX, relY, 0, 0, WIDTH, HEIGHT);
 
-        drawFluidTank(89, 23, te.getUTank());
-        drawFluidTank(31, 23, te.getSTank());
+        drawFluidTank(89, 22, te.getUTank());
+        drawFluidTank(31, 22, te.getSTank());
     }
 
     private void drawActiveIcon(boolean isActive) {
@@ -64,16 +77,23 @@ public class CreatorScreen extends ContainerScreen<CreatorContainer> {
 
         this.minecraft.getTextureManager().bindTexture(GUI);
 
-        if(te.getClientEnergy() == 0) {
-            this.blit(150, 59, 176, 114, 15, 20);
-        } else {
-            double percentage = te.getClientEnergy() * 100 / 1000000;  // i know this is dumb
-            float percentagef = (float) percentage / 100; // but it works.
-            this.blit(150, 59, 176, 93, 15, Math.round(20 * percentagef)); // it's not really intended that the bolt fills from the top but it looks cool tbh.
+        drawEnergyBolt(te.getClientEnergy());
 
-        }
         drawActiveIcon(te.isActivatedClient());
         font.drawString(I18n.format(ObjectHolders.CREATOR_BLOCK.getTranslationKey()), 8, 6, 0x404040);
+    }
+
+    private void drawEnergyBolt(int energy) {
+        this.minecraft.getTextureManager().bindTexture(GUI);
+
+        if(energy == 0) {
+            this.blit(150, 58, 176, 114, 15, 20);
+        } else {
+            double percentage = energy * 100.0F / 1000000;  // i know this is dumb
+            float percentagef = (float) percentage / 100; // but it works.
+            this.blit(150, 58, 176, 93, 15, Math.round(20 * percentagef)); // it's not really intended that the bolt fills from the top but it looks cool tbh.
+
+        }
     }
 
     @Override
@@ -111,54 +131,49 @@ public class CreatorScreen extends ContainerScreen<CreatorContainer> {
     //both drawFluid and drawFluidTank is courtesy of DarkGuardsMan and was modified to suit my needs. Go check him out: https://github.com/BuiltBrokenModding/Atomic-Science | MIT License |  Copyright (c) 2018 Built Broken Modding License: https://opensource.org/licenses/MIT
     private void drawFluid(int x, int y, int line, int col, int width, int drawSize, FluidStack fluidStack)
     {
-//        if (fluidStack != null && fluidStack.getFluid() != null)
-//        {
-//            drawSize -= 1;
-//            ResourceLocation fluidIcon = null;
-//            Fluid fluid = fluidStack.getFluid();
-//            if (fluid != null)
-//            {
-//                if (fluid.getStill(fluidStack) != null)
-//                {
-//                    fluidIcon = fluid.getStill(fluidStack);
-//                }
-//                else if (fluid.getFlowing(fluidStack) != null)
-//                {
-//                    fluidIcon = fluid.getFlowing(fluidStack);
-//                }
-//                else
-//                {
-//                    fluidIcon = FluidRegistry.WATER.getStill();
-//                }
-//            }
-//            //Get sprite
-//            TextureAtlasSprite texture = FMLClientHandler.instance().getClient().getTextureMapBlocks().getAtlasSprite(fluidIcon.toString());
-//            //bind texture
-//            FMLClientHandler.instance().getClient().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-//            final int textureSize = 16;
-//            int start = 0;
-//            int renderY;
-//            while (drawSize != 0)
-//            {
-//                if (drawSize > textureSize)
-//                {
-//                    renderY = textureSize;
-//                    drawSize -= textureSize;
-//                }
-//                else
-//                {
-//                    renderY = drawSize;
-//                    drawSize = 0;
-//                }
-//
-//                this.blit(x + col, y + line + 58 - renderY - start, width, textureSize - (textureSize - renderY), texture);
-//                start = start + textureSize;
-//            }
-//        }
+        if (fluidStack != null && fluidStack.getFluid() != null && !fluidStack.isEmpty())
+        {
+            drawSize -= 1;
+            ResourceLocation fluidIcon;
+            Fluid fluid = fluidStack.getFluid();
+
+            ResourceLocation waterSprite = Fluids.WATER.getAttributes().getStill(new FluidStack(Fluids.WATER, 1000));
+
+            if (fluid instanceof FlowingFluid) {
+                if (fluid.getAttributes().getStill(fluidStack) != null) {
+                    fluidIcon = fluid.getAttributes().getStill(fluidStack);
+                } else if (fluid.getAttributes().getFlowing(fluidStack) != null) {
+                    fluidIcon = fluid.getAttributes().getFlowing(fluidStack);
+                } else {
+                    fluidIcon = waterSprite;
+                }
+            } else {
+                fluidIcon = waterSprite;
+            }
+
+            //Bind fluid texture
+
+            this.getMinecraft().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
+
+            final int textureSize = 16;
+            int start = 0;
+            int renderY;
+            while (drawSize != 0) {
+                if (drawSize > textureSize) {
+                    renderY = textureSize;
+                    drawSize -= textureSize;
+                } else {
+                    renderY = drawSize;
+                    drawSize = 0;
+                }
+
+                blit(x + col, y + line + 58 - renderY - start, 1000, width, textureSize - (textureSize - renderY), this.minecraft.getTextureMap().getAtlasSprite(fluidIcon.toString()));
+                start = start + textureSize;
+            }
+        }
     }
 
-    private void drawFluidTank(int x, int y, IFluidTank tank)
-    {
+    private void drawFluidTank(int x, int y, IFluidTank tank) {
 
         //Get data
         final float scale = tank.getFluidAmount() / (float) tank.getCapacity();
@@ -185,8 +200,6 @@ public class CreatorScreen extends ContainerScreen<CreatorContainer> {
 
     }
 
-    //TODO register creator (Doesnt appear in creative tab)
-
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
         super.mouseClicked(mouseX, mouseY, mouseButton);
@@ -195,7 +208,7 @@ public class CreatorScreen extends ContainerScreen<CreatorContainer> {
             double yAxis = (mouseY - (height - ySize) / 2);
             if(xAxis >= 148 && xAxis <= 167 && yAxis >= 7 && yAxis <= 27) {
                 //Playing Click sound
-                //Minecraft.getInstance().getSoundHandler().play(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F)); TODO
+                Minecraft.getInstance().getSoundHandler().play(SimpleSound.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 //Sending packet to server
                 PacketHandler.INSTANCE.sendToServer(new PacketChangeSettingsCreatorServer(!te.isActivatedClient()));
             }

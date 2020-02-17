@@ -62,6 +62,13 @@ public class ObjectHolders {
     @ObjectHolder(YouMatter.MODID + ":creator")
     public static TileEntityType<CreatorTile> CREATOR_TILE;
 
+//    @ObjectHolder(YouMatter.MODID + ":replicator")
+//    public static ReplicatorBlock REPLICATOR_BLOCK;
+//    @ObjectHolder(YouMatter.MODID + ":replicator")
+//    public static ContainerType<ReplicatorContainer> REPLICATOR_CONTAINER;
+//    @ObjectHolder(YouMatter.MODID + ":replicator")
+//    public static TileEntityType<CreatorTile> CREATOR_TILE;
+
     @ObjectHolder(YouMatter.MODID + ":stabilizer_bucket")
     public static BucketItem STABILIZER_BUCKET;
 

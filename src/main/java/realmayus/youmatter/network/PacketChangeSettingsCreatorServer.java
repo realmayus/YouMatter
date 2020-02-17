@@ -3,6 +3,7 @@ package realmayus.youmatter.network;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
+import realmayus.youmatter.creator.CreatorContainer;
 //import realmayus.youmatter.creator.ContainerCreator;
 import java.util.function.Supplier;
 
@@ -24,14 +25,14 @@ public class PacketChangeSettingsCreatorServer{
     }
 
     void handle(Supplier<NetworkEvent.Context> ctx) {
-//        // This is the player the packet was sent to the server from
-//        ctx.get().enqueueWork(() -> {
-//            ServerPlayerEntity player = ctx.get().getSender();
-//            if (player.openContainer instanceof ContainerCreator) {
-//                ContainerCreator openContainer = (ContainerCreator) player.openContainer;
-//                openContainer.te.setActivated(message.isActivated);
-//            }
-//        });
-//        ctx.get().setPacketHandled(true);
+        // This is the player the packet was sent to the server from
+        ctx.get().enqueueWork(() -> {
+            ServerPlayerEntity player = ctx.get().getSender();
+            if (player.openContainer instanceof CreatorContainer) {
+                CreatorContainer openContainer = (CreatorContainer) player.openContainer;
+                openContainer.te.setActivated(isActivated);
+            }
+        });
+        ctx.get().setPacketHandled(true);
     }
 }

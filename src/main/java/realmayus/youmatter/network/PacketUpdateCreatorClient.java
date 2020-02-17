@@ -7,8 +7,7 @@ import net.minecraftforge.fml.network.NetworkEvent;
 import java.util.function.Supplier;
 
 public class PacketUpdateCreatorClient {
-    public int uFluidAmount;
-    public int sFluidAmount;
+
     public int energy;
     public int progress;
     public FluidStack uTank;
@@ -16,8 +15,6 @@ public class PacketUpdateCreatorClient {
     public boolean isActivated;
 
     public void encode(PacketBuffer buf) {
-        buf.writeInt(uFluidAmount);
-        buf.writeInt(sFluidAmount);
         buf.writeInt(energy);
         buf.writeInt(progress);
         buf.writeFluidStack(uTank);
@@ -26,8 +23,6 @@ public class PacketUpdateCreatorClient {
     }
 
     public PacketUpdateCreatorClient(PacketBuffer buf) {
-        uFluidAmount = buf.readInt();
-        sFluidAmount = buf.readInt();
         energy = buf.readInt();
         progress = buf.readInt();
         uTank = buf.readFluidStack();
@@ -35,9 +30,7 @@ public class PacketUpdateCreatorClient {
         isActivated = buf.readBoolean();
     }
 
-    public PacketUpdateCreatorClient(int uFluidAmount, int sFluidAmount, int energy, int progress, FluidStack uTank, FluidStack sTank, boolean isActivated) {
-        this.uFluidAmount = uFluidAmount;
-        this.sFluidAmount = sFluidAmount;
+    public PacketUpdateCreatorClient(int energy, int progress, FluidStack uTank, FluidStack sTank, boolean isActivated) {
         this.energy = energy;
         this.progress = progress;
         this.uTank = uTank;

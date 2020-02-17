@@ -24,4 +24,6 @@ public class StabilizerFluidBlock extends FlowingFluidBlock {
         }
         super.onEntityCollision(state, worldIn, pos, entityIn);
     }
+
+
 }

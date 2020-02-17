@@ -1,10 +1,10 @@
 package realmayus.youmatter.creator;
 
 
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraftforge.fluids.FluidStack;
 
 public interface ICreatorStateContainer {
 
-    void sync(int uFluidAmount, int sFluidAmount, int energy, int progress, CompoundNBT uTank, CompoundNBT sTank, boolean isActivated);
+    void sync(int energy, int progress, FluidStack uTank, FluidStack sTank, boolean isActivated);
 
 }
