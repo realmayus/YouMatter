@@ -1,13 +1,13 @@
 {
   "result": {
-    "item": "thumb_drive"
+    "item": "youmatter:thumb_drive"
   },
   "pattern": [
     " cc",
     "Itt",
     " cc"
   ],
-  "type": "forge:ore_shaped",
+  "type": "minecraft:crafting_shaped",
   "key": {
     "c": {
       "item": "youmatter:machine_casing"

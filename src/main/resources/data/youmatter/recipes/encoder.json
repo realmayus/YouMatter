@@ -1,13 +1,13 @@
 {
   "result": {
-    "item": "encoder"
+    "item": "youmatter:encoder"
   },
   "pattern": [
     "cMc",
     "MTM",
     "MMM"
   ],
-  "type": "forge:ore_shaped",
+  "type": "minecraft:crafting_shaped",
   "key": {
     "c": {
       "item": "youmatter:compute_module"

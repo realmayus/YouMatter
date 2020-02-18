@@ -1,13 +1,13 @@
 {
   "result": {
-    "item": "transistor_raw"
+    "item": "youmatter:transistor_raw"
   },
   "pattern": [
     "ggg",
     "sss",
     "ggg"
   ],
-  "type": "forge:ore_shaped",
+  "type": "minecraft:crafting_shaped",
   "key": {
     "g": {
       "item": "minecraft:gold_nugget"

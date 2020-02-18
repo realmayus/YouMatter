@@ -14,6 +14,8 @@
   "item.youmatter.machine_casing": "Machine Casing",
   "item.youmatter.transistor": "Transistor",
   "item.youmatter.transistor_raw": "Transistor (Raw)",
+  "item.youmatter.umatter_bucket": "Bucket of U-Matter",
+  "item.youmatter.stabilizer_bucket": "Bucket of Stabilizer",
 
   "_comment": "Fluids",
   "fluid.umatter": "U-Matter",

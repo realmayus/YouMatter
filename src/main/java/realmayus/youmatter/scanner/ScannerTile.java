@@ -110,8 +110,12 @@ public class ScannerTile extends TileEntity implements INamedContainerProvider, 
     @Override
     public void read(CompoundNBT compound) {
         super.read(compound);
-        setProgress(compound.getInt("progress"));
-        myEnergyStorage.setEnergy(compound.getInt("energy"));
+        if (compound.contains("progress")) {
+            setProgress(compound.getInt("progress"));
+        }
+        if (compound.contains("energy")) {
+            myEnergyStorage.setEnergy(compound.getInt("energy"));
+        }
         if(compound.contains("inventory")) {
             inventory.deserializeNBT((CompoundNBT) compound.get("inventory"));
         }
@@ -162,18 +166,14 @@ public class ScannerTile extends TileEntity implements INamedContainerProvider, 
 
     private boolean isItemAllowed(ItemStack itemStack) {
             //If list should act as a blacklist AND it contains the item, disallow scanning
-        if (YMConfig.useAsBlacklist && Arrays.stream(YMConfig.itemList).anyMatch(s -> s.equalsIgnoreCase(Objects.requireNonNull(itemStack.getItem().getRegistryName()).toString()))) {
+        if (YMConfig.CONFIG.filterMode.get() && Arrays.stream((String[])YMConfig.CONFIG.filterItems.get().toArray(new String[YMConfig.CONFIG.filterItems.get().size()])).anyMatch(s -> s.equalsIgnoreCase(Objects.requireNonNull(itemStack.getItem().getRegistryName()).toString()))) {
             return false;
-
             //If list should act as a whitelist AND it DOESN'T contain the item, disallow scanning
-        } else if (!(YMConfig.useAsBlacklist) && Arrays.stream(YMConfig.itemList).noneMatch(s -> s.equalsIgnoreCase(Objects.requireNonNull(itemStack.getItem().getRegistryName()).toString()))) {
-            return false;
-
-            //Else:
-        } else {
-            return true;
-        }
+        } else
+            return YMConfig.CONFIG.filterMode.get() || Arrays.stream((String[]) YMConfig.CONFIG.filterItems.get().toArray((new String[YMConfig.CONFIG.filterItems.get().size()]))).anyMatch(s -> s.equalsIgnoreCase(Objects.requireNonNull(itemStack.getItem().getRegistryName()).toString()));
     }
+
+    @Nullable
     private BlockPos getNeighborEncoder(BlockPos scannerPos) {
         for(Direction facing : Direction.values()) {
             if(world.getBlockState(scannerPos.offset(facing)).getBlock() instanceof EncoderBlock) {

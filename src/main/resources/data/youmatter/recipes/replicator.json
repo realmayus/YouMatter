@@ -1,13 +1,13 @@
 {
   "result": {
-    "item": "replicator"
+    "item": "youmatter:replicator"
   },
   "pattern": [
     "cMc",
     "ene",
     "MbM"
   ],
-  "type": "forge:ore_shaped",
+  "type": "minecraft:crafting_shaped",
   "key": {
     "c": {
       "item": "youmatter:compute_module"

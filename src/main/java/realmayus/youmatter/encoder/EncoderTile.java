@@ -6,11 +6,13 @@ import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.StringNBT;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.IItemProvider;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.capabilities.Capability;
@@ -109,6 +111,20 @@ public class EncoderTile extends TileEntity implements INamedContainerProvider, 
         if(compound.contains("inventory")) {
             inventory.deserializeNBT((CompoundNBT) compound.get("inventory"));
         }
+        if(compound.contains("queue")) {
+            if (compound.get("queue") instanceof ListNBT) {
+                List<ItemStack> queueBuilder = new ArrayList<>();
+                for(INBT base: compound.getList("queue", Constants.NBT.TAG_COMPOUND)) {
+                    if (base instanceof CompoundNBT) {
+                        CompoundNBT nbtTagCompound = (CompoundNBT) base;
+                        if(!ItemStack.read(nbtTagCompound).isEmpty()) {
+                            queueBuilder.add(ItemStack.read(nbtTagCompound));
+                        }
+                    }
+                }
+                queue = queueBuilder;
+            }
+        }
     }
 
     @Override
@@ -119,6 +135,13 @@ public class EncoderTile extends TileEntity implements INamedContainerProvider, 
         if (inventory != null) {
             compound.put("inventory", inventory.serializeNBT());
         }
+        ListNBT tempCompoundList = new ListNBT();
+        for (ItemStack is : queue) {
+            if (!is.isEmpty()) {
+                tempCompoundList.add(is.write(new CompoundNBT()));
+            }
+        }
+        compound.put("queue", tempCompoundList);
         return compound;
     }
 

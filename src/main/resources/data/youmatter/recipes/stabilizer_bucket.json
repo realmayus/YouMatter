@@ -1,0 +1,14 @@
+{
+  "result": {
+    "item": "youmatter:stabilizer_bucket"
+  },
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "minecraft:bucket"
+    },
+    {
+      "item": "minecraft:snowball"
+    }
+  ]
+}

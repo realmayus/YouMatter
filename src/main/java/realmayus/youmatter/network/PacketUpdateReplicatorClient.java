@@ -12,7 +12,6 @@ import java.util.function.Supplier;
 
 
 public class PacketUpdateReplicatorClient {
-    public int fluidAmount;
     public int energy;
     public int progress;
     public FluidStack fluidStack;
@@ -21,7 +20,6 @@ public class PacketUpdateReplicatorClient {
 
 
     public PacketUpdateReplicatorClient(PacketBuffer buf) {
-        fluidAmount = buf.readInt();
         energy = buf.readInt();
         progress = buf.readInt();
         isActivated = buf.readBoolean();
@@ -29,8 +27,7 @@ public class PacketUpdateReplicatorClient {
         fluidStack = buf.readFluidStack();
     }
 
-    public PacketUpdateReplicatorClient(Integer fluidAmount, Integer energy, Integer progress, Boolean isActivated, Boolean mode, FluidStack fluidStack) {
-        this.fluidAmount = fluidAmount;
+    public PacketUpdateReplicatorClient(Integer energy, Integer progress, Boolean isActivated, Boolean mode, FluidStack fluidStack) {
         this.energy = energy;
         this.progress = progress;
         this.isActivated = isActivated;
@@ -39,7 +36,6 @@ public class PacketUpdateReplicatorClient {
     }
 
     void encode(PacketBuffer buf) {
-        buf.writeInt(fluidAmount);
         buf.writeInt(energy);
         buf.writeInt(progress);
         buf.writeBoolean(isActivated);

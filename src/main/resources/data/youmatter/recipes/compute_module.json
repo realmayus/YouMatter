@@ -1,17 +1,16 @@
 {
   "result": {
-    "item": "compute_module"
+    "item": "youmatter:compute_module"
   },
   "pattern": [
     "wTw",
     "TGT",
     "wTw"
   ],
-  "type": "forge:ore_shaped",
+  "type": "minecraft:crafting_shaped",
   "key": {
     "w": {
-      "type": "forge:ore_dict",
-      "ore": "slabWood"
+      "tag": "wooden_slabs"
     },
     "T": {
       "item": "youmatter:transistor"

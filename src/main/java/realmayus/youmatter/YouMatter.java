@@ -4,7 +4,9 @@ package realmayus.youmatter;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,25 +19,9 @@ public class YouMatter {
 
     public static final Logger logger = LogManager.getLogger();
 
-//    static {
-//        FluidRegistry.enableUniversalBucket();
-//    }
-/*
-    public static ItemTab creativeTab = new CreativeTabs("youmatter") {
-        @Override
-        public ItemStack createIcon() {
-            return FluidUtil.getFilledBucket(new FluidStack(ModFluids.UMATTER, 1));
-        }
-
-        @Override
-        public void displayAllRelevantItems(NonNullList<ItemStack> items) {
-            super.displayAllRelevantItems(items);
-            items.add(FluidUtil.getFilledBucket(new FluidStack(ModFluids.UMATTER, 1)));
-            items.add(FluidUtil.getFilledBucket(new FluidStack(ModFluids.STABILIZER, 1)));
-        }
-    };*/
 
     public YouMatter() {
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, YMConfig.CONFIG_SPEC);
         ModFluids.init();
     }
 

@@ -20,6 +20,9 @@ import realmayus.youmatter.encoder.EncoderContainer;
 import realmayus.youmatter.encoder.EncoderTile;
 import realmayus.youmatter.items.BlackHoleItem;
 import realmayus.youmatter.items.ThumbdriveItem;
+import realmayus.youmatter.replicator.ReplicatorBlock;
+import realmayus.youmatter.replicator.ReplicatorContainer;
+import realmayus.youmatter.replicator.ReplicatorTile;
 import realmayus.youmatter.scanner.ScannerBlock;
 import realmayus.youmatter.scanner.ScannerContainer;
 import realmayus.youmatter.scanner.ScannerTile;
@@ -32,6 +35,7 @@ public class RegistryHandler {
         event.getRegistry().register(new ScannerBlock().setRegistryName(YouMatter.MODID, "scanner"));
         event.getRegistry().register(new EncoderBlock().setRegistryName(YouMatter.MODID, "encoder"));
         event.getRegistry().register(new CreatorBlock().setRegistryName(YouMatter.MODID, "creator"));
+        event.getRegistry().register(new ReplicatorBlock().setRegistryName(YouMatter.MODID, "replicator"));
     }
 
     @SubscribeEvent
@@ -39,6 +43,7 @@ public class RegistryHandler {
         event.getRegistry().register(TileEntityType.Builder.create(ScannerTile::new, ObjectHolders.SCANNER_BLOCK).build(null).setRegistryName(YouMatter.MODID, "scanner"));
         event.getRegistry().register(TileEntityType.Builder.create(EncoderTile::new, ObjectHolders.ENCODER_BLOCK).build(null).setRegistryName(YouMatter.MODID, "encoder"));
         event.getRegistry().register(TileEntityType.Builder.create(CreatorTile::new, ObjectHolders.CREATOR_BLOCK).build(null).setRegistryName(YouMatter.MODID, "creator"));
+        event.getRegistry().register(TileEntityType.Builder.create(ReplicatorTile::new, ObjectHolders.REPLICATOR_BLOCK).build(null).setRegistryName(YouMatter.MODID, "replicator"));
     }
 
     @SubscribeEvent
@@ -46,8 +51,13 @@ public class RegistryHandler {
         event.getRegistry().register(new BlockItem(ObjectHolders.SCANNER_BLOCK, new Item.Properties().group(YouMatter.ITEM_GROUP)).setRegistryName(YouMatter.MODID, "scanner"));
         event.getRegistry().register(new BlockItem(ObjectHolders.ENCODER_BLOCK, new Item.Properties().group(YouMatter.ITEM_GROUP)).setRegistryName(YouMatter.MODID, "encoder"));
         event.getRegistry().register(new BlockItem(ObjectHolders.CREATOR_BLOCK, new Item.Properties().group(YouMatter.ITEM_GROUP)).setRegistryName(YouMatter.MODID, "creator"));
+        event.getRegistry().register(new BlockItem(ObjectHolders.REPLICATOR_BLOCK, new Item.Properties().group(YouMatter.ITEM_GROUP)).setRegistryName(YouMatter.MODID, "replicator"));
         event.getRegistry().register(new ThumbdriveItem().setRegistryName(YouMatter.MODID, "thumb_drive"));
         event.getRegistry().register(new BlackHoleItem().setRegistryName(YouMatter.MODID, "black_hole"));
+        event.getRegistry().register(new BlackHoleItem().setRegistryName(YouMatter.MODID, "machine_casing"));
+        event.getRegistry().register(new BlackHoleItem().setRegistryName(YouMatter.MODID, "compute_module"));
+        event.getRegistry().register(new BlackHoleItem().setRegistryName(YouMatter.MODID, "transistor"));
+        event.getRegistry().register(new BlackHoleItem().setRegistryName(YouMatter.MODID, "transistor_raw"));
     }
 
     @SubscribeEvent
@@ -55,10 +65,8 @@ public class RegistryHandler {
         event.getRegistry().register(IForgeContainerType.create((windowId, inv, data) -> new ScannerContainer(windowId, inv.player.world, data.readBlockPos(), inv, inv.player)).setRegistryName(YouMatter.MODID + ":scanner"));
         event.getRegistry().register(IForgeContainerType.create((windowId, inv, data) -> new EncoderContainer(windowId, inv.player.world, data.readBlockPos(), inv, inv.player)).setRegistryName(YouMatter.MODID + ":encoder"));
         event.getRegistry().register(IForgeContainerType.create((windowId, inv, data) -> new CreatorContainer(windowId, inv.player.world, data.readBlockPos(), inv, inv.player)).setRegistryName(YouMatter.MODID + ":creator"));
+        event.getRegistry().register(IForgeContainerType.create((windowId, inv, data) -> new ReplicatorContainer(windowId, inv.player.world, data.readBlockPos(), inv, inv.player)).setRegistryName(YouMatter.MODID + ":replicator"));
 
-    }
-
-    public static void registerFluidTextures(TextureStitchEvent event) {
     }
 
 } //todo furnace recipe

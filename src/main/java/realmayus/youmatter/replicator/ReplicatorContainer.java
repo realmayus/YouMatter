@@ -1,5 +1,4 @@
-package realmayus.youmatter.creator;
-
+package realmayus.youmatter.replicator;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -9,7 +8,6 @@ import net.minecraft.inventory.container.IContainerListener;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.BucketItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidStack;
@@ -17,26 +15,23 @@ import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
-
 import net.minecraftforge.items.wrapper.InvWrapper;
 import realmayus.youmatter.ModFluids;
 import realmayus.youmatter.ObjectHolders;
-
+import realmayus.youmatter.items.ThumbdriveItem;
 import realmayus.youmatter.network.PacketHandler;
-import realmayus.youmatter.network.PacketUpdateCreatorClient;
+import realmayus.youmatter.network.PacketUpdateReplicatorClient;
+import realmayus.youmatter.util.DisplaySlot;
 
+public class ReplicatorContainer extends Container implements IReplicatorStateContainer {
 
-
-public class CreatorContainer extends Container implements ICreatorStateContainer {
-
-    public CreatorTile te;
+    public ReplicatorTile te;
     private PlayerEntity playerEntity;
     private IItemHandler playerInventory;
 
-
-    public CreatorContainer(int windowId, World world, BlockPos pos, PlayerInventory playerInventory, PlayerEntity player) {
-        super(ObjectHolders.CREATOR_CONTAINER, windowId);
-        te = world.getTileEntity(pos) instanceof CreatorTile ? (CreatorTile) world.getTileEntity(pos) : null;
+    public ReplicatorContainer(int windowId, World world, BlockPos pos, PlayerInventory playerInventory, PlayerEntity player) {
+        super(ObjectHolders.REPLICATOR_CONTAINER, windowId);
+        te = world.getTileEntity(pos) instanceof ReplicatorTile ? (ReplicatorTile) world.getTileEntity(pos) : null;
         this.playerEntity = player;
         this.playerInventory = new InvWrapper(playerInventory);
 
@@ -50,7 +45,7 @@ public class CreatorContainer extends Container implements ICreatorStateContaine
         for(IContainerListener p : this.listeners) {
             if(p != null) {
                 if (p instanceof ServerPlayerEntity) {
-                    PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) p), new PacketUpdateCreatorClient(te.getEnergy(), 0, te.getUTank().getFluid(), te.getSTank().getFluid(), te.isActivated()));
+                    PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) p), new PacketUpdateReplicatorClient(te.getEnergy(), te.getProgress(), te.isActive(), te.isCurrentMode(), te.getTank().getFluid()));
                 }
             }
         }
@@ -60,6 +55,7 @@ public class CreatorContainer extends Container implements ICreatorStateContaine
     public boolean canInteractWith(PlayerEntity playerIn) {
         return true;
     }
+
 
     private void addPlayerSlots(IItemHandler iItemHandler) {
         // Slots for the main inventory
@@ -80,16 +76,19 @@ public class CreatorContainer extends Container implements ICreatorStateContaine
 
     private void addCustomSlots() {
         te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(h -> {
-                    addSlot(new SlotItemHandler(h, 1, 52, 20));
-                    addSlot(new SlotItemHandler(h, 2, 52, 62));
-                    addSlot(new SlotItemHandler(h, 3, 110, 20));
-                    addSlot(new SlotItemHandler(h, 4, 110, 62));
-                });
+            // Flash drive
+            addSlot(new SlotItemHandler(h, 0, 150, 60));
+            // Output slot
+            addSlot(new SlotItemHandler(h, 1, 89, 60));
+            // Item Display slot
+            addSlot(new DisplaySlot(h, 2, 89, 17));
+            // bucket input slot
+            addSlot(new SlotItemHandler(h, 3, 47, 18));
+            // bucket output slot
+            addSlot(new SlotItemHandler(h, 4, 47, 60));
+        });
     }
 
-    /**
-     * This is actually needed in order to achieve shift click functionality in the Controller GUI. If this method isn't overridden, the game crashes.
-     */
     @Override
     public ItemStack transferStackInSlot(PlayerEntity playerIn, int index) {
         ItemStack itemstack = ItemStack.EMPTY;
@@ -99,21 +98,21 @@ public class CreatorContainer extends Container implements ICreatorStateContaine
             ItemStack itemstack1 = slot.getStack();
             itemstack = itemstack1.copy();
 
-            if (index >= 37 && index <= 39) { //originating slot is custom slot
+            if (index >= 36 && index <= 40) { //originating slot is custom slot
                 if (!this.mergeItemStack(itemstack1, 0, 36, true)) {
                     return ItemStack.EMPTY; // Inventory is full, can't transfer item!
                 }
             } else {
-                if(itemstack1.getItem() instanceof BucketItem) {
+                if (itemstack1.getItem() instanceof ThumbdriveItem) {
+                    if(!this.mergeItemStack(itemstack1, 36, 37, false)) {
+                        return ItemStack.EMPTY; // custom slot is full, can't transfer item!
+                    }
+                } else if(itemstack1.getItem() instanceof BucketItem) {
                     BucketItem bucket = (BucketItem) itemstack1.getItem();
-                    if (bucket.getFluid().getFluid().equals(ModFluids.STABILIZER.get())) {
-                        if(!this.mergeItemStack(itemstack1, 36, 37, false)) {
+                    if(bucket.getFluid().getFluid().equals(ModFluids.UMATTER.get())) {
+                        if(!this.mergeItemStack(itemstack1, 39, 40, false)) {
                             return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                         }
-                    }
-                } else if(itemstack1.getItem().equals(Items.BUCKET)) {
-                    if(!this.mergeItemStack(itemstack1, 38, 39, false)) {
-                        return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                     }
                 }
                 return ItemStack.EMPTY;
@@ -129,10 +128,11 @@ public class CreatorContainer extends Container implements ICreatorStateContaine
     }
 
     @Override
-    public void sync(int energy, int progress, FluidStack uTank, FluidStack sTank, boolean isActivated) {
+    public void sync(int energy, int progress, FluidStack tank, boolean isActivated, boolean mode) {
         te.setClientEnergy(energy);
-        te.getUTank().setFluid(uTank);
-        te.getSTank().setFluid(sTank);
-        te.setActivatedClient(isActivated);
+        te.setClientProgress(progress);
+        te.getTank().setFluid(tank);
+        te.setCurrentClientMode(mode);
+        te.setActiveClient(isActivated);
     }
 }

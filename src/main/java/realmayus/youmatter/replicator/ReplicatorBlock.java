@@ -1,4 +1,4 @@
-package realmayus.youmatter.creator;
+package realmayus.youmatter.replicator;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -22,10 +22,9 @@ import realmayus.youmatter.scanner.ScannerTile;
 import javax.annotation.Nullable;
 import java.util.stream.IntStream;
 
-public class CreatorBlock extends Block {
+public class ReplicatorBlock extends Block {
 
-
-    public CreatorBlock() {
+    public ReplicatorBlock() {
         super(Block.Properties.create(Material.IRON).hardnessAndResistance(5.0F).sound(SoundType.METAL));
     }
 
@@ -37,8 +36,10 @@ public class CreatorBlock extends Block {
     @Nullable
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return new CreatorTile();
+        return new ReplicatorTile();
     }
+
+
 
 
     /**
@@ -61,18 +62,19 @@ public class CreatorBlock extends Block {
     public INamedContainerProvider getContainer(BlockState state, World worldIn, BlockPos pos) {
         TileEntity te = worldIn.getTileEntity(pos);
 
-        return te instanceof CreatorTile ? (INamedContainerProvider)te : null;
+        return te instanceof ReplicatorTile ? (INamedContainerProvider)te : null;
     }
 
     @Override
     public void onPlayerDestroy(IWorld worldIn, BlockPos pos, BlockState state) {
         TileEntity te = worldIn.getTileEntity(pos);
         if (te != null) {
-            if(te instanceof CreatorTile){
+            if(te instanceof ReplicatorTile){
                 te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent(h -> IntStream.range(0, h.getSlots()).forEach(i -> worldIn.addEntity(new ItemEntity(worldIn.getWorld(), pos.getX(), pos.getY(), pos.getZ(), h.getStackInSlot(i)))));
 
             }
         }
         super.onPlayerDestroy(worldIn, pos, state);
     }
+
 }

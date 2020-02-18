@@ -1,6 +1,6 @@
 {
   "parent": "item/handheld",
   "textures": {
-    "layer0": "youmatter:items/transistor_raw"
+    "layer0": "youmatter:item/transistor_raw"
   }
 }

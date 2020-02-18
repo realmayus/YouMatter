@@ -8,6 +8,7 @@ import net.minecraft.entity.player.PlayerEntity;
 //import realmayus.youmatter.replicator.IReplicatorStateContainer;
 import realmayus.youmatter.creator.ICreatorStateContainer;
 import realmayus.youmatter.encoder.IEncoderStateContainer;
+import realmayus.youmatter.replicator.IReplicatorStateContainer;
 import realmayus.youmatter.scanner.IScannerStateContainer;
 
 public class ClientPacketHandlers {
@@ -37,10 +38,10 @@ public class ClientPacketHandlers {
     }
 
     public static void handlePacketUpdateReplicatorClient(PacketUpdateReplicatorClient message) {
-//        PlayerEntity player = Minecraft.getInstance().player;
-//
-//        if (player.openContainer instanceof IReplicatorStateContainer) {
-//            ((IReplicatorStateContainer) player.openContainer).sync(message.fluidAmount, message.energy, message.progress, message.fluidStack, message.isActivated, message.mode);
-//        }
+        PlayerEntity player = Minecraft.getInstance().player;
+
+        if (player.openContainer instanceof IReplicatorStateContainer) {
+            ((IReplicatorStateContainer) player.openContainer).sync(message.energy, message.progress, message.fluidStack, message.isActivated, message.mode);
+        }
     }
 }

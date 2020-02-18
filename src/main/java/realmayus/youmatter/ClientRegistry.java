@@ -7,6 +7,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import realmayus.youmatter.creator.CreatorScreen;
 import realmayus.youmatter.encoder.EncoderScreen;
+import realmayus.youmatter.replicator.ReplicatorScreen;
 import realmayus.youmatter.scanner.ScannerScreen;
 import realmayus.youmatter.util.GuiHandler;
 
@@ -18,5 +19,6 @@ public class ClientRegistry {
         ScreenManager.registerFactory(ObjectHolders.SCANNER_CONTAINER, ScannerScreen::new);
         ScreenManager.registerFactory(ObjectHolders.ENCODER_CONTAINER, EncoderScreen::new);
         ScreenManager.registerFactory(ObjectHolders.CREATOR_CONTAINER, CreatorScreen::new);
+        ScreenManager.registerFactory(ObjectHolders.REPLICATOR_CONTAINER, ReplicatorScreen::new);
     }
 }

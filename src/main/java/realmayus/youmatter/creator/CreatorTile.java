@@ -102,7 +102,6 @@ public class CreatorTile extends TileEntity implements ITickableTileEntity, INam
 
     FluidTank getUTank() {
         return uTank;
-
     }
 
     FluidTank getSTank() {
@@ -140,7 +139,7 @@ public class CreatorTile extends TileEntity implements ITickableTileEntity, INam
         public boolean isFluidValid(int tank, @Nonnull FluidStack stack) {
             if (tank == 0) {
                 return false;
-            } else if (tank == 1 && stack.getFluid().equals(ModFluids.stabilizer.get())) {
+            } else if (tank == 1 && stack.getFluid().equals(ModFluids.STABILIZER.get())) {
                 return true;
             }
             return false;
@@ -148,7 +147,7 @@ public class CreatorTile extends TileEntity implements ITickableTileEntity, INam
 
         @Override
         public int fill(FluidStack resource, FluidAction action) {
-            if (resource.getFluid().equals(ModFluids.stabilizer.get())) {
+            if (resource.getFluid().equals(ModFluids.STABILIZER.get())) {
                 if (MAX_STABILIZER - getSTank().getFluidAmount() < resource.getAmount()) {
                     return sTank.fill(new FluidStack(resource.getFluid(), MAX_STABILIZER), action);
                 } else {
@@ -161,7 +160,7 @@ public class CreatorTile extends TileEntity implements ITickableTileEntity, INam
         @Nonnull
         @Override
         public FluidStack drain(FluidStack resource, FluidAction action) {
-            if (resource.getFluid().equals(ModFluids.umatter.get())) {
+            if (resource.getFluid().equals(ModFluids.UMATTER.get())) {
                 if (uTank.getFluidAmount() < resource.getAmount()) {
                     uTank.drain(uTank.getFluid(), action);
                     return uTank.getFluid();
@@ -184,29 +183,6 @@ public class CreatorTile extends TileEntity implements ITickableTileEntity, INam
         }
     };
 
-
-    boolean canInteractWith(PlayerEntity playerIn) {
-        return true;
-    }
-
-    public int getClientProgress() {
-        return clientProgress;
-    }
-
-    void setClientProgress(int clientProgress) {
-        this.clientProgress = clientProgress;
-    }
-    
-    void setClientUFluidAmount(int clientUFluidAmount) {
-        this.clientUFluidAmount = clientUFluidAmount;
-    }
-    void setClientSFluidAmount(int clientSFluidAmount) {
-        this.clientSFluidAmount = clientSFluidAmount;
-    }
-
-    private int clientUFluidAmount = -1;
-    private int clientSFluidAmount = -1;
-
     int getClientEnergy() {
         return clientEnergy;
     }
@@ -219,28 +195,28 @@ public class CreatorTile extends TileEntity implements ITickableTileEntity, INam
         return myEnergyStorage.getEnergyStored();
     }
 
-    public void setClientTank(CompoundNBT tank) {
-        FluidTank newUTank = new FluidTank(MAX_UMATTER).readFromNBT(tank);
-        FluidTank newSTank = new FluidTank(MAX_STABILIZER).readFromNBT(tank);
-        getUTank().setFluid(newUTank.getFluid());
-        getSTank().setFluid(newSTank.getFluid());
-    }
-
-
     private int clientEnergy = -1;
-    private int clientProgress = -1;
 
     private MyEnergyStorage myEnergyStorage = new MyEnergyStorage(1000000, Integer.MAX_VALUE);
 
     @Override
     public void read(CompoundNBT compound) {
         super.read(compound);
-        CompoundNBT tagUTank = compound.getCompound("uTank");
-        CompoundNBT tagSTank = compound.getCompound("sTank");
-        uTank.readFromNBT(tagUTank);
-        sTank.readFromNBT(tagSTank);
-        myEnergyStorage.setEnergy(compound.getInt("energy"));
-        isActivated = compound.getBoolean("isActivated");
+
+        if(compound.contains("uTank")) {
+            CompoundNBT tagUTank = compound.getCompound("uTank");
+            uTank.readFromNBT(tagUTank);
+        }
+        if (compound.contains("sTank")) {
+            CompoundNBT tagSTank = compound.getCompound("sTank");
+            sTank.readFromNBT(tagSTank);
+        }
+        if (compound.contains("energy")) {
+            myEnergyStorage.setEnergy(compound.getInt("energy"));
+        }
+        if (compound.contains("isActivated")) {
+            isActivated = compound.getBoolean("isActivated");
+        }
         if(compound.contains("inventory")) {
             inventory.deserializeNBT((CompoundNBT) compound.get("inventory"));
         }
@@ -264,19 +240,6 @@ public class CreatorTile extends TileEntity implements ITickableTileEntity, INam
         return compound;
     }
 
-    void setClientUTank(CompoundNBT tank) {
-        FluidTank newTank = new FluidTank(10500).readFromNBT(tank);
-        getUTank().setFluid(newTank.getFluid());
-        getUTank().setCapacity(newTank.getCapacity());
-    }
-
-    void setClientSTank(CompoundNBT tank) {
-        FluidTank newTank = new FluidTank(10500).readFromNBT(tank);
-        getSTank().setFluid(newTank.getFluid());
-        
-        getSTank().setCapacity(newTank.getCapacity());
-    }
-
     private int currentPartTick = 0;
 
     @Override
@@ -286,7 +249,7 @@ public class CreatorTile extends TileEntity implements ITickableTileEntity, INam
                 if(isActivated()) {
                     if (getEnergy() >= 0.3f * 1000000 && sTank.getFluidAmount() >= 125) { // if energy more than 10 % of max energy
                         sTank.drain(125, IFluidHandler.FluidAction.EXECUTE);
-                        uTank.fill(new FluidStack(ModFluids.umatter.get(), Math.round((float) 0.000005 * (getEnergy()/3f))), IFluidHandler.FluidAction.EXECUTE);
+                        uTank.fill(new FluidStack(ModFluids.UMATTER.get(), Math.round((float) 0.000005 * (getEnergy()/3f))), IFluidHandler.FluidAction.EXECUTE);
                         myEnergyStorage.consumePower(Math.round(getEnergy()/3f));
                     }
                 }
@@ -295,9 +258,9 @@ public class CreatorTile extends TileEntity implements ITickableTileEntity, INam
                 Object[] neighborTE = getNeighborTileEntity(pos);
                 if(neighborTE != null){
                     if (uTank.getFluidAmount() >= 500) {
-                        uTank.drain(world.getTileEntity((BlockPos)neighborTE[0]).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, (Direction)neighborTE[1]).map(h -> h.fill(new FluidStack(ModFluids.umatter.get(), 500), IFluidHandler.FluidAction.EXECUTE)).orElse(0), IFluidHandler.FluidAction.EXECUTE);
+                        uTank.drain(world.getTileEntity((BlockPos)neighborTE[0]).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, (Direction)neighborTE[1]).map(h -> h.fill(new FluidStack(ModFluids.UMATTER.get(), 500), IFluidHandler.FluidAction.EXECUTE)).orElse(0), IFluidHandler.FluidAction.EXECUTE);
                     } else {
-                        uTank.drain(world.getTileEntity((BlockPos)neighborTE[0]).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, (Direction)neighborTE[1]).map(h -> h.fill(new FluidStack(ModFluids.umatter.get(), uTank.getFluidAmount()), IFluidHandler.FluidAction.EXECUTE)).orElse(0), IFluidHandler.FluidAction.EXECUTE);
+                        uTank.drain(world.getTileEntity((BlockPos)neighborTE[0]).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, (Direction)neighborTE[1]).map(h -> h.fill(new FluidStack(ModFluids.UMATTER.get(), uTank.getFluidAmount()), IFluidHandler.FluidAction.EXECUTE)).orElse(0), IFluidHandler.FluidAction.EXECUTE);
                     }
                 }
             }
@@ -317,7 +280,7 @@ public class CreatorTile extends TileEntity implements ITickableTileEntity, INam
                     BucketItem bucket = (BucketItem) this.inventory.getStackInSlot(1).getItem();
                     if (bucket == ObjectHolders.STABILIZER_BUCKET) {
                         if (getSTank().getFluidAmount() < getSTank().getCapacity()) {
-                            getSTank().fill(new FluidStack(ModFluids.stabilizer.get(), 1000), IFluidHandler.FluidAction.EXECUTE);
+                            getSTank().fill(new FluidStack(ModFluids.STABILIZER.get(), 1000), IFluidHandler.FluidAction.EXECUTE);
                             this.inventory.setStackInSlot(1, ItemStack.EMPTY);
                             this.inventory.insertItem(2, new ItemStack(Items.BUCKET, 1), false);
                         }
@@ -342,7 +305,7 @@ public class CreatorTile extends TileEntity implements ITickableTileEntity, INam
         // Prioritize Replicator
         for (Map.Entry<BlockPos, Direction> entry : foundPos.entrySet()) {
            // if (world.getTileEntity( entry.getKey()) instanceof TileReplicator) {
-                if(Objects.requireNonNull(world.getTileEntity(entry.getKey())).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, entry.getValue()).map(h -> h.fill(new FluidStack(ModFluids.umatter.get(), 500), IFluidHandler.FluidAction.SIMULATE)).orElse(0) > 0) {
+                if(Objects.requireNonNull(world.getTileEntity(entry.getKey())).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, entry.getValue()).map(h -> h.fill(new FluidStack(ModFluids.UMATTER.get(), 500), IFluidHandler.FluidAction.SIMULATE)).orElse(0) > 0) {
                     //Replicator can take fluid
                     return new Object[] {entry.getKey(), entry.getValue()}; // position, facing
                 }
@@ -351,7 +314,7 @@ public class CreatorTile extends TileEntity implements ITickableTileEntity, INam
 
         // Replicator not found / can't take fluid, now trying other blocks
         for (Map.Entry<BlockPos, Direction> entry : foundPos.entrySet()) {
-            if(Objects.requireNonNull(world.getTileEntity(entry.getKey())).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, entry.getValue()).map(h -> h.fill(new FluidStack(ModFluids.umatter.get(), 500), IFluidHandler.FluidAction.SIMULATE)).orElse(0) > 0) {
+            if(Objects.requireNonNull(world.getTileEntity(entry.getKey())).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, entry.getValue()).map(h -> h.fill(new FluidStack(ModFluids.UMATTER.get(), 500), IFluidHandler.FluidAction.SIMULATE)).orElse(0) > 0) {
                 //Tile can take fluid
                 return new Object[] {entry.getKey(), entry.getValue()}; // position, facing
             }

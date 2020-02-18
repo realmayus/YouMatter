@@ -1,9 +1,9 @@
 {
   "result": {
-    "item": "black_hole",
+    "item": "youmatter:black_hole",
     "count": 2
   },
-  "type": "forge:ore_shapeless",
+  "type": "minecraft:crafting_shapeless",
   "ingredients": [
     {
       "item": "youmatter:black_hole"
