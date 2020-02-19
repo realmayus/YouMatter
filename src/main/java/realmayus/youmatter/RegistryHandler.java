@@ -71,6 +71,24 @@ public class RegistryHandler {
         event.getRegistry().register(new MachineCasingItem().setRegistryName(YouMatter.MODID, "machine_casing").setCreativeTab(YouMatter.creativeTab));
         event.getRegistry().register(new BlackHoleItem().setRegistryName(YouMatter.MODID, "black_hole").setCreativeTab(YouMatter.creativeTab));
     }
+    
+        /**
+     * Will be called by Forge automatically when it's time.
+     * Stolen from Cadiboo https://gist.github.com/Cadiboo/3f5cdb785affc069af2fa5fdf2d70358
+     */
+    @SubscribeEvent
+    public static void onRegisterModelsEvent(@Nonnull final ModelRegistryEvent event) {
+        setStateMappers();
+        ForgeRegistries.ITEMS.getValues().stream()
+                .filter(item -> item.getRegistryName().getNamespace().equals(YouMatter.MODID))
+                .forEach(item -> ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(item.getRegistryName(), "normal")));
+    }
+
+    @SideOnly(Side.CLIENT)
+    public static void setStateMappers() {
+        ModelLoader.setCustomStateMapper(ModBlocks.UMATTER_BLOCK, new StateMap.Builder().ignore(ModBlocks.UMATTER_BLOCK.LEVEL).build());
+        ModelLoader.setCustomStateMapper(ModBlocks.STABILIZER_BLOCK, new StateMap.Builder().ignore(ModBlocks.STABILIZER_BLOCK.LEVEL).build());
+    }
 
     @SubscribeEvent
     public static void addRecipes(RegistryEvent.Register<IRecipe> event) {
