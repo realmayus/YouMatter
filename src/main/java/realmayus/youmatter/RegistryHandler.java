@@ -72,7 +72,7 @@ public class RegistryHandler {
         event.getRegistry().register(new BlackHoleItem().setRegistryName(YouMatter.MODID, "black_hole").setCreativeTab(YouMatter.creativeTab));
     }
     
-        /**
+    /**
      * Will be called by Forge automatically when it's time.
      * Stolen from Cadiboo https://gist.github.com/Cadiboo/3f5cdb785affc069af2fa5fdf2d70358
      */
