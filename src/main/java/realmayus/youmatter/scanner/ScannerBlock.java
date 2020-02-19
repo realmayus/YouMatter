@@ -10,6 +10,8 @@ import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -40,7 +42,7 @@ public class ScannerBlock extends Block {
      * EVENT that is called when you right-click the block,
      */
     @Override
-    public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
         if (!worldIn.isRemote) {
             INamedContainerProvider containerProvider = getContainer(state, worldIn, pos);
             if (containerProvider != null) {
@@ -49,7 +51,7 @@ public class ScannerBlock extends Block {
                 }
             }
         }
-        return true;
+        return ActionResultType.SUCCESS;
     }
 
     @Nullable

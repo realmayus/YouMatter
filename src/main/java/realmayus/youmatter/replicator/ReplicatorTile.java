@@ -4,6 +4,7 @@ package realmayus.youmatter.replicator;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.BucketItem;
@@ -40,6 +41,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.IntStream;
 
 public class ReplicatorTile extends TileEntity implements ITickableTileEntity, INamedContainerProvider {
 
@@ -130,7 +132,7 @@ public class ReplicatorTile extends TileEntity implements ITickableTileEntity, I
 
         @Override
         public int fill(FluidStack resource, FluidAction action) {
-            if (resource.getFluid().equals(ModFluids.STABILIZER.get())) {
+            if (resource.getFluid().equals(ModFluids.UMATTER.get())) {
                 if (MAX_UMATTER - getTank().getFluidAmount() < resource.getAmount()) {
                     return tank.fill(new FluidStack(resource.getFluid(), MAX_UMATTER), action);
                 } else {
@@ -180,6 +182,11 @@ public class ReplicatorTile extends TileEntity implements ITickableTileEntity, I
     };
 
     private List<ItemStack> cachedItems;
+
+    @Override
+    public void remove() {
+        this.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent(h -> IntStream.range(0, h.getSlots()).forEach(i -> InventoryHelper.spawnItemStack(world, pos.getX(), pos.getY(), pos.getZ(), h.getStackInSlot(i))));
+    }
 
     // Current displayed item index -> cachedItems
     private int currentIndex = 0;

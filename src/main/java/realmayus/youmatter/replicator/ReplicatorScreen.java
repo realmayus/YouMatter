@@ -1,6 +1,7 @@
 package realmayus.youmatter.replicator;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
@@ -46,7 +47,7 @@ public class ReplicatorScreen extends ContainerScreen<ReplicatorContainer> {
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
         //Setting color to white because JEI is bae (gui would be yellow)
-        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         this.minecraft.getTextureManager().bindTexture(GUI);
 
         int relX = (this.width - WIDTH) / 2;
@@ -157,13 +158,13 @@ public class ReplicatorScreen extends ContainerScreen<ReplicatorContainer> {
             ResourceLocation fluidIcon;
             Fluid fluid = fluidStack.getFluid();
 
-            ResourceLocation waterSprite = Fluids.WATER.getAttributes().getStill(new FluidStack(Fluids.WATER, 1000));
+            ResourceLocation waterSprite = Fluids.WATER.getAttributes().getStillTexture(new FluidStack(Fluids.WATER, 1000));
 
             if (fluid instanceof FlowingFluid) {
-                if (fluid.getAttributes().getStill(fluidStack) != null) {
-                    fluidIcon = fluid.getAttributes().getStill(fluidStack);
-                } else if (fluid.getAttributes().getFlowing(fluidStack) != null) {
-                    fluidIcon = fluid.getAttributes().getFlowing(fluidStack);
+                if (fluid.getAttributes().getStillTexture(fluidStack) != null) {
+                    fluidIcon = fluid.getAttributes().getStillTexture(fluidStack);
+                } else if (fluid.getAttributes().getFlowingTexture(fluidStack) != null) {
+                    fluidIcon = fluid.getAttributes().getFlowingTexture(fluidStack);
                 } else {
                     fluidIcon = waterSprite;
                 }
@@ -186,7 +187,7 @@ public class ReplicatorScreen extends ContainerScreen<ReplicatorContainer> {
                     drawSize = 0;
                 }
 
-                blit(x + col, y + line + 58 - renderY - start, 1000, width, textureSize - (textureSize - renderY), this.minecraft.getTextureMap().getAtlasSprite(fluidIcon.toString()));
+                blit(x + col, y + line + 58 - renderY - start, 1000, width, textureSize - (textureSize - renderY), this.minecraft.getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE).apply(fluidIcon));
                 start = start + textureSize;
             }
         }
@@ -199,7 +200,7 @@ public class ReplicatorScreen extends ContainerScreen<ReplicatorContainer> {
         final FluidStack fluidStack = tank.getFluid();
 
         //Reset color
-        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 
 
         //Draw fluid
@@ -215,7 +216,7 @@ public class ReplicatorScreen extends ContainerScreen<ReplicatorContainer> {
         this.blit(this.guiLeft + x, this.guiTop + y, 176, 35, meterWidth, meterHeight);
 
         //Reset color
-        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 
     }
 

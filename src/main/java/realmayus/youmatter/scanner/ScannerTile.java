@@ -2,6 +2,7 @@ package realmayus.youmatter.scanner;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.ItemStack;
@@ -28,6 +29,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.stream.IntStream;
 
 public class ScannerTile extends TileEntity implements INamedContainerProvider, ITickableTileEntity {
 
@@ -165,12 +167,19 @@ public class ScannerTile extends TileEntity implements INamedContainerProvider, 
     }
 
     private boolean isItemAllowed(ItemStack itemStack) {
+
+        boolean matches = YMConfig.CONFIG.filterItems.get().stream().anyMatch(s -> s.equalsIgnoreCase(Objects.requireNonNull(itemStack.getItem().getRegistryName()).toString()));
             //If list should act as a blacklist AND it contains the item, disallow scanning
-        if (YMConfig.CONFIG.filterMode.get() && Arrays.stream((String[])YMConfig.CONFIG.filterItems.get().toArray(new String[YMConfig.CONFIG.filterItems.get().size()])).anyMatch(s -> s.equalsIgnoreCase(Objects.requireNonNull(itemStack.getItem().getRegistryName()).toString()))) {
+        if (YMConfig.CONFIG.filterMode.get() && matches) {
             return false;
             //If list should act as a whitelist AND it DOESN'T contain the item, disallow scanning
-        } else
-            return YMConfig.CONFIG.filterMode.get() || Arrays.stream((String[]) YMConfig.CONFIG.filterItems.get().toArray((new String[YMConfig.CONFIG.filterItems.get().size()]))).anyMatch(s -> s.equalsIgnoreCase(Objects.requireNonNull(itemStack.getItem().getRegistryName()).toString()));
+        } else if (YMConfig.CONFIG.filterMode.get() || matches) return true;
+        else return false;
+    }
+
+    @Override
+    public void remove() {
+        this.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent(h -> IntStream.range(0, h.getSlots()).forEach(i -> InventoryHelper.spawnItemStack(world, pos.getX(), pos.getY(), pos.getZ(), h.getStackInSlot(i))));
     }
 
     @Nullable

@@ -9,6 +9,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -45,7 +46,7 @@ public class CreatorBlock extends Block {
      * EVENT that is called when you right-click the block,
      */
     @Override
-    public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
         if (!worldIn.isRemote) {
             INamedContainerProvider containerProvider = getContainer(state, worldIn, pos);
             if (containerProvider != null) {
@@ -54,7 +55,7 @@ public class CreatorBlock extends Block {
                 }
             }
         }
-        return true;
+        return ActionResultType.SUCCESS;
     }
     @Nullable
     @Override
@@ -64,15 +65,4 @@ public class CreatorBlock extends Block {
         return te instanceof CreatorTile ? (INamedContainerProvider)te : null;
     }
 
-    @Override
-    public void onPlayerDestroy(IWorld worldIn, BlockPos pos, BlockState state) {
-        TileEntity te = worldIn.getTileEntity(pos);
-        if (te != null) {
-            if(te instanceof CreatorTile){
-                te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent(h -> IntStream.range(0, h.getSlots()).forEach(i -> worldIn.addEntity(new ItemEntity(worldIn.getWorld(), pos.getX(), pos.getY(), pos.getZ(), h.getStackInSlot(i)))));
-
-            }
-        }
-        super.onPlayerDestroy(worldIn, pos, state);
-    }
 }

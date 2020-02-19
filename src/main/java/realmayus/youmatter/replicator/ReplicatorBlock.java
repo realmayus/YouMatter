@@ -9,6 +9,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -46,8 +47,7 @@ public class ReplicatorBlock extends Block {
      * EVENT that is called when you right-click the block,
      */
     @Override
-    public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-        if (!worldIn.isRemote) {
+    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult p_225533_6_) {        if (!worldIn.isRemote) {
             INamedContainerProvider containerProvider = getContainer(state, worldIn, pos);
             if (containerProvider != null) {
                 if (player instanceof ServerPlayerEntity) {
@@ -55,7 +55,7 @@ public class ReplicatorBlock extends Block {
                 }
             }
         }
-        return true;
+        return ActionResultType.SUCCESS;
     }
     @Nullable
     @Override

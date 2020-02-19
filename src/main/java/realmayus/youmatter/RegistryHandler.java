@@ -18,8 +18,7 @@ import realmayus.youmatter.creator.CreatorTile;
 import realmayus.youmatter.encoder.EncoderBlock;
 import realmayus.youmatter.encoder.EncoderContainer;
 import realmayus.youmatter.encoder.EncoderTile;
-import realmayus.youmatter.items.BlackHoleItem;
-import realmayus.youmatter.items.ThumbdriveItem;
+import realmayus.youmatter.items.*;
 import realmayus.youmatter.replicator.ReplicatorBlock;
 import realmayus.youmatter.replicator.ReplicatorContainer;
 import realmayus.youmatter.replicator.ReplicatorTile;
@@ -54,10 +53,10 @@ public class RegistryHandler {
         event.getRegistry().register(new BlockItem(ObjectHolders.REPLICATOR_BLOCK, new Item.Properties().group(YouMatter.ITEM_GROUP)).setRegistryName(YouMatter.MODID, "replicator"));
         event.getRegistry().register(new ThumbdriveItem().setRegistryName(YouMatter.MODID, "thumb_drive"));
         event.getRegistry().register(new BlackHoleItem().setRegistryName(YouMatter.MODID, "black_hole"));
-        event.getRegistry().register(new BlackHoleItem().setRegistryName(YouMatter.MODID, "machine_casing"));
-        event.getRegistry().register(new BlackHoleItem().setRegistryName(YouMatter.MODID, "compute_module"));
-        event.getRegistry().register(new BlackHoleItem().setRegistryName(YouMatter.MODID, "transistor"));
-        event.getRegistry().register(new BlackHoleItem().setRegistryName(YouMatter.MODID, "transistor_raw"));
+        event.getRegistry().register(new MachineCasingItem().setRegistryName(YouMatter.MODID, "machine_casing"));
+        event.getRegistry().register(new ComputeModuleItem().setRegistryName(YouMatter.MODID, "compute_module"));
+        event.getRegistry().register(new TransistorItem().setRegistryName(YouMatter.MODID, "transistor"));
+        event.getRegistry().register(new TransistorRawItem().setRegistryName(YouMatter.MODID, "transistor_raw"));
     }
 
     @SubscribeEvent

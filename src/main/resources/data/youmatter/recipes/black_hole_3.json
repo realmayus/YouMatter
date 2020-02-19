@@ -1,0 +1,22 @@
+{
+  "result": {
+    "item": "youmatter:black_hole"
+  },
+  "pattern": [
+    "PsP",
+    "sEs",
+    "PsP"
+  ],
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "P": {
+      "item": "minecraft:purpur_block"
+    },
+    "E": {
+      "item": "minecraft:dragon_head"
+    },
+    "s": {
+      "item": "minecraft:shulker_shell"
+    }
+  }
+}

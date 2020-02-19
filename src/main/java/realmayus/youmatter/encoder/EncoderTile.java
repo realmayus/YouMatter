@@ -2,6 +2,7 @@ package realmayus.youmatter.encoder;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.ItemStack;
@@ -29,6 +30,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 public class EncoderTile extends TileEntity implements INamedContainerProvider, ITickableTileEntity {
 
@@ -144,6 +146,10 @@ public class EncoderTile extends TileEntity implements INamedContainerProvider, 
         compound.put("queue", tempCompoundList);
         return compound;
     }
+    @Override
+    public void remove() {
+        this.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent(h -> IntStream.range(0, h.getSlots()).forEach(i -> InventoryHelper.spawnItemStack(world, pos.getX(), pos.getY(), pos.getZ(), h.getStackInSlot(i))));
+    }
 
     @Override
     public void tick() {
@@ -173,18 +179,18 @@ public class EncoderTile extends TileEntity implements INamedContainerProvider, 
                                 if(nbt.contains("stored_items")) {
                                     ListNBT list = nbt.getList("stored_items", Constants.NBT.TAG_STRING);
                                     if(list.size() < 8) {
-                                        list.add(new StringNBT(processIS.getItem().getRegistryName() + ""));
+                                        list.add(StringNBT.valueOf(processIS.getItem().getRegistryName() + ""));
                                         nbt.put("stored_items", list);
                                     }
                                 } else {
                                     ListNBT list = new ListNBT();
-                                    list.add(new StringNBT(processIS.getItem().getRegistryName() + ""));
+                                    list.add(StringNBT.valueOf(processIS.getItem().getRegistryName() + ""));
                                     nbt.put("stored_items", list);
                                 }
                             } else {
                                 nbt = new CompoundNBT();
                                 ListNBT list = new ListNBT();
-                                list.add(new StringNBT(processIS.getItem().getRegistryName() + ""));
+                                list.add(StringNBT.valueOf(processIS.getItem().getRegistryName() + ""));
                                 nbt.put("stored_items", list);
                                 this.inventory.getStackInSlot(1).setTag(nbt);
                             }

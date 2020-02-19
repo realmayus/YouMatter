@@ -1,6 +1,4 @@
 {
-  "itemGroup.youmatter": "YouMatter",
-
   "_comment": "Blocks",
   "block.youmatter.replicator": "Replicator",
   "block.youmatter.creator": "U-Matter Creator",
@@ -22,7 +20,7 @@
   "fluid.stabilizer": "Stabilizer",
 
   "_comment": "Item Tooltips",
-  "youmatter.tooltip.craftingItemEndCities": "\"§7Crafting Item. Can be found in End Cities.\"",
+  "youmatter.tooltip.craftingItemEndCities": "§7Crafting Item. Can be found in End Cities.",
   "youmatter.tooltip.craftingItem": "§7Crafting Item.",
   "youmatter.tooltip.dataStored": "§5Data stored.",
   "youmatter.tooltip.noDataStored": "§cNo Data stored.",
@@ -52,5 +50,6 @@
   "youmatter.gui.paused": "§6Paused",
   "youmatter.gui.clicktochange": "Click to change",
   "youmatter.gui.performInfiniteRuns": "§6Perform infinite runs",
-  "youmatter.gui.performSingleRun": "§6Perform single run"
+  "youmatter.gui.performSingleRun": "§6Perform single run",
+  "itemGroup.YouMatter": "YouMatter"
 }

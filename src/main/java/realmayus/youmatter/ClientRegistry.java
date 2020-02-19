@@ -9,7 +9,6 @@ import realmayus.youmatter.creator.CreatorScreen;
 import realmayus.youmatter.encoder.EncoderScreen;
 import realmayus.youmatter.replicator.ReplicatorScreen;
 import realmayus.youmatter.scanner.ScannerScreen;
-import realmayus.youmatter.util.GuiHandler;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, modid = YouMatter.MODID, value = Dist.CLIENT)
 public class ClientRegistry {

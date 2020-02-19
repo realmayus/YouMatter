@@ -1,32 +1,25 @@
 package realmayus.youmatter.creator;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
-import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.renderer.texture.AtlasTexture;
-import net.minecraft.client.renderer.texture.ITextureObject;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.fluid.EmptyFluid;
 import net.minecraft.fluid.FlowingFluid;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.ForgeFlowingFluid;
 import net.minecraftforge.fluids.IFluidTank;
 import realmayus.youmatter.ObjectHolders;
 import realmayus.youmatter.YouMatter;
 import realmayus.youmatter.network.PacketChangeSettingsCreatorServer;
 import realmayus.youmatter.network.PacketHandler;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -48,7 +41,7 @@ public class CreatorScreen extends ContainerScreen<CreatorContainer> {
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
         //Setting color to white because JEI is bae (gui would be yellow)
-        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         this.minecraft.getTextureManager().bindTexture(GUI);
 
         int relX = (this.width - WIDTH) / 2;
@@ -137,13 +130,13 @@ public class CreatorScreen extends ContainerScreen<CreatorContainer> {
             ResourceLocation fluidIcon;
             Fluid fluid = fluidStack.getFluid();
 
-            ResourceLocation waterSprite = Fluids.WATER.getAttributes().getStill(new FluidStack(Fluids.WATER, 1000));
+            ResourceLocation waterSprite = Fluids.WATER.getAttributes().getStillTexture(new FluidStack(Fluids.WATER, 1000));
 
             if (fluid instanceof FlowingFluid) {
-                if (fluid.getAttributes().getStill(fluidStack) != null) {
-                    fluidIcon = fluid.getAttributes().getStill(fluidStack);
-                } else if (fluid.getAttributes().getFlowing(fluidStack) != null) {
-                    fluidIcon = fluid.getAttributes().getFlowing(fluidStack);
+                if (fluid.getAttributes().getStillTexture(fluidStack) != null) {
+                    fluidIcon = fluid.getAttributes().getStillTexture(fluidStack);
+                } else if (fluid.getAttributes().getFlowingTexture(fluidStack) != null) {
+                    fluidIcon = fluid.getAttributes().getFlowingTexture(fluidStack);
                 } else {
                     fluidIcon = waterSprite;
                 }
@@ -167,7 +160,10 @@ public class CreatorScreen extends ContainerScreen<CreatorContainer> {
                     drawSize = 0;
                 }
 
-                blit(x + col, y + line + 58 - renderY - start, 1000, width, textureSize - (textureSize - renderY), this.minecraft.getTextureMap().getAtlasSprite(fluidIcon.toString()));
+                //TODO?
+                blit(x + col, y + line + 58 - renderY - start, 1000, width, textureSize - (textureSize - renderY), this.minecraft.getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE).apply(fluidIcon));
+
+
                 start = start + textureSize;
             }
         }
@@ -180,7 +176,7 @@ public class CreatorScreen extends ContainerScreen<CreatorContainer> {
         final FluidStack fluidStack = tank.getFluid();
 
         //Reset color
-        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 
 
         //Draw fluid
@@ -196,7 +192,7 @@ public class CreatorScreen extends ContainerScreen<CreatorContainer> {
         this.blit(this.guiLeft + x, this.guiTop + y, 176, 35, meterWidth, meterHeight);
 
         //Reset color
-        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 
     }
 

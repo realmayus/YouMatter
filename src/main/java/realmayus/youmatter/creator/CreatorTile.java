@@ -2,8 +2,10 @@ package realmayus.youmatter.creator;
 
 
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.BucketItem;
@@ -16,6 +18,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.gen.feature.structure.IStructurePieceType;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -27,11 +30,13 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import realmayus.youmatter.ModFluids;
 import realmayus.youmatter.ObjectHolders;
+import realmayus.youmatter.replicator.ReplicatorTile;
 import realmayus.youmatter.util.MyEnergyStorage;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.stream.IntStream;
 
 public class CreatorTile extends TileEntity implements ITickableTileEntity, INamedContainerProvider {
 
@@ -70,6 +75,10 @@ public class CreatorTile extends TileEntity implements ITickableTileEntity, INam
 
         if(cap == CapabilityEnergy.ENERGY) {
             return LazyOptional.of(() -> myEnergyStorage).cast();
+
+        }
+        if(cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
+            return LazyOptional.of(() -> fluidHandler).cast();
 
         }
         return super.getCapability(cap, side);
@@ -200,6 +209,11 @@ public class CreatorTile extends TileEntity implements ITickableTileEntity, INam
     private MyEnergyStorage myEnergyStorage = new MyEnergyStorage(1000000, Integer.MAX_VALUE);
 
     @Override
+    public void remove() {
+        this.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent(h -> IntStream.range(0, h.getSlots()).forEach(i -> InventoryHelper.spawnItemStack(world, pos.getX(), pos.getY(), pos.getZ(), h.getStackInSlot(i))));
+    }
+
+    @Override
     public void read(CompoundNBT compound) {
         super.read(compound);
 
@@ -241,7 +255,6 @@ public class CreatorTile extends TileEntity implements ITickableTileEntity, INam
     }
 
     private int currentPartTick = 0;
-
     @Override
     public void tick() {
         if (currentPartTick == 40) { // every 2 sec
@@ -257,12 +270,12 @@ public class CreatorTile extends TileEntity implements ITickableTileEntity, INam
                 //Auto-outputting U-Matter
                 Object[] neighborTE = getNeighborTileEntity(pos);
                 if(neighborTE != null){
-                    if (uTank.getFluidAmount() >= 500) {
+                    System.out.println("not null!");
+                    if (uTank.getFluidAmount() >= 500) { // set a maximum output of 500 mB (every two seconds)
                         uTank.drain(world.getTileEntity((BlockPos)neighborTE[0]).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, (Direction)neighborTE[1]).map(h -> h.fill(new FluidStack(ModFluids.UMATTER.get(), 500), IFluidHandler.FluidAction.EXECUTE)).orElse(0), IFluidHandler.FluidAction.EXECUTE);
                     } else {
                         uTank.drain(world.getTileEntity((BlockPos)neighborTE[0]).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, (Direction)neighborTE[1]).map(h -> h.fill(new FluidStack(ModFluids.UMATTER.get(), uTank.getFluidAmount()), IFluidHandler.FluidAction.EXECUTE)).orElse(0), IFluidHandler.FluidAction.EXECUTE);
-                    }
-                }
+                    }                }
             }
             currentPartTick = 0;
         } else if ((currentPartTick % 5) == 0) { // every five ticks
@@ -304,12 +317,13 @@ public class CreatorTile extends TileEntity implements ITickableTileEntity, INam
 
         // Prioritize Replicator
         for (Map.Entry<BlockPos, Direction> entry : foundPos.entrySet()) {
-           // if (world.getTileEntity( entry.getKey()) instanceof TileReplicator) {
-                if(Objects.requireNonNull(world.getTileEntity(entry.getKey())).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, entry.getValue()).map(h -> h.fill(new FluidStack(ModFluids.UMATTER.get(), 500), IFluidHandler.FluidAction.SIMULATE)).orElse(0) > 0) {
+            if (world.getTileEntity(entry.getKey()) instanceof ReplicatorTile) {
+                System.out.println(world.getTileEntity(entry.getKey()).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, entry.getValue()).map(h -> h.fill(new FluidStack(ModFluids.UMATTER.get(), 500), IFluidHandler.FluidAction.SIMULATE)).orElse(0) + "bla");
+                if(world.getTileEntity(entry.getKey()).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, entry.getValue()).map(h -> h.fill(new FluidStack(ModFluids.UMATTER.get(), 500), IFluidHandler.FluidAction.SIMULATE)).orElse(0) > 0) {
                     //Replicator can take fluid
                     return new Object[] {entry.getKey(), entry.getValue()}; // position, facing
                 }
-            //}
+            }
         }
 
         // Replicator not found / can't take fluid, now trying other blocks
