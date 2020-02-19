@@ -3,6 +3,7 @@
 
 # YouMatter
 ### A standalone UU-Matter mod for Minecraft Forge. Why? Because it matters.
+#### YouMatter is available for 1.12.2, 1.14.4 and 1.15.2. Check out the respective branches.
 ![YouMatter](https://i.imgur.com/nNAFIs0.png)
 
 You know that fluid called "UU-Matter" from IndustrialCraft2, don't you? Well, here you have it as a standalone mod.
