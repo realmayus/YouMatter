@@ -43,6 +43,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
+import static realmayus.youmatter.util.GeneralUtils.getUMatterAmountForItem;
+
 public class ReplicatorTile extends TileEntity implements ITickableTileEntity, INamedContainerProvider {
 
     public ReplicatorTile() {
@@ -295,14 +297,6 @@ public class ReplicatorTile extends TileEntity implements ITickableTileEntity, I
             }
         }
         currentPartTick++;
-    }
-
-    private int getUMatterAmountForItem(Item item) {
-        if(YMConfig.CONFIG.getOverride(item.getRegistryName().toString()) != null) {
-            return Integer.parseInt((String)YMConfig.CONFIG.getOverride(item.getRegistryName().toString())[1]);
-        } else {
-            return YMConfig.CONFIG.defaultAmount.get();
-        }
     }
 
     public void renderPrevious() {

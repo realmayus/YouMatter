@@ -12,6 +12,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.fluid.FlowingFluid;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.text.ITextComponent;
@@ -24,6 +25,8 @@ import realmayus.youmatter.network.PacketChangeSettingsReplicatorServer;
 import realmayus.youmatter.network.PacketHandler;
 import realmayus.youmatter.network.PacketShowNext;
 import realmayus.youmatter.network.PacketShowPrevious;
+import realmayus.youmatter.util.DisplaySlot;
+import realmayus.youmatter.util.GeneralUtils;
 
 import java.io.IOException;
 import java.util.List;
@@ -148,6 +151,18 @@ public class ReplicatorScreen extends ContainerScreen<ReplicatorContainer> {
         renderTooltip(tooltips, x, y);
     }
 
+    @Override
+    public List<String> getTooltipFromItem(ItemStack givenItem) {
+        if (hoveredSlot instanceof DisplaySlot) {
+            if(givenItem.isItemEqual(hoveredSlot.getStack())) {
+                List<String> existingTooltips =  super.getTooltipFromItem(givenItem);
+                existingTooltips.add("");
+                existingTooltips.add("§aRequired Amount: " + GeneralUtils.getUMatterAmountForItem(givenItem.getItem()) + "mB");
+                return existingTooltips;
+            }
+        }
+        return super.getTooltipFromItem(givenItem);
+    }
 
     //both drawFluid and drawFluidTank is courtesy of DarkGuardsMan and was modified to suit my needs. Go check him out: https://github.com/BuiltBrokenModding/Atomic-Science | MIT License |  Copyright (c) 2018 Built Broken Modding License: https://opensource.org/licenses/MIT
     private void drawFluid(int x, int y, int line, int col, int width, int drawSize, FluidStack fluidStack)
