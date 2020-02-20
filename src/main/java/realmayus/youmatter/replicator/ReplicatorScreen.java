@@ -11,6 +11,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.fluid.FlowingFluid;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.text.ITextComponent;
@@ -23,6 +24,8 @@ import realmayus.youmatter.network.PacketChangeSettingsReplicatorServer;
 import realmayus.youmatter.network.PacketHandler;
 import realmayus.youmatter.network.PacketShowNext;
 import realmayus.youmatter.network.PacketShowPrevious;
+import realmayus.youmatter.util.DisplaySlot;
+import realmayus.youmatter.util.GeneralUtils;
 
 import java.io.IOException;
 import java.util.List;
@@ -108,6 +111,20 @@ public class ReplicatorScreen extends ContainerScreen<ReplicatorContainer> {
         } else {
             this.blit(151, 35, 176, 0, 13, 11);
         }
+    }
+
+
+    @Override
+    public List<String> getTooltipFromItem(ItemStack givenItem) {
+        if (hoveredSlot instanceof DisplaySlot) {
+            if(givenItem.isItemEqual(hoveredSlot.getStack())) {
+                List<String> existingTooltips =  super.getTooltipFromItem(givenItem);
+                existingTooltips.add("");
+                existingTooltips.add("§aRequired Amount: " + GeneralUtils.getUMatterAmountForItem(givenItem.getItem()) + "mB");
+                return existingTooltips;
+            }
+        }
+        return super.getTooltipFromItem(givenItem);
     }
 
     @Override
