@@ -120,7 +120,7 @@ public class ReplicatorScreen extends ContainerScreen<ReplicatorContainer> {
             if(givenItem.isItemEqual(hoveredSlot.getStack())) {
                 List<String> existingTooltips =  super.getTooltipFromItem(givenItem);
                 existingTooltips.add("");
-                existingTooltips.add("§aRequired Amount: " + GeneralUtils.getUMatterAmountForItem(givenItem.getItem()) + "mB");
+                existingTooltips.add(I18n.format("gui.youmatter.requiredAmount", GeneralUtils.getUMatterAmountForItem(givenItem.getItem())));
                 return existingTooltips;
             }
         }
