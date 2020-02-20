@@ -50,3 +50,4 @@ youmatter.gui.paused=§6Paused
 youmatter.gui.clicktochange=Click to change
 youmatter.gui.performInfiniteRuns=§6Perform infinite runs
 youmatter.gui.performSingleRun=§6Perform single run
+youmatter.gui.requiredAmount=§aRequired Amount: %s mB

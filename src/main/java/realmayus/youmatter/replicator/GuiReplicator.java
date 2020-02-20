@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.init.SoundEvents;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
@@ -19,6 +20,8 @@ import realmayus.youmatter.network.PacketChangeSettingsReplicatorServer;
 import realmayus.youmatter.network.PacketHandler;
 import realmayus.youmatter.network.PacketShowNext;
 import realmayus.youmatter.network.PacketShowPrevious;
+import realmayus.youmatter.util.DisplaySlot;
+import realmayus.youmatter.util.GeneralUtils;
 
 import java.io.IOException;
 import java.util.List;
@@ -140,6 +143,19 @@ public class GuiReplicator extends GuiContainer {
     private void drawTooltip(int x, int y, List<String> tooltips)
     {
         drawHoveringText(tooltips, x, y, fontRenderer);
+    }
+
+    @Override
+    public List<String> getItemToolTip(ItemStack givenItem) {
+        if (getSlotUnderMouse() instanceof DisplaySlot) {
+            if (givenItem.isItemEqual(getSlotUnderMouse().getStack())) {
+                List<String> existingTooltips = super.getItemToolTip(givenItem);
+                existingTooltips.add("");
+                existingTooltips.add(I18n.format("youmatter.gui.requiredAmount", GeneralUtils.getUMatterAmountForItem(givenItem.getItem())));
+                return existingTooltips;
+            }
+        }
+        return super.getItemToolTip(givenItem);
     }
 
     //both drawFluid and drawFluidTank is courtesy of DarkGuardsMan and was modified to suit my needs. Go check him out: https://github.com/BuiltBrokenModding/Atomic-Science | MIT License |  Copyright (c) 2018 Built Broken Modding License: https://opensource.org/licenses/MIT

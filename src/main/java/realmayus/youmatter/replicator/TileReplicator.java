@@ -30,6 +30,7 @@ import net.minecraftforge.items.ItemStackHandler;
 import realmayus.youmatter.ModFluids;
 import realmayus.youmatter.YMConfig;
 import realmayus.youmatter.util.CustomInvWrapper;
+import realmayus.youmatter.util.GeneralUtils;
 import realmayus.youmatter.util.MyEnergyStorage;
 
 import javax.annotation.Nonnull;
@@ -232,7 +233,7 @@ public class TileReplicator extends TileEntity implements  ITickable{
                     if(progress > 0) {
                         if (currentItem != null) {
                             if(!currentItem.isEmpty()) {
-                                getTank().fill(new FluidStack(ModFluids.UMATTER, getUMatterAmountForItem(currentItem.getItem())), true); // give the user its umatter back!
+                                getTank().fill(new FluidStack(ModFluids.UMATTER, GeneralUtils.getUMatterAmountForItem(currentItem.getItem())), true); // give the user its umatter back!
                             }
                         }
                     }
@@ -263,8 +264,8 @@ public class TileReplicator extends TileEntity implements  ITickable{
                                         if(combinedHandler.getStackInSlot(1).isEmpty()) {
                                             if (isActive) {
                                                 currentItem = cachedItems.get(currentIndex);
-                                                if(tank.getFluidAmount() >= getUMatterAmountForItem(currentItem.getItem())) {
-                                                    tank.drain(getUMatterAmountForItem(currentItem.getItem()), true);
+                                                if(tank.getFluidAmount() >= GeneralUtils.getUMatterAmountForItem(currentItem.getItem())) {
+                                                    tank.drain(GeneralUtils.getUMatterAmountForItem(currentItem.getItem()), true);
                                                     progress++;
                                                 }
                                             }
@@ -289,7 +290,7 @@ public class TileReplicator extends TileEntity implements  ITickable{
                                                         }
                                                     } else {
                                                         if (progress > 0) { // progress was over 0 (= already drained U-matter) and then aborted
-                                                            getTank().fill(new FluidStack(ModFluids.UMATTER, getUMatterAmountForItem(currentItem.getItem())), true); // give the user its umatter back!
+                                                            getTank().fill(new FluidStack(ModFluids.UMATTER, GeneralUtils.getUMatterAmountForItem(currentItem.getItem())), true); // give the user its umatter back!
                                                         }
                                                         progress = 0; // abort if not
                                                     }
@@ -313,13 +314,7 @@ public class TileReplicator extends TileEntity implements  ITickable{
         currentPartTick++;
     }
 
-    private int getUMatterAmountForItem(Item item) {
-        if(YMConfig.overrides.containsKey(item.getRegistryName().toString())) {
-            return YMConfig.overrides.getOrDefault(item.getRegistryName().toString(), YMConfig.uMatterPerItem);
-        } else {
-            return YMConfig.uMatterPerItem;
-        }
-    }
+
 
     public void renderPrevious() {
         if(cachedItems != null){
