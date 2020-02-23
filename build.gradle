@@ -7,11 +7,15 @@ buildscript {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
     }
 }
+
+plugins {
+    id "com.wynprice.cursemaven" version "2.1.1"
+}
 apply plugin: 'net.minecraftforge.gradle.forge'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
 
-version = "1.12.2-1.9"
+version = "1.12.2-2.0"
 group = "realmayus.youmatter" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "youmatter"
 
@@ -54,6 +58,7 @@ dependencies {
     // for more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
+    deobfCompile "curse.maven:mekanism:2745458"
 
 }
 
