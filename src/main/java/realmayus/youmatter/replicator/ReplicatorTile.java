@@ -34,6 +34,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import realmayus.youmatter.ModFluids;
 import realmayus.youmatter.ObjectHolders;
 import realmayus.youmatter.YMConfig;
+import realmayus.youmatter.util.CustomInvWrapper;
 import realmayus.youmatter.util.MyEnergyStorage;
 
 import javax.annotation.Nonnull;
@@ -162,7 +163,7 @@ public class ReplicatorTile extends TileEntity implements ITickableTileEntity, I
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
         if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            return LazyOptional.of(() -> inventory).cast();
+            return LazyOptional.of(() -> invWrapper).cast();
         }
         if(cap == CapabilityEnergy.ENERGY) {
             return LazyOptional.of(() -> myEnergyStorage).cast();
@@ -182,6 +183,8 @@ public class ReplicatorTile extends TileEntity implements ITickableTileEntity, I
             ReplicatorTile.this.markDirty();
         }
     };
+
+    CustomInvWrapper invWrapper = new CustomInvWrapper(inventory);
 
     private List<ItemStack> cachedItems;
 
@@ -234,63 +237,66 @@ public class ReplicatorTile extends TileEntity implements ITickableTileEntity, I
                         if(thumbdrive.getTag() != null) {
                             ListNBT taglist = (ListNBT) thumbdrive.getTag().get("stored_items");
                             cachedItems = new ArrayList<>();
-                            for(INBT nbt : taglist) {
-                                if (nbt != null) {
-                                    if(nbt instanceof StringNBT) {
-                                        StringNBT item = (StringNBT) nbt;
-                                        ItemStack newitem = new ItemStack(Objects.requireNonNull(ForgeRegistries.ITEMS.getValue(new ResourceLocation(item.getString()))), 1);
-                                        cachedItems.add(newitem);
-                                    }
-                                }
-                            }
-                            renderItem(cachedItems, currentIndex);
-                            if(progress == 0) {
-                                if (!inventory.getStackInSlot(2).isEmpty()) {
-                                    if(inventory.getStackInSlot(1).isEmpty()) {
-                                        if (isActive) {
-                                            currentItem = cachedItems.get(currentIndex);
-                                            if(tank.getFluidAmount() >= getUMatterAmountForItem(currentItem.getItem())) {
-                                                tank.drain(getUMatterAmountForItem(currentItem.getItem()), IFluidHandler.FluidAction.EXECUTE);
-                                                progress++;
-                                            }
+                            if (taglist != null) {
+                                for(INBT nbt : taglist) {
+                                    if (nbt != null) {
+                                        if(nbt instanceof StringNBT) {
+                                            StringNBT item = (StringNBT) nbt;
+                                            ItemStack newitem = new ItemStack(Objects.requireNonNull(ForgeRegistries.ITEMS.getValue(new ResourceLocation(item.getString()))), 1);
+                                            cachedItems.add(newitem);
                                         }
                                     }
-
                                 }
-                            } else {
-                                if(isActive) {
-                                    if(progress >= 100) {
-                                        if(!inventory.getStackInSlot(2).isEmpty()) {
-                                            if(!currentMode) { //if mode is single run, then pause machine
-                                                isActive = false;
-                                            }
-                                            inventory.setStackInSlot(1, currentItem);
-                                        }
-                                        progress = 0;
-                                    } else {
-                                        if (currentItem != null) {
-                                            if (!currentItem.isEmpty()) {
-                                                if (currentItem.isItemEqual(inventory.getStackInSlot(2))) { // Check if selected item hasn't changed
-                                                    if(inventory.getStackInSlot(1).isEmpty()) { //check if output slot is still empty
-                                                        progress++;
-                                                    }
-                                                } else {
-                                                    if (progress > 0) { // progress was over 0 (= already drained U-matter) and then aborted
-                                                        getTank().fill(new FluidStack(ModFluids.UMATTER.get(), getUMatterAmountForItem(currentItem.getItem())), IFluidHandler.FluidAction.EXECUTE); // give the user its umatter back!
-                                                    }
-                                                    progress = 0; // abort if not
+                                renderItem(cachedItems, currentIndex);
+                                if(progress == 0) {
+                                    if (!inventory.getStackInSlot(2).isEmpty()) {
+                                        if(inventory.getStackInSlot(1).isEmpty()) {
+                                            if (isActive) {
+                                                currentItem = cachedItems.get(currentIndex);
+                                                if(tank.getFluidAmount() >= getUMatterAmountForItem(currentItem.getItem())) {
+                                                    tank.drain(getUMatterAmountForItem(currentItem.getItem()), IFluidHandler.FluidAction.EXECUTE);
+                                                    progress++;
                                                 }
                                             }
+                                        }
+
+                                    }
+                                } else {
+                                    if(isActive) {
+                                        if(progress >= 100) {
+                                            if(!inventory.getStackInSlot(2).isEmpty()) {
+                                                if(!currentMode) { //if mode is single run, then pause machine
+                                                    isActive = false;
+                                                }
+                                                inventory.setStackInSlot(1, currentItem);
+                                            }
+                                            progress = 0;
                                         } else {
-                                            if(cachedItems.get(currentIndex) != null) { //in case the current item isn't loaded yet -> this happens when reloading the world, see issue #31 on GitHub
-                                                currentItem = cachedItems.get(currentIndex);
+                                            if (currentItem != null) {
+                                                if (!currentItem.isEmpty()) {
+                                                    if (currentItem.isItemEqual(inventory.getStackInSlot(2))) { // Check if selected item hasn't changed
+                                                        if(inventory.getStackInSlot(1).isEmpty()) { //check if output slot is still empty
+                                                            progress++;
+                                                        }
+                                                    } else {
+                                                        if (progress > 0) { // progress was over 0 (= already drained U-matter) and then aborted
+                                                            getTank().fill(new FluidStack(ModFluids.UMATTER.get(), getUMatterAmountForItem(currentItem.getItem())), IFluidHandler.FluidAction.EXECUTE); // give the user its umatter back!
+                                                        }
+                                                        progress = 0; // abort if not
+                                                    }
+                                                }
+                                            } else {
+                                                if(cachedItems.get(currentIndex) != null) { //in case the current item isn't loaded yet -> this happens when reloading the world, see issue #31 on GitHub
+                                                    currentItem = cachedItems.get(currentIndex);
+                                                }
                                             }
                                         }
-                                    }
 
-                                    myEnergyStorage.consumePower(2048);
+                                        myEnergyStorage.consumePower(2048);
+                                    }
                                 }
                             }
+
                         }
                     }
                 }
