@@ -1,5 +1,4 @@
-[![Download on CF](http://cf.way2muchnoise.eu/title/361476_Get_on%20CF.svg?badge_style=for_the_badge)](https://www.curseforge.com/minecraft/mc-mods/youmatter)
-[![forthebadge](https://forthebadge.com/images/badges/made-with-java.svg)](https://forthebadge.com) <br>
+[![Download on CF](http://cf.way2muchnoise.eu/title/361476_Get_on%20CF.svg?badge_style=for_the_badge)](https://www.curseforge.com/minecraft/mc-mods/youmatter) <br>
 [![Discord Banner 2](https://discordapp.com/api/guilds/564185633984348170/widget.png?style=banner2)](https://discord.gg/53FQpTQ)
 
 # YouMatter
