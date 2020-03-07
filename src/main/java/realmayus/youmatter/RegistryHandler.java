@@ -27,7 +27,7 @@ import realmayus.youmatter.scanner.ScannerTile;
 public class RegistryHandler {
 
     @SubscribeEvent
-    public static void regusterBlocks(RegistryEvent.Register<Block> event) {
+    public static void registerBlocks(RegistryEvent.Register<Block> event) {
         event.getRegistry().register(new ScannerBlock().setRegistryName(YouMatter.MODID, "scanner"));
         event.getRegistry().register(new EncoderBlock().setRegistryName(YouMatter.MODID, "encoder"));
         event.getRegistry().register(new CreatorBlock().setRegistryName(YouMatter.MODID, "creator"));
