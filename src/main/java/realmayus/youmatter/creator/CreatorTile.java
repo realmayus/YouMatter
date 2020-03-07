@@ -301,12 +301,6 @@ public class CreatorTile extends TileEntity implements ITickableTileEntity, INam
                         this.inventory.setStackInSlot(3, ItemStack.EMPTY);
                         this.inventory.insertItem(4, item, false);
                     }
-
-//                    if (item.getItem().equals(Items.BUCKET)) {
-//                        this.inventory.insertItem(4, new ItemStack(ObjectHolders.UMATTER_BUCKET, 1), false);
-//                    } else {
-
-//                    }
                 }
                 if (!this.inventory.getStackInSlot(1).isEmpty()) {
                     ItemStack item = this.inventory.getStackInSlot(1);

@@ -11,6 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
@@ -114,6 +115,17 @@ public class ReplicatorContainer extends Container implements IReplicatorStateCo
                             return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                         }
                     }
+                } else if(itemstack1.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).isPresent()) {
+                    return itemstack1.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).map(h -> {
+                        if (h.getFluidInTank(0).getFluid().isEquivalentTo(ModFluids.UMATTER.get())) {
+                            if(!this.mergeItemStack(itemstack1, 39, 40, false)) {
+                                return ItemStack.EMPTY; // custom slot is full, can't transfer item!
+                            }
+                        } else {
+                            return ItemStack.EMPTY;
+                        }
+                        return ItemStack.EMPTY;
+                    }).orElse(ItemStack.EMPTY);
                 }
                 return ItemStack.EMPTY;
             }

@@ -8,7 +8,6 @@ import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.BucketItem;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
@@ -33,8 +32,8 @@ import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.registries.ForgeRegistries;
 import realmayus.youmatter.ModFluids;
 import realmayus.youmatter.ObjectHolders;
-import realmayus.youmatter.YMConfig;
 import realmayus.youmatter.util.CustomInvWrapper;
+import realmayus.youmatter.util.GeneralUtils;
 import realmayus.youmatter.util.MyEnergyStorage;
 
 import javax.annotation.Nonnull;
@@ -204,18 +203,44 @@ public class ReplicatorTile extends TileEntity implements ITickableTileEntity, I
             //only execute this code on the server
             if(!world.isRemote) {
                 // Fill tank through inserted buckets
+//                if (!this.inventory.getStackInSlot(3).isEmpty()) {
+//                    if(this.inventory.getStackInSlot(3).getItem() instanceof BucketItem) {
+//                        BucketItem bucket = (BucketItem) this.inventory.getStackInSlot(3).getItem();
+//                        if(bucket.getFluid() != null) {
+//                            if (bucket.getFluid().getFluid().equals(ModFluids.UMATTER.get())) {
+//                                if (getTank().getFluidAmount() + 1000 < getTank().getCapacity()) {
+//                                    getTank().fill(new FluidStack(ModFluids.UMATTER.get(), 1000), IFluidHandler.FluidAction.EXECUTE);
+//                                    this.inventory.setStackInSlot(3, ItemStack.EMPTY);
+//                                    this.inventory.insertItem(4, new ItemStack(Items.BUCKET, 1), false);
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
                 if (!this.inventory.getStackInSlot(3).isEmpty()) {
-                    if(this.inventory.getStackInSlot(3).getItem() instanceof BucketItem) {
-                        BucketItem bucket = (BucketItem) this.inventory.getStackInSlot(3).getItem();
-                        if(bucket.getFluid() != null) {
-                            if (bucket.getFluid().getFluid().equals(ModFluids.UMATTER.get())) {
-                                if (getTank().getFluidAmount() + 1000 < getTank().getCapacity()) {
+                    ItemStack item = this.inventory.getStackInSlot(3);
+                    if (item.getItem() instanceof BucketItem && GeneralUtils.canAddItemToSlot(this.inventory.getStackInSlot(4).getStack(), new ItemStack(Items.BUCKET, 1), false)) {
+                        item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).ifPresent(h -> {
+                            if (!h.getFluidInTank(0).isEmpty() && h.getFluidInTank(0).getFluid().isEquivalentTo(ModFluids.UMATTER.get())) {
+                                if (MAX_UMATTER - getTank().getFluidAmount() >= 1000) {
                                     getTank().fill(new FluidStack(ModFluids.UMATTER.get(), 1000), IFluidHandler.FluidAction.EXECUTE);
                                     this.inventory.setStackInSlot(3, ItemStack.EMPTY);
                                     this.inventory.insertItem(4, new ItemStack(Items.BUCKET, 1), false);
                                 }
                             }
-                        }
+                        });
+                    } else if(GeneralUtils.canAddItemToSlot(this.inventory.getStackInSlot(4).getStack(), this.inventory.getStackInSlot(3).getStack(), false)) {
+                        item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).ifPresent(h -> {
+                            if (h.getFluidInTank(0).getFluid().isEquivalentTo(ModFluids.UMATTER.get())) {
+                                if (h.getFluidInTank(0).getAmount() > MAX_UMATTER - getTank().getFluidAmount()) { //given fluid is more than what fits in the U-Tank
+                                    getTank().fill(h.drain(MAX_UMATTER - getTank().getFluidAmount(), IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
+                                } else { //given fluid fits perfectly in U-Tank
+                                    getTank().fill(h.drain(h.getFluidInTank(0).getAmount(), IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
+                                }
+                            }
+                        });
+                        this.inventory.setStackInSlot(3, ItemStack.EMPTY);
+                        this.inventory.insertItem(4, item, false);
                     }
                 }
 
@@ -250,16 +275,13 @@ public class ReplicatorTile extends TileEntity implements ITickableTileEntity, I
                                 renderItem(cachedItems, currentIndex);
                                 if(progress == 0) {
                                     if (!inventory.getStackInSlot(2).isEmpty()) {
-                                        if(inventory.getStackInSlot(1).isEmpty()) {
-                                            if (isActive) {
-                                                currentItem = cachedItems.get(currentIndex);
-                                                if(tank.getFluidAmount() >= getUMatterAmountForItem(currentItem.getItem())) {
-                                                    tank.drain(getUMatterAmountForItem(currentItem.getItem()), IFluidHandler.FluidAction.EXECUTE);
-                                                    progress++;
-                                                }
+                                        if (isActive) {
+                                            currentItem = cachedItems.get(currentIndex);
+                                            if(tank.getFluidAmount() >= getUMatterAmountForItem(currentItem.getItem())) {
+                                                tank.drain(getUMatterAmountForItem(currentItem.getItem()), IFluidHandler.FluidAction.EXECUTE);
+                                                progress++;
                                             }
                                         }
-
                                     }
                                 } else {
                                     if(isActive) {
@@ -268,14 +290,14 @@ public class ReplicatorTile extends TileEntity implements ITickableTileEntity, I
                                                 if(!currentMode) { //if mode is single run, then pause machine
                                                     isActive = false;
                                                 }
-                                                inventory.setStackInSlot(1, currentItem);
+                                                inventory.insertItem(1, currentItem, false);
                                             }
                                             progress = 0;
                                         } else {
                                             if (currentItem != null) {
                                                 if (!currentItem.isEmpty()) {
                                                     if (currentItem.isItemEqual(inventory.getStackInSlot(2))) { // Check if selected item hasn't changed
-                                                        if(inventory.getStackInSlot(1).isEmpty()) { //check if output slot is still empty
+                                                        if(inventory.getStackInSlot(1).isEmpty() || GeneralUtils.canAddItemToSlot(inventory.getStackInSlot(1).getStack(), currentItem, false)) { //check if output slot is still empty
                                                             progress++;
                                                         }
                                                     } else {

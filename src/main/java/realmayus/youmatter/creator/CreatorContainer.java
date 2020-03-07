@@ -13,15 +13,14 @@ import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
-
 import net.minecraftforge.items.wrapper.InvWrapper;
 import realmayus.youmatter.ModFluids;
 import realmayus.youmatter.ObjectHolders;
-
 import realmayus.youmatter.network.PacketHandler;
 import realmayus.youmatter.network.PacketUpdateCreatorClient;
 
@@ -99,7 +98,7 @@ public class CreatorContainer extends Container implements ICreatorStateContaine
             ItemStack itemstack1 = slot.getStack();
             itemstack = itemstack1.copy();
 
-            if (index >= 37 && index <= 39) { //originating slot is custom slot
+            if (index >= 36 && index <= 39) { //originating slot is custom slot
                 if (!this.mergeItemStack(itemstack1, 0, 36, true)) {
                     return ItemStack.EMPTY; // Inventory is full, can't transfer item!
                 }
@@ -110,11 +109,31 @@ public class CreatorContainer extends Container implements ICreatorStateContaine
                         if(!this.mergeItemStack(itemstack1, 36, 37, false)) {
                             return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                         }
+                    } else if(bucket == Items.BUCKET) {
+                        if(!this.mergeItemStack(itemstack1, 38, 39, false)) {
+                            return ItemStack.EMPTY; // custom slot is full, can't transfer item!
+                        }
                     }
                 } else if(itemstack1.getItem().equals(Items.BUCKET)) {
                     if(!this.mergeItemStack(itemstack1, 38, 39, false)) {
                         return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                     }
+
+                } else if(itemstack1.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).isPresent()) {
+                    return itemstack1.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).map(h -> {
+                       if (h.getFluidInTank(0).isEmpty() || h.getFluidInTank(0).getFluid().isEquivalentTo(ModFluids.UMATTER.get())) {
+                           if(!this.mergeItemStack(itemstack1, 38, 39, false)) {
+                               return ItemStack.EMPTY; // custom slot is full, can't transfer item!
+                           }
+                       } else if (h.getFluidInTank(0).getFluid().isEquivalentTo(ModFluids.STABILIZER.get())) {
+                           if(!this.mergeItemStack(itemstack1, 36, 37, false)) {
+                               return ItemStack.EMPTY; // custom slot is full, can't transfer item!
+                           }
+                       } else {
+                           return ItemStack.EMPTY;
+                       }
+                        return ItemStack.EMPTY;
+                    }).orElse(ItemStack.EMPTY);
                 }
                 return ItemStack.EMPTY;
             }
