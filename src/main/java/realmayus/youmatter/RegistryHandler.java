@@ -3,15 +3,12 @@ package realmayus.youmatter;
 import net.minecraft.block.Block;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.item.BlockItem;
-import net.minecraft.item.BucketItem;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntityType;
-import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import org.apache.logging.log4j.core.pattern.AbstractStyleNameConverter;
 import realmayus.youmatter.creator.CreatorBlock;
 import realmayus.youmatter.creator.CreatorContainer;
 import realmayus.youmatter.creator.CreatorTile;
@@ -30,7 +27,7 @@ import realmayus.youmatter.scanner.ScannerTile;
 public class RegistryHandler {
 
     @SubscribeEvent
-    public static void addBlocksAndFluids(RegistryEvent.Register<Block> event) {
+    public static void regusterBlocks(RegistryEvent.Register<Block> event) {
         event.getRegistry().register(new ScannerBlock().setRegistryName(YouMatter.MODID, "scanner"));
         event.getRegistry().register(new EncoderBlock().setRegistryName(YouMatter.MODID, "encoder"));
         event.getRegistry().register(new CreatorBlock().setRegistryName(YouMatter.MODID, "creator"));
@@ -38,7 +35,7 @@ public class RegistryHandler {
     }
 
     @SubscribeEvent
-    public static void addTE(RegistryEvent.Register<TileEntityType<?>> event) {
+    public static void registerTileEntites(RegistryEvent.Register<TileEntityType<?>> event) {
         event.getRegistry().register(TileEntityType.Builder.create(ScannerTile::new, ObjectHolders.SCANNER_BLOCK).build(null).setRegistryName(YouMatter.MODID, "scanner"));
         event.getRegistry().register(TileEntityType.Builder.create(EncoderTile::new, ObjectHolders.ENCODER_BLOCK).build(null).setRegistryName(YouMatter.MODID, "encoder"));
         event.getRegistry().register(TileEntityType.Builder.create(CreatorTile::new, ObjectHolders.CREATOR_BLOCK).build(null).setRegistryName(YouMatter.MODID, "creator"));
@@ -46,7 +43,7 @@ public class RegistryHandler {
     }
 
     @SubscribeEvent
-    public static void addItems(RegistryEvent.Register<Item> event) {
+    public static void registerItems(RegistryEvent.Register<Item> event) {
         event.getRegistry().register(new BlockItem(ObjectHolders.SCANNER_BLOCK, new Item.Properties().group(YouMatter.ITEM_GROUP)).setRegistryName(YouMatter.MODID, "scanner"));
         event.getRegistry().register(new BlockItem(ObjectHolders.ENCODER_BLOCK, new Item.Properties().group(YouMatter.ITEM_GROUP)).setRegistryName(YouMatter.MODID, "encoder"));
         event.getRegistry().register(new BlockItem(ObjectHolders.CREATOR_BLOCK, new Item.Properties().group(YouMatter.ITEM_GROUP)).setRegistryName(YouMatter.MODID, "creator"));
@@ -68,4 +65,4 @@ public class RegistryHandler {
 
     }
 
-} //todo furnace recipe
+}
