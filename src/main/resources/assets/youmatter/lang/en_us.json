@@ -19,7 +19,9 @@
 
   "_comment": "Fluids",
   "fluid.umatter": "U-Matter",
+  "fluid.youmatter.umatter": "U-Matter",
   "fluid.stabilizer": "Stabilizer",
+  "fluid.youmatter.stabilizer": "Stabilizer",
 
   "_comment": "Item Tooltips",
   "youmatter.tooltip.craftingItemEndCities": "\"§7Crafting Item. Can be found in End Cities.\"",

@@ -113,6 +113,8 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
     implementation fg.deobf("curse.maven:refinedstorage:2851763")
+    implementation fg.deobf("curse.maven:rlysmpletanks:2861031")
+
 
 }
 
