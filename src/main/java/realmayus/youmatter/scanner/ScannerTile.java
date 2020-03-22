@@ -12,7 +12,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
@@ -27,7 +26,6 @@ import realmayus.youmatter.util.MyEnergyStorage;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
@@ -143,10 +141,10 @@ public class ScannerTile extends TileEntity implements INamedContainerProvider, 
                 hasEncoder = true;
                 BlockPos encoderPos = getNeighborEncoder(this.pos);
                 if(!inventory.getStackInSlot(1).isEmpty() && isItemAllowed(inventory.getStackInSlot(1))) {
-                    if(getEnergy() > 2048) {
+                    if(getEnergy() > YMConfig.CONFIG.energyScanner.get()) {
                         if (getProgress() < 100) {
                             setProgress(getProgress() + 1);
-                            myEnergyStorage.consumePower(2048);
+                            myEnergyStorage.consumePower(YMConfig.CONFIG.energyScanner.get());
                        } else if (encoderPos != null) {
                             // Notifying the neighboring encoder of this scanner having finished its operation
                             ((EncoderTile)world.getTileEntity(encoderPos)).ignite(this.inventory.getStackInSlot(1)); //don't worry, this is already checked by getNeighborEncoder() c:

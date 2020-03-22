@@ -20,6 +20,7 @@ public class YMConfig {
     public final ForgeConfigSpec.ConfigValue<Integer> energyEncoder;
     public final ForgeConfigSpec.ConfigValue<Integer> energyScanner;
 
+    public final ForgeConfigSpec.ConfigValue<Integer> productionPerTick;
     static {
         Pair<YMConfig, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder().configure(YMConfig::new);
         CONFIG_SPEC = specPair.getRight();
@@ -40,14 +41,18 @@ public class YMConfig {
                 .comment("The default amount that is required to duplicate an item if it is not overridden.")
                 .define("defaultAmount", 1000);
         energyReplicator = builder
-                .comment("The energy consumption of the replicator per tick")
+                .comment("The energy consumption of the replicator per tick. Default: 2048")
                 .define("energyReplicator", 2048);
         energyEncoder = builder
-                .comment("The energy consumption of the encoder per tick")
-                .define("energyEncoder", 2048);
+                .comment("The energy consumption of the encoder per tick. Default: 512")
+                .define("energyEncoder", 512);
         energyScanner = builder
-                .comment("The energy consumption of the scanner per tick")
-                .define("energyScanner", 2048);
+                .comment("The energy consumption of the scanner per tick. Default: 512")
+                .define("energyScanner", 512);
+        productionPerTick = builder
+                .comment("Determines how much U-Matter [in mB] the creator produces every work cycle. Energy is withdrawn like this: if energy more than 30% of max energy, consume 30% and add [whatever value below] of U-Matter to the tank. Default is 1mB/work cycle. Don't increase this too much due to balancing issues.")
+                .define("productionPerTick", 1);
+
     }
 
     public Object[] getOverride(String registryName) {
