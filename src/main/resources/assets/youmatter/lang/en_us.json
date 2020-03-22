@@ -22,7 +22,7 @@
   "fluid.youmatter.stabilizer": "Stabilizer",
 
   "_comment": "Item Tooltips",
-  "youmatter.tooltip.craftingItemEndCities": "§7Crafting Item. Can be found in End Cities.",
+  "youmatter.tooltip.craftingItemEndCities": "§7Crafting Item. Can be duplicated in Crafting Table.",
   "youmatter.tooltip.craftingItem": "§7Crafting Item.",
   "youmatter.tooltip.dataStored": "§5Data stored.",
   "youmatter.tooltip.noDataStored": "§cNo Data stored.",

@@ -18,7 +18,6 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkHooks;
 import net.minecraftforge.items.CapabilityItemHandler;
-import realmayus.youmatter.scanner.ScannerTile;
 
 import javax.annotation.Nullable;
 import java.util.stream.IntStream;
@@ -41,7 +40,43 @@ public class ReplicatorBlock extends Block {
     }
 
 
-
+//    int currentDepth = 0;
+//    int result = 0;
+//    public int recurse(ItemStack is, RecipeManager recipeManager) {
+//        System.out.println("New Recursion, depth is: " + currentDepth);
+//        List<IRecipe<?>> matchingRecipes = GeneralUtils.getMatchingRecipes(recipeManager, is);
+//        for (IRecipe<?> recipe : matchingRecipes) {
+//            if (currentDepth < 747598378) {
+//                for(Ingredient ingredient : recipe.getIngredients()) {
+//                    if (!GeneralUtils.hasCustomUMatterValue(ingredient.getMatchingStacks())) {
+//                        //recursion
+//                        int cheapestVariant = Integer.MAX_VALUE;
+//                        for (ItemStack variant : ingredient.getMatchingStacks()) {
+//                            System.out.println("Variant: " + variant.toString());
+//                            if (!GeneralUtils.getMatchingRecipes(recipeManager, variant).isEmpty()) { //Item has Override!
+//                                int currentAmount = recurse(variant, recipeManager);
+//                                if (currentAmount < cheapestVariant) {
+//                                    cheapestVariant = currentAmount;
+//                                }
+//                            }
+//                        }
+//                        if (cheapestVariant == Integer.MAX_VALUE) {
+//                            System.out.println("Falling back to default value for current variant");
+//                            result = result + YMConfig.CONFIG.defaultAmount.get();
+//                        } else {
+//                            System.out.println("Cheapest variant found costs " + cheapestVariant + "mB");
+//                        }
+//                    } else {
+//                        result = result + YMConfig.CONFIG.defaultAmount.get();
+//                    }
+//                }
+//            } else {
+//                result = result + YMConfig.CONFIG.defaultAmount.get();
+//            }
+//        }
+//        currentDepth++;
+//        return result;
+//    }
 
     /**
      * EVENT that is called when you right-click the block,
@@ -54,6 +89,7 @@ public class ReplicatorBlock extends Block {
                     NetworkHooks.openGui((ServerPlayerEntity) player, containerProvider, pos);
                 }
             }
+
         }
         return ActionResultType.SUCCESS;
     }
