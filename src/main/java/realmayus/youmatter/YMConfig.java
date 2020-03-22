@@ -32,10 +32,10 @@ public class YMConfig {
                 .comment("Use the filterItems list as blacklist (true) or as whitelist (false). Whitelist means, that you can only duplicate those items in that list. Blacklist is vice-versa.")
                 .define("filterMode", true);
         filterItems = builder
-                .comment("List of items that are being treated specially. See filterMode for further details.")
+                .comment("List of items that are being treated specially. See filterMode for further details. Format: \"modid:item\"")
                 .defineList("filterItems", Lists.newArrayList("youmatter:umatter_bucket", "youmatter:stabilizer_bucket"), e -> e instanceof String && ((String) e).contains(":"));
         overrides = builder
-                .comment("Overrides: Set your desired required U-Matter values for each item. These do not apply when you e.g. have whitelist on but it doesn't include the desired override.")
+                .comment("Overrides: Set your desired required U-Matter values for each item. These do not apply when you e.g. have whitelist on but it doesn't include the desired override. Format: \"modid:item=amount\"")
                 .defineList("overrides", Lists.newArrayList("minecraft:diamond=2500", "minecraft:nether_star=5000"), e -> e instanceof String && ((String) e).contains(":") && ((String) e).contains("="));
         defaultAmount = builder
                 .comment("The default amount that is required to duplicate an item if it is not overridden.")
