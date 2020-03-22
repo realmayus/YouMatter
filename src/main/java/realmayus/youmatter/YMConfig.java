@@ -16,6 +16,10 @@ public class YMConfig {
     public final ForgeConfigSpec.ConfigValue<List<? extends String>> overrides;
     public final ForgeConfigSpec.ConfigValue<Integer> defaultAmount;
 
+    public final ForgeConfigSpec.ConfigValue<Integer> energyReplicator;
+    public final ForgeConfigSpec.ConfigValue<Integer> energyEncoder;
+    public final ForgeConfigSpec.ConfigValue<Integer> energyScanner;
+
     static {
         Pair<YMConfig, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder().configure(YMConfig::new);
         CONFIG_SPEC = specPair.getRight();
@@ -35,6 +39,15 @@ public class YMConfig {
         defaultAmount = builder
                 .comment("The default amount that is required to duplicate an item if it is not overridden.")
                 .define("defaultAmount", 1000);
+        energyReplicator = builder
+                .comment("The energy consumption of the replicator per tick")
+                .define("energyReplicator", 2048);
+        energyEncoder = builder
+                .comment("The energy consumption of the encoder per tick")
+                .define("energyEncoder", 2048);
+        energyScanner = builder
+                .comment("The energy consumption of the scanner per tick")
+                .define("energyScanner", 2048);
     }
 
     public Object[] getOverride(String registryName) {

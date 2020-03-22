@@ -32,6 +32,7 @@ import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.registries.ForgeRegistries;
 import realmayus.youmatter.ModFluids;
 import realmayus.youmatter.ObjectHolders;
+import realmayus.youmatter.YMConfig;
 import realmayus.youmatter.util.CustomInvWrapper;
 import realmayus.youmatter.util.GeneralUtils;
 import realmayus.youmatter.util.MyEnergyStorage;
@@ -202,21 +203,6 @@ public class ReplicatorTile extends TileEntity implements ITickableTileEntity, I
             currentPartTick = 0;
             //only execute this code on the server
             if(!world.isRemote) {
-                // Fill tank through inserted buckets
-//                if (!this.inventory.getStackInSlot(3).isEmpty()) {
-//                    if(this.inventory.getStackInSlot(3).getItem() instanceof BucketItem) {
-//                        BucketItem bucket = (BucketItem) this.inventory.getStackInSlot(3).getItem();
-//                        if(bucket.getFluid() != null) {
-//                            if (bucket.getFluid().getFluid().equals(ModFluids.UMATTER.get())) {
-//                                if (getTank().getFluidAmount() + 1000 < getTank().getCapacity()) {
-//                                    getTank().fill(new FluidStack(ModFluids.UMATTER.get(), 1000), IFluidHandler.FluidAction.EXECUTE);
-//                                    this.inventory.setStackInSlot(3, ItemStack.EMPTY);
-//                                    this.inventory.insertItem(4, new ItemStack(Items.BUCKET, 1), false);
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
                 if (!this.inventory.getStackInSlot(3).isEmpty()) {
                     ItemStack item = this.inventory.getStackInSlot(3);
                     if (item.getItem() instanceof BucketItem && GeneralUtils.canAddItemToSlot(this.inventory.getStackInSlot(4).getStack(), new ItemStack(Items.BUCKET, 1), false)) {
@@ -245,14 +231,7 @@ public class ReplicatorTile extends TileEntity implements ITickableTileEntity, I
                 }
 
                 ItemStack thumbdrive = inventory.getStackInSlot(0);
-                if (thumbdrive.isEmpty()){
-                    if(progress > 0) {
-                        if (currentItem != null) {
-                            if(!currentItem.isEmpty()) {
-                                getTank().fill(new FluidStack(ModFluids.UMATTER.get(), getUMatterAmountForItem(currentItem.getItem())), IFluidHandler.FluidAction.EXECUTE); // give the user its umatter back!
-                            }
-                        }
-                    }
+                if (thumbdrive.isEmpty()){ //in case user removes thumb drive while replicator is in operation
                     inventory.setStackInSlot(2, ItemStack.EMPTY);
                     cachedItems = null;
                     currentIndex = 0;
@@ -277,10 +256,14 @@ public class ReplicatorTile extends TileEntity implements ITickableTileEntity, I
                                     if (!inventory.getStackInSlot(2).isEmpty()) {
                                         if (isActive) {
                                             currentItem = cachedItems.get(currentIndex);
-                                            if(tank.getFluidAmount() >= getUMatterAmountForItem(currentItem.getItem())) {
-                                                tank.drain(getUMatterAmountForItem(currentItem.getItem()), IFluidHandler.FluidAction.EXECUTE);
-                                                progress++;
+                                            if (myEnergyStorage.getEnergyStored() >= YMConfig.CONFIG.energyReplicator.get()) {
+                                                if(tank.getFluidAmount() >= getUMatterAmountForItem(currentItem.getItem())) {
+                                                    tank.drain(getUMatterAmountForItem(currentItem.getItem()), IFluidHandler.FluidAction.EXECUTE);
+                                                    progress++;
+                                                    myEnergyStorage.consumePower(YMConfig.CONFIG.energyReplicator.get());
+                                                }
                                             }
+
                                         }
                                     }
                                 } else {
@@ -298,12 +281,12 @@ public class ReplicatorTile extends TileEntity implements ITickableTileEntity, I
                                                 if (!currentItem.isEmpty()) {
                                                     if (currentItem.isItemEqual(inventory.getStackInSlot(2))) { // Check if selected item hasn't changed
                                                         if(inventory.getStackInSlot(1).isEmpty() || GeneralUtils.canAddItemToSlot(inventory.getStackInSlot(1).getStack(), currentItem, false)) { //check if output slot is still empty
-                                                            progress++;
+                                                            if (myEnergyStorage.getEnergyStored() >= YMConfig.CONFIG.energyReplicator.get()) {
+                                                                progress++;
+                                                                myEnergyStorage.consumePower(YMConfig.CONFIG.energyReplicator.get());
+                                                            }
                                                         }
                                                     } else {
-                                                        if (progress > 0) { // progress was over 0 (= already drained U-matter) and then aborted
-                                                            getTank().fill(new FluidStack(ModFluids.UMATTER.get(), getUMatterAmountForItem(currentItem.getItem())), IFluidHandler.FluidAction.EXECUTE); // give the user its umatter back!
-                                                        }
                                                         progress = 0; // abort if not
                                                     }
                                                 }
@@ -314,7 +297,6 @@ public class ReplicatorTile extends TileEntity implements ITickableTileEntity, I
                                             }
                                         }
 
-                                        myEnergyStorage.consumePower(2048);
                                     }
                                 }
                             }
