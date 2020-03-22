@@ -27,6 +27,7 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import realmayus.youmatter.ModFluids;
 import realmayus.youmatter.ObjectHolders;
+import realmayus.youmatter.YMConfig;
 import realmayus.youmatter.util.GeneralUtils;
 import realmayus.youmatter.util.MyEnergyStorage;
 
@@ -251,9 +252,11 @@ public class CreatorTile extends TileEntity implements ITickableTileEntity, INam
             if (!world.isRemote) {
                 if(isActivated()) {
                     if (getEnergy() >= 0.3f * 1000000 && sTank.getFluidAmount() >= 125) { // if energy more than 30 % of max energy
-                        sTank.drain(125, IFluidHandler.FluidAction.EXECUTE);
-                        uTank.fill(new FluidStack(ModFluids.UMATTER.get(), 1), IFluidHandler.FluidAction.EXECUTE);
-                        myEnergyStorage.consumePower(Math.round(getEnergy()/3f));
+                        if (uTank.getFluidAmount() + YMConfig.CONFIG.productionPerTick.get() <= MAX_UMATTER) {
+                            sTank.drain(125, IFluidHandler.FluidAction.EXECUTE);
+                            uTank.fill(new FluidStack(ModFluids.UMATTER.get(), YMConfig.CONFIG.productionPerTick.get()), IFluidHandler.FluidAction.EXECUTE);
+                            myEnergyStorage.consumePower(Math.round(getEnergy()/3f));
+                        }
                     }
                 }
 

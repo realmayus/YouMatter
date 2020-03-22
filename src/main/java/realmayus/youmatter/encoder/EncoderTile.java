@@ -12,7 +12,6 @@ import net.minecraft.nbt.StringNBT;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
-import net.minecraft.util.IItemProvider;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.capabilities.Capability;
@@ -22,6 +21,7 @@ import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import realmayus.youmatter.ObjectHolders;
+import realmayus.youmatter.YMConfig;
 import realmayus.youmatter.items.ThumbdriveItem;
 import realmayus.youmatter.util.MyEnergyStorage;
 
@@ -154,17 +154,19 @@ public class EncoderTile extends TileEntity implements INamedContainerProvider, 
                 if(processIS != ItemStack.EMPTY) {
                     if(this.inventory.getStackInSlot(1).getItem() instanceof ThumbdriveItem) {
                         if (progress < 100) {
-                            if(getEnergy() >= 2048) {
+                            if(getEnergy() >= YMConfig.CONFIG.energyEncoder.get()) {
                                 CompoundNBT nbt = this.inventory.getStackInSlot(1).getTag();
                                 if (nbt != null) {
                                     if (nbt.contains("stored_items")) {
                                         ListNBT list = nbt.getList("stored_items", Constants.NBT.TAG_STRING);
                                         if (list.size() < 8) {
                                             progress = progress + 1;
+                                            myEnergyStorage.consumePower(YMConfig.CONFIG.energyEncoder.get());
                                         }
                                     }
                                 } else {
                                     progress = progress + 1; //doesn't have data stored yet
+                                    myEnergyStorage.consumePower(YMConfig.CONFIG.energyEncoder.get());
                                 }
                             }
                         } else {
