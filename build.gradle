@@ -15,7 +15,7 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
 
-version = "1.12.2-2.0"
+version = "1.12.2-2.1.0"
 group = "realmayus.youmatter" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "youmatter"
 
@@ -59,7 +59,6 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
     deobfCompile "curse.maven:mekanism:2745458"
-
 }
 
 processResources {

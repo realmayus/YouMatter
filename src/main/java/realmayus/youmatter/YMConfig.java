@@ -1,10 +1,8 @@
 package realmayus.youmatter;
 
-import com.google.common.collect.ImmutableMap;
 import net.minecraftforge.common.config.Config;
 
 import java.util.HashMap;
-import java.util.Map;
 
 @Config(modid = YouMatter.MODID)
 public class YMConfig {
@@ -24,4 +22,16 @@ public class YMConfig {
 
     @Config.Comment(value = "How much U-Matter (in mB) should you need for one item to be duplicated (that is not overridden)")
     public static int uMatterPerItem = 1000;
+
+    @Config.Comment(value = "The energy consumption of the replicator per tick. Default: 2048")
+    public static int energyReplicator = 2048;
+
+    @Config.Comment(value = "The energy consumption of the encoder per tick. Default: 512")
+    public static int energyEncoder = 512;
+
+    @Config.Comment(value = "The energy consumption of the scanner per tick. Default: 512")
+    public static int energyScanner = 512;
+
+    @Config.Comment(value = "Determines how much U-Matter [in mB] the creator produces every work cycle. Energy is withdrawn like this: if energy more than 30% of max energy, consume 30% and add [whatever value below] of U-Matter to the tank. Default is 1mB/work cycle. Don't increase this too much due to balancing issues.")
+    public static int productionPerWorkcycle = 1;
 }

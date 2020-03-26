@@ -1,10 +1,8 @@
 package realmayus.youmatter.replicator;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
-import net.minecraft.inventory.Container;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
@@ -23,8 +21,6 @@ import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.FluidTankProperties;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import realmayus.youmatter.ModFluids;
@@ -38,6 +34,8 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import static realmayus.youmatter.util.GeneralUtils.getUMatterAmountForItem;
 
 public class TileReplicator extends TileEntity implements  ITickable{
     public TileReplicator() {
@@ -214,26 +212,64 @@ public class TileReplicator extends TileEntity implements  ITickable{
             currentPartTick = 0;
             //only execute this code on the server
             if(!world.isRemote) {
+//                if (!this.inputHandler.getStackInSlot(3).isEmpty()) {
+//                    if(this.inputHandler.getStackInSlot(3).getItem() instanceof UniversalBucket) {
+//                        UniversalBucket bucket = (UniversalBucket) this.inputHandler.getStackInSlot(3).getItem();
+//                        if(bucket.getFluid(this.inputHandler.getStackInSlot(3)) != null) {
+//                            if (bucket.getFluid(this.inputHandler.getStackInSlot(3)).getFluid().equals(ModFluids.UMATTER)) {
+//                                if (getTank().getFluidAmount() + 1000 < getTank().getCapacity()) {
+//                                    getTank().fill(new FluidStack(ModFluids.UMATTER, 1000), true);
+//                                    this.inputHandler.setStackInSlot(3, ItemStack.EMPTY);
+//                                    this.combinedHandler.insertItem(4, new ItemStack(Items.BUCKET, 1), false);
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+
                 if (!this.inputHandler.getStackInSlot(3).isEmpty()) {
-                    if(this.inputHandler.getStackInSlot(3).getItem() instanceof UniversalBucket) {
-                        UniversalBucket bucket = (UniversalBucket) this.inputHandler.getStackInSlot(3).getItem();
-                        if(bucket.getFluid(this.inputHandler.getStackInSlot(3)) != null) {
-                            if (bucket.getFluid(this.inputHandler.getStackInSlot(3)).getFluid().equals(ModFluids.UMATTER)) {
-                                if (getTank().getFluidAmount() + 1000 < getTank().getCapacity()) {
-                                    getTank().fill(new FluidStack(ModFluids.UMATTER, 1000), true);
-                                    this.inputHandler.setStackInSlot(3, ItemStack.EMPTY);
-                                    this.combinedHandler.insertItem(4, new ItemStack(Items.BUCKET, 1), false);
+                    ItemStack item = this.inputHandler.getStackInSlot(3);
+                    if (item.getItem() instanceof UniversalBucket && GeneralUtils.canAddItemToSlot(this.inputHandler.getStackInSlot(4), new ItemStack(Items.BUCKET, 1), false)) {
+                        if (item.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null)) {
+                            IFluidTankProperties tankProperties = item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null).getTankProperties()[0];
+                            if (tankProperties.getContents() != null) {
+                                if (tankProperties.getContents().getFluid().equals(ModFluids.UMATTER)) {
+                                    if (MAX_UMATTER - getTank().getFluidAmount() >= 1000) {
+                                        if (MAX_UMATTER - getTank().getFluidAmount() >= 1000) {
+                                            getTank().fill(new FluidStack(ModFluids.UMATTER, 1000), true);
+                                            this.inputHandler.setStackInSlot(3, ItemStack.EMPTY);
+                                            this.inputHandler.insertItem(4, new ItemStack(Items.BUCKET, 1), false);
+                                        }
+                                    }
                                 }
                             }
                         }
+                    } else if (!(item.getItem() instanceof UniversalBucket) && GeneralUtils.canAddItemToSlot(this.inputHandler.getStackInSlot(4), this.inputHandler.getStackInSlot(3), false)) {
+                        if (item.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null)) {
+                            IFluidTankProperties tankProperties = item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null).getTankProperties()[0];
+                            if (tankProperties.getContents() != null) {
+                                if (tankProperties.getContents().getFluid().equals(ModFluids.UMATTER)) {
+                                    if (tankProperties.getContents().amount > MAX_UMATTER - getTank().getFluidAmount()) { //given fluid is more than what fits in the U-Tank
+                                        getTank().fill(item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null).drain(MAX_UMATTER - getTank().getFluidAmount(), true), true);
+                                    } else { //given fluid fits perfectly in U-Tank
+                                        getTank().fill(item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null).drain(tankProperties.getContents().amount, true), true);
+                                    }
+                                }
+                            }
+
+                        }
+                        this.inputHandler.setStackInSlot(3, ItemStack.EMPTY);
+                        this.inputHandler.insertItem(4, item, false);
                     }
                 }
+
+
                 ItemStack thumbdrive = inputHandler.getStackInSlot(0);
                 if (thumbdrive.isEmpty()){
                     if(progress > 0) {
                         if (currentItem != null) {
                             if(!currentItem.isEmpty()) {
-                                getTank().fill(new FluidStack(ModFluids.UMATTER, GeneralUtils.getUMatterAmountForItem(currentItem.getItem())), true); // give the user its umatter back!
+                                getTank().fill(new FluidStack(ModFluids.UMATTER, getUMatterAmountForItem(currentItem.getItem())), true); // give the user its umatter back!
                             }
                         }
                     }
@@ -261,13 +297,11 @@ public class TileReplicator extends TileEntity implements  ITickable{
                                 renderItem(cachedItems, currentIndex);
                                 if(progress == 0) {
                                     if (!combinedHandler.getStackInSlot(2).isEmpty()) {
-                                        if(combinedHandler.getStackInSlot(1).isEmpty()) {
-                                            if (isActive) {
-                                                currentItem = cachedItems.get(currentIndex);
-                                                if(tank.getFluidAmount() >= GeneralUtils.getUMatterAmountForItem(currentItem.getItem())) {
-                                                    tank.drain(GeneralUtils.getUMatterAmountForItem(currentItem.getItem()), true);
-                                                    progress++;
-                                                }
+                                        if (isActive) {
+                                            currentItem = cachedItems.get(currentIndex);
+                                            if(tank.getFluidAmount() >= getUMatterAmountForItem(currentItem.getItem())) {
+                                                tank.drain(getUMatterAmountForItem(currentItem.getItem()), true);
+                                                progress++;
                                             }
                                         }
                                     }
@@ -278,19 +312,19 @@ public class TileReplicator extends TileEntity implements  ITickable{
                                                 if(!currentMode) { //if mode is single run, then pause machine
                                                     isActive = false;
                                                 }
-                                                combinedHandler.setStackInSlot(1, currentItem);
+                                                combinedHandler.insertItem(1, currentItem, false);
                                             }
                                             progress = 0;
                                         } else {
                                             if (currentItem != null) {
                                                 if (!currentItem.isEmpty()) {
                                                     if (currentItem.isItemEqual(combinedHandler.getStackInSlot(2))) { // Check if selected item hasn't changed
-                                                        if(combinedHandler.getStackInSlot(1).isEmpty()) { //check if output slot is still empty
+                                                        if(combinedHandler.getStackInSlot(1).isEmpty() || GeneralUtils.canAddItemToSlot(combinedHandler.getStackInSlot(1), currentItem, false)) { //check if output slot is still empty
                                                             progress++;
                                                         }
                                                     } else {
                                                         if (progress > 0) { // progress was over 0 (= already drained U-matter) and then aborted
-                                                            getTank().fill(new FluidStack(ModFluids.UMATTER, GeneralUtils.getUMatterAmountForItem(currentItem.getItem())), true); // give the user its umatter back!
+                                                            getTank().fill(new FluidStack(ModFluids.UMATTER, getUMatterAmountForItem(currentItem.getItem())), true); // give the user its umatter back!
                                                         }
                                                         progress = 0; // abort if not
                                                     }
@@ -301,7 +335,7 @@ public class TileReplicator extends TileEntity implements  ITickable{
                                                 }
                                             }
                                         }
-                                        myEnergyStorage.consumePower(2048);
+                                        myEnergyStorage.consumePower(YMConfig.energyReplicator);
                                     }
                                 }
                             }

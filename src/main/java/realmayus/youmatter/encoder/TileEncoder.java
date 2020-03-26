@@ -1,8 +1,6 @@
 package realmayus.youmatter.encoder;
 
-import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
@@ -14,10 +12,10 @@ import net.minecraft.util.ITickable;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.fml.common.asm.transformers.ItemStackTransformer;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
+import realmayus.youmatter.YMConfig;
 import realmayus.youmatter.items.ThumbdriveItem;
 import realmayus.youmatter.util.MyEnergyStorage;
 
@@ -207,17 +205,19 @@ public class TileEncoder extends TileEntity implements  ITickable {
                 if(processIS != ItemStack.EMPTY) {
                     if(this.inputHandler.getStackInSlot(1).getItem() instanceof ThumbdriveItem) {
                         if (progress < 100) {
-                            if(getEnergy() >= 2048) {
+                            if(getEnergy() >= YMConfig.energyEncoder) {
                                 NBTTagCompound nbt = this.inputHandler.getStackInSlot(1).getTagCompound();
                                 if (nbt != null) {
                                     if (nbt.hasKey("stored_items")) {
                                         NBTTagList list = nbt.getTagList("stored_items", Constants.NBT.TAG_STRING);
                                         if (list.tagCount() < 8) {
                                             progress = progress + 1;
+                                            myEnergyStorage.consumePower(YMConfig.energyEncoder);
                                         }
                                     }
                                 } else {
                                     progress = progress + 1; //doesn't have data stored yet
+                                    myEnergyStorage.consumePower(YMConfig.energyEncoder);
                                 }
                             }
                         } else {

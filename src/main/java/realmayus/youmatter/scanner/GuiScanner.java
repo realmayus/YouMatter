@@ -33,18 +33,21 @@ public class GuiScanner extends GuiContainer {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         mc.getTextureManager().bindTexture(GUI);
         drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
+
+        drawEnergyBolt(te.getClientEnergy());
+        drawProgressDisplayChain(te.getClientProgress());
+
+        //draw warning
+        if(!te.getHasEncoderClient()) {
+            drawTexturedModalRect(guiLeft + 16, guiTop + 59, 176, 101, 16, 16);
+        }
+
     }
 
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         super.drawGuiContainerForegroundLayer(mouseX, mouseY);
 
-        drawEnergyBolt(te.getClientEnergy());
-        drawProgressDisplayChain(te.getClientProgress());
-
-        if(!te.getHasEncoderClient()) {
-            drawTexturedModalRect(16, 59, 176, 101, 16, 16);
-        }
 
         this.fontRenderer.drawString(I18n.format("youmatter.guiname.scanner"), 8, 6, 4210752);
     }
@@ -65,20 +68,20 @@ public class GuiScanner extends GuiContainer {
         }
 
         mc.getTextureManager().bindTexture(GUI);
-        drawTexturedModalRect(79, 63, 176, 41, Math.round((arrow / 100.0f) * 18), 12);
-        drawTexturedModalRect(104, 35, 176, 53, 17, Math.round((circuits / 100.0f) * 24));
-        drawTexturedModalRect(54, 35, 176, 77, 17, Math.round((circuits / 100.0f) * 24));
+        drawTexturedModalRect(guiLeft + 79, guiTop + 63, 176, 41, Math.round((arrow / 100.0f) * 18), 12);
+        drawTexturedModalRect(guiLeft + 104, guiTop + 35, 176, 53, 17, Math.round((circuits / 100.0f) * 24));
+        drawTexturedModalRect(guiLeft + 54, guiTop + 35, 176, 77, 17, Math.round((circuits / 100.0f) * 24));
     }
 
     private void drawEnergyBolt(int energy) {
         mc.getTextureManager().bindTexture(GUI);
 
         if(energy == 0) {
-            drawTexturedModalRect(141, 36, 176, 21, 15, 20);
+            drawTexturedModalRect(guiLeft + 141, guiTop + 36, 176, 21, 15, 20);
         } else {
-            double percentage = energy * 100 / 1000000;  // i know this is dumb
+            double percentage = energy * 100 / 1000000F;  // i know this is dumb
             float percentagef = (float) percentage / 100; // but it works.
-            drawTexturedModalRect(141, 36, 176, 0, 15, Math.round(20 * percentagef)); // it's not really intended that the bolt fills from the top but it looks cool tbh.
+            drawTexturedModalRect(guiLeft + 141, guiTop + 36, 176, 0, 15, Math.round(20 * percentagef)); // it's not really intended that the bolt fills from the top but it looks cool tbh.
 
         }
     }

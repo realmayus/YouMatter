@@ -1,8 +1,6 @@
 package realmayus.youmatter.scanner;
 
-import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -195,10 +193,10 @@ public class TileScanner extends TileEntity implements  ITickable{
                 hasEncoder = true;
                 BlockPos encoderPos = getNeighborEncoder(this.pos);
                 if(!inputHandler.getStackInSlot(1).isEmpty() && isItemAllowed(inputHandler.getStackInSlot(1))) {
-                    if(getEnergy() > 2048) {
+                    if(getEnergy() > YMConfig.energyScanner) {
                         if (getProgress() < 100) {
                             setProgress(getProgress() + 1);
-                            myEnergyStorage.consumePower(2048);
+                            myEnergyStorage.consumePower(YMConfig.energyScanner);
                         } else if (encoderPos != null) {
                             // Notifying the neighboring encoder of this scanner having finished its operation
                             ((TileEncoder)world.getTileEntity(encoderPos)).ignite(this.inputHandler.getStackInSlot(1)); //don't worry, this is already checked by getNeighborEncoder() c:

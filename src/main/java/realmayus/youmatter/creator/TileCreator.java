@@ -1,10 +1,9 @@
 package realmayus.youmatter.creator;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
-import net.minecraft.inventory.Container;
+import net.minecraft.item.ItemBucket;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -24,14 +23,16 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
 import realmayus.youmatter.ModFluids;
-import realmayus.youmatter.encoder.BlockEncoder;
-import realmayus.youmatter.encoder.TileEncoder;
+import realmayus.youmatter.YMConfig;
 import realmayus.youmatter.replicator.TileReplicator;
+import realmayus.youmatter.util.GeneralUtils;
 import realmayus.youmatter.util.MyEnergyStorage;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 public class TileCreator extends TileEntity implements  ITickable{
 
@@ -329,10 +330,12 @@ public class TileCreator extends TileEntity implements  ITickable{
         if (currentPartTick == 40) { // every 2 sec
             if (!world.isRemote) {
                 if(isActivated()) {
-                    if (getEnergy() >= 0.3f * 1000000 && sTank.getFluidAmount() >= 125) { // if energy more than 10 % of max energy
-                        sTank.drain(125, true);
-                        uTank.fill(new FluidStack(ModFluids.UMATTER, Math.round((float) 0.000005 * (getEnergy()/3f))), true);
-                        myEnergyStorage.consumePower(Math.round(getEnergy()/3f));
+                    if (getEnergy() >= 0.3f * 1000000 && sTank.getFluidAmount() >= 125) { // if energy more than 30 % of max energy
+                        if (uTank.getFluidAmount() + YMConfig.productionPerWorkcycle <= MAX_UMATTER) {
+                            sTank.drain(125, true);
+                            uTank.fill(new FluidStack(ModFluids.UMATTER, YMConfig.productionPerWorkcycle), true);
+                            myEnergyStorage.consumePower(Math.round(getEnergy()/3f));
+                        }
                     }
                 }
 
@@ -349,27 +352,59 @@ public class TileCreator extends TileEntity implements  ITickable{
             currentPartTick = 0;
         } else if ((currentPartTick % 5) == 0) { // every five ticks
             if (!world.isRemote) {
-                if (!this.inputHandler.getStackInSlot(3).isEmpty()) {
-                    if (this.inputHandler.getStackInSlot(3).getItem() == Items.BUCKET) {
+                if (!(this.inputHandler.getStackInSlot(3).isEmpty()) && GeneralUtils.canAddItemToSlot(this.inputHandler.getStackInSlot(4), this.inputHandler.getStackInSlot(3), false)) {
+                    ItemStack item = this.inputHandler.getStackInSlot(3);
+                    if (item.getItem() instanceof ItemBucket) {
                         if (getUTank().getFluidAmount() >= 1000) {
                             getUTank().drain(1000, true);
                             this.inputHandler.setStackInSlot(3, ItemStack.EMPTY);
                             this.combinedHandler.insertItem(4, UniversalBucket.getFilledBucket(new UniversalBucket(), ModFluids.UMATTER), false);
                         }
-                    }
-                }
-                if (!this.inputHandler.getStackInSlot(1).isEmpty()) {
-                    if (this.inputHandler.getStackInSlot(1).getItem() instanceof UniversalBucket) {
-                        UniversalBucket bucket = (UniversalBucket) this.inputHandler.getStackInSlot(1).getItem();
-                        if (bucket.getFluid(this.inputHandler.getStackInSlot(1)) != null) {
-                            if (bucket.getFluid(this.inputHandler.getStackInSlot(1)).getFluid().equals(ModFluids.STABILIZER)) {
-                                if (getSTank().getFluidAmount() < getUTank().getCapacity()) {
-                                    getSTank().fill(new FluidStack(ModFluids.STABILIZER, 1000), true);
-                                    this.inputHandler.setStackInSlot(1, ItemStack.EMPTY);
-                                    this.combinedHandler.insertItem(2, new ItemStack(Items.BUCKET, 1), false);
+                    } else {
+                        if (item.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null)) {
+                            IFluidTankProperties tankProperties = item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null).getTankProperties()[0];
+                            if (tankProperties.getContents() != null) {
+                                if (tankProperties.getContents().getFluid().equals(ModFluids.UMATTER) || tankProperties.getContents().getFluid() == null) {
+                                    if (tankProperties.getCapacity() - tankProperties.getContents().amount < getUTank().getFluidAmount()) { //fluid in S-Tank is more than what fits in the item's tank
+                                        getUTank().drain(item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null).fill(new FluidStack(ModFluids.UMATTER, tankProperties.getCapacity() - tankProperties.getContents().amount), true), true);
+                                    } else { //S-Tank's fluid fits perfectly in item's tank
+                                        getUTank().drain(item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null).fill(getUTank().getFluid(), true), true);
+                                    }
                                 }
                             }
                         }
+                        this.inputHandler.setStackInSlot(3, ItemStack.EMPTY);
+                        this.inputHandler.insertItem(4, item, false);
+                    }
+                }
+                if (!this.inputHandler.getStackInSlot(1).isEmpty()) {
+                    ItemStack item = this.inputHandler.getStackInSlot(1);
+                    if (item.getItem() instanceof UniversalBucket && GeneralUtils.canAddItemToSlot(this.inputHandler.getStackInSlot(2), new ItemStack(Items.BUCKET, 1), false)) {
+                        if (item.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null)) {
+                            IFluidTankProperties tankProperties = item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null).getTankProperties()[0];
+                            if (tankProperties.getContents() != null && tankProperties.getContents().getFluid().equals(ModFluids.STABILIZER)) {
+                                if (MAX_STABILIZER - getSTank().getFluidAmount() >= 1000) {
+                                    getSTank().fill(new FluidStack(ModFluids.STABILIZER, 1000), true);
+                                    this.inputHandler.setStackInSlot(1, ItemStack.EMPTY);
+                                    this.inputHandler.insertItem(2, new ItemStack(Items.BUCKET, 1), false);
+                                }
+                            }
+                        }
+                    } else if(GeneralUtils.canAddItemToSlot(this.inputHandler.getStackInSlot(2), this.inputHandler.getStackInSlot(1), false)) {
+                        if (item.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null)) {
+                            IFluidTankProperties tankProperties = item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null).getTankProperties()[0];
+                            if (tankProperties.getContents() != null) {
+                                if (tankProperties.getContents().getFluid().equals(ModFluids.STABILIZER)) {
+                                    if (tankProperties.getContents().amount > MAX_STABILIZER - getSTank().getFluidAmount()) { //given fluid is more than what fits in the S-Tank
+                                        getSTank().fill(item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null).drain(MAX_STABILIZER - getSTank().getFluidAmount(), true), true);
+                                    } else { //given fluid fits perfectly in S-Tank
+                                        getSTank().fill(item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null).drain(tankProperties.getContents().amount, true), true);
+                                    }
+                                }
+                            }
+                        }
+                        this.inputHandler.setStackInSlot(1, ItemStack.EMPTY);
+                        this.inputHandler.insertItem(2, item, false);
                     }
                 }
 

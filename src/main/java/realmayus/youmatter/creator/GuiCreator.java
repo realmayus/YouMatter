@@ -49,16 +49,18 @@ public class GuiCreator extends GuiContainer {
         drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
         drawFluidTank(89, 23, te.getUTank());
         drawFluidTank(31, 23, te.getSTank());
+        drawActiveIcon(te.isActivatedClient());
+        drawEnergyBolt(te.getClientEnergy());
     }
 
     private void drawActiveIcon(boolean isActive) {
         mc.getTextureManager().bindTexture(GUI);
 
         if(isActive) {
-            drawTexturedModalRect(154, 13, 176, 24, 8, 9);
+            drawTexturedModalRect(guiLeft +154,  guiTop + 13, 176, 24, 8, 9);
 
         } else {
-            drawTexturedModalRect(154, 13, 176, 15, 8, 9);
+            drawTexturedModalRect(guiLeft +154, guiTop + 13, 176, 15, 8, 9);
         }
     }
 
@@ -69,16 +71,18 @@ public class GuiCreator extends GuiContainer {
 
         mc.getTextureManager().bindTexture(GUI);
 
-        if(te.getClientEnergy() == 0) {
-            drawTexturedModalRect(150, 59, 176, 114, 15, 20);
+        this.fontRenderer.drawString(I18n.format("youmatter.guiname.creator"), 8, 6, 4210752);
+    }
+
+    private void drawEnergyBolt(int clientEnergy) {
+        if(clientEnergy == 0) {
+            drawTexturedModalRect(guiLeft + 150, guiTop + 59, 176, 114, 15, 20);
         } else {
-            double percentage = te.getClientEnergy() * 100 / 1000000;  // i know this is dumb
+            double percentage = clientEnergy * 100 / 1000000F;  // i know this is dumb
             float percentagef = (float)percentage / 100; // but it works.
-            drawTexturedModalRect(150, 59, 176, 93, 15, Math.round(20 * percentagef)); // it's not really intended that the bolt fills from the top but it looks cool tbh.
+            drawTexturedModalRect(guiLeft + 150, guiTop + 59, 176, 93, 15, Math.round(20 * percentagef)); // it's not really intended that the bolt fills from the top but it looks cool tbh.
 
         }
-        drawActiveIcon(te.isActivatedClient());
-        this.fontRenderer.drawString(I18n.format("youmatter.guiname.creator"), 8, 6, 4210752);
     }
 
     @Override

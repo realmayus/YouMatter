@@ -54,8 +54,21 @@ public class GuiReplicator extends GuiContainer {
 
         drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
 
+        drawActiveIcon(te.isActiveClient());
+        drawModeIcon(te.isCurrentClientMode());
+        drawProgressArrow(te.getClientProgress());
+        drawEnergyBolt(te.getClientEnergy());
         drawFluidTank(26, 21, te.getTank());
+    }
 
+    private void drawEnergyBolt(int clientEnergy) {
+        if(clientEnergy == 0) {
+            drawTexturedModalRect(guiLeft + 127, guiTop + 59, 176, 114, 15, 20);
+        } else {
+            double percentage =  clientEnergy * 100 / 1000000F;  // i know this is dumb
+            float percentagef = (float)percentage / 100; // but it works.
+            drawTexturedModalRect(guiLeft + 127, guiTop + 59, 176, 93, 15, Math.round(20 * percentagef)); // it's not really intended that the bolt fills from the top but it looks cool tbh.
+        }
     }
 
     @Override
@@ -63,19 +76,6 @@ public class GuiReplicator extends GuiContainer {
         super.drawGuiContainerForegroundLayer(mouseX, mouseY);
 
         mc.getTextureManager().bindTexture(GUI);
-
-        if(te.getClientEnergy() == 0) {
-            drawTexturedModalRect(127, 59, 176, 114, 15, 20);
-        } else {
-            double percentage = te.getClientEnergy() * 100 / 1000000;  // i know this is dumb
-            float percentagef = (float)percentage / 100; // but it works.
-            drawTexturedModalRect(127, 59, 176, 93, 15, Math.round(20 * percentagef)); // it's not really intended that the bolt fills from the top but it looks cool tbh.
-
-        }
-
-        drawActiveIcon(te.isActiveClient());
-        drawModeIcon(te.isCurrentClientMode());
-        drawProgressArrow(te.getClientProgress());
 
         this.fontRenderer.drawString(I18n.format("youmatter.guiname.replicator"), 8, 6, 4210752);
     }
@@ -90,9 +90,9 @@ public class GuiReplicator extends GuiContainer {
         mc.getTextureManager().bindTexture(GUI);
 
         if(isActive) {
-            drawTexturedModalRect(154, 13, 176, 24, 8, 9);
+            drawTexturedModalRect(guiLeft + 154, guiTop + 13, 176, 24, 8, 9);
         } else {
-            drawTexturedModalRect(154, 13, 184, 24, 8, 9);
+            drawTexturedModalRect(guiLeft + 154, guiTop + 13, 184, 24, 8, 9);
         }
     }
 
@@ -101,16 +101,15 @@ public class GuiReplicator extends GuiContainer {
 
         if (mode){
             //loop
-            drawTexturedModalRect(152, 35, 176, 11, 13,13);
+            drawTexturedModalRect(guiLeft + 152, guiTop + 35, 176, 11, 13,13);
         } else {
-            drawTexturedModalRect(151, 36, 176, 0, 13, 11);
+            drawTexturedModalRect(guiLeft + 151, guiTop + 36, 176, 0, 13, 11);
         }
     }
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         //Render the dark background
-
         drawDefaultBackground();
         super.drawScreen(mouseX, mouseY, partialTicks);
 

@@ -37,26 +37,30 @@ public class GuiEncoder extends GuiContainer {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         mc.getTextureManager().bindTexture(GUI);
         drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
+
+        drawEnergyBolt(te.getClientEnergy());
+        drawProgressDisplayChain(te.getClientProgress());
+
+
+        //draw warning
+        if (!(te.inputHandler.getStackInSlot(1).getItem() instanceof ThumbdriveItem)) {
+            drawTexturedModalRect(guiLeft + 16, guiTop + 59, 176, 66, 16, 16);
+        } else {
+            NBTTagCompound nbt = te.inputHandler.getStackInSlot(1).getTagCompound();
+            if (nbt != null) {
+                NBTTagList list = nbt.getTagList("stored_items", Constants.NBT.TAG_STRING);
+                if (list.tagCount() >= 8) {
+                    drawTexturedModalRect(guiLeft + 16, guiTop + 59, 176, 66, 16, 16);
+                }
+            }
+        }
     }
 
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         super.drawGuiContainerForegroundLayer(mouseX, mouseY);
 
-        drawEnergyBolt(te.getClientEnergy());
-        drawProgressDisplayChain(te.getClientProgress());
 
-        if (!(te.inputHandler.getStackInSlot(1).getItem() instanceof ThumbdriveItem)) {
-            drawTexturedModalRect(16, 59, 176, 66, 16, 16);
-        } else {
-            NBTTagCompound nbt = te.inputHandler.getStackInSlot(1).getTagCompound();
-            if (nbt != null) {
-                NBTTagList list = nbt.getTagList("stored_items", Constants.NBT.TAG_STRING);
-                if (list.tagCount() >= 8) {
-                    drawTexturedModalRect(16, 59, 176, 66, 16, 16);
-                }
-            }
-        }
         this.fontRenderer.drawString(I18n.format("youmatter.guiname.encoder"), 8, 6, 4210752);
     }
 
@@ -84,9 +88,9 @@ public class GuiEncoder extends GuiContainer {
         }
 
         mc.getTextureManager().bindTexture(GUI);
-        drawTexturedModalRect(22, 42, 176, 41, Math.round((arrow1 / 100.0f) * 18), 12);
-        drawTexturedModalRect(47, 41, 176, 53, 7, Math.round((lock / 100.0f) * 13));
-        drawTexturedModalRect(61, 42, 176, 41, Math.round((arrow2 / 100.0f) * 18), 12);
+        drawTexturedModalRect(guiLeft + 22, guiTop + 42, 176, 41, Math.round((arrow1 / 100.0f) * 18), 12);
+        drawTexturedModalRect(guiLeft + 47, guiTop + 41, 176, 53, 7, Math.round((lock / 100.0f) * 13));
+        drawTexturedModalRect(guiLeft + 61, guiTop + 42, 176, 41, Math.round((arrow2 / 100.0f) * 18), 12);
 
     }
 
@@ -94,11 +98,11 @@ public class GuiEncoder extends GuiContainer {
         mc.getTextureManager().bindTexture(GUI);
 
         if(energy == 0) {
-            drawTexturedModalRect(141, 37, 176, 21, 15, 20);
+            drawTexturedModalRect(guiLeft + 141, guiTop + 37, 176, 21, 15, 20);
         } else {
-            double percentage = energy * 100 / 1000000;  // i know this is dumb
+            double percentage = energy * 100 / 1000000F;  // i know this is dumb
             float percentagef = (float) percentage / 100; // but it works.
-            drawTexturedModalRect(141, 37, 176, 0, 15, Math.round(20 * percentagef)); // it's not really intended that the bolt fills from the top but it looks cool tbh.
+            drawTexturedModalRect(guiLeft + 141, guiTop + 37, 176, 0, 15, Math.round(20 * percentagef)); // it's not really intended that the bolt fills from the top but it looks cool tbh.
 
         }
     }
