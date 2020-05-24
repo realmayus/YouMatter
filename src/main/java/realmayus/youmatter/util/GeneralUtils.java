@@ -2,6 +2,8 @@ package realmayus.youmatter.util;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import realmayus.youmatter.YMConfig;
 
 public class GeneralUtils {
@@ -14,12 +16,13 @@ public class GeneralUtils {
     }
 
 
-    public static boolean canAddItemToSlot(ItemStack slotStack, ItemStack givenStack, boolean stackSizeMatters) {
+    public static boolean canAddItemToSlot(ItemStack slotStack, ItemStack givenStack, boolean stackSizeMatters, boolean checkTags) {
         boolean flag = slotStack.isEmpty();
-        if (!flag && givenStack.isItemEqual(slotStack) /*&& ItemStack.areItemStackTagsEqual(slotStack, givenStack)*/) {
+        if (!flag && givenStack.isItemEqual(slotStack) && (!checkTags || ItemStack.areItemStackTagsEqual(slotStack, givenStack))) {
             return slotStack.getCount() + (stackSizeMatters ? 0 : givenStack.getCount()) <= givenStack.getMaxStackSize();
         } else {
             return flag;
         }
     }
+
 }
