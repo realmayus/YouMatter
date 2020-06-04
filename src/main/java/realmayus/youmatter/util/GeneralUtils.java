@@ -14,12 +14,13 @@ public class GeneralUtils {
     }
 
 
-    public static boolean canAddItemToSlot(ItemStack slotStack, ItemStack givenStack, boolean stackSizeMatters) {
+    public static boolean canAddItemToSlot(ItemStack slotStack, ItemStack givenStack, boolean stackSizeMatters, boolean checkTags) {
         boolean flag = slotStack.isEmpty();
-        if (!flag && givenStack.isItemEqual(slotStack) /*&& ItemStack.areItemStackTagsEqual(slotStack, givenStack)*/) {
+        if (!flag && givenStack.isItemEqual(slotStack) && (!checkTags || ItemStack.areItemStackTagsEqual(slotStack, givenStack))) {
             return slotStack.getCount() + (stackSizeMatters ? 0 : givenStack.getCount()) <= givenStack.getMaxStackSize();
         } else {
             return flag;
         }
     }
+
 }

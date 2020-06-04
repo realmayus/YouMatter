@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+
 public class TileCreator extends TileEntity implements  ITickable{
 
     public TileCreator() {
@@ -352,7 +353,7 @@ public class TileCreator extends TileEntity implements  ITickable{
             currentPartTick = 0;
         } else if ((currentPartTick % 5) == 0) { // every five ticks
             if (!world.isRemote) {
-                if (!(this.inputHandler.getStackInSlot(3).isEmpty()) && GeneralUtils.canAddItemToSlot(this.inputHandler.getStackInSlot(4), this.inputHandler.getStackInSlot(3), false)) {
+                if (!(this.inputHandler.getStackInSlot(3).isEmpty()) && GeneralUtils.canAddItemToSlot(this.inputHandler.getStackInSlot(4), this.inputHandler.getStackInSlot(3), false, false)) {
                     ItemStack item = this.inputHandler.getStackInSlot(3);
                     if (item.getItem() instanceof ItemBucket) {
                         if (getUTank().getFluidAmount() >= 1000) {
@@ -361,25 +362,33 @@ public class TileCreator extends TileEntity implements  ITickable{
                             this.combinedHandler.insertItem(4, UniversalBucket.getFilledBucket(new UniversalBucket(), ModFluids.UMATTER), false);
                         }
                     } else {
-                        if (item.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null)) {
-                            IFluidTankProperties tankProperties = item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null).getTankProperties()[0];
-                            if (tankProperties.getContents() != null) {
-                                if (tankProperties.getContents().getFluid().equals(ModFluids.UMATTER) || tankProperties.getContents().getFluid() == null) {
-                                    if (tankProperties.getCapacity() - tankProperties.getContents().amount < getUTank().getFluidAmount()) { //fluid in S-Tank is more than what fits in the item's tank
-                                        getUTank().drain(item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null).fill(new FluidStack(ModFluids.UMATTER, tankProperties.getCapacity() - tankProperties.getContents().amount), true), true);
-                                    } else { //S-Tank's fluid fits perfectly in item's tank
-                                        getUTank().drain(item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null).fill(getUTank().getFluid(), true), true);
+                        for (int i = 0; i <= item.getCount(); i++) {
+//                            ItemStack currentSplit = item.splitStack(1);
+                            ItemStack currentSplit = item.copy();
+                            item.setCount(item.getCount() - 1);
+                            currentSplit.setCount(1);
+
+                            if (currentSplit.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null)) {
+                                IFluidTankProperties tankProperties = currentSplit.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null).getTankProperties()[0];
+                                if (tankProperties.getContents() != null) {
+                                    if (tankProperties.getContents().getFluid().equals(ModFluids.UMATTER) || tankProperties.getContents().getFluid() == null) {
+                                        if (tankProperties.getCapacity() - tankProperties.getContents().amount < getUTank().getFluidAmount()) { //fluid in S-Tank is more than what fits in the item's tank
+                                            getUTank().drain(currentSplit.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null).fill(new FluidStack(ModFluids.UMATTER, tankProperties.getCapacity() - tankProperties.getContents().amount), true), true);
+                                        } else { //S-Tank's fluid fits perfectly in item's tank
+                                            getUTank().drain(currentSplit.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null).fill(getUTank().getFluid(), true), true);
+                                        }
                                     }
                                 }
                             }
+                            this.inputHandler.setStackInSlot(3, ItemStack.EMPTY);
+                            this.inputHandler.insertItem(4, currentSplit, false);
                         }
-                        this.inputHandler.setStackInSlot(3, ItemStack.EMPTY);
-                        this.inputHandler.insertItem(4, item, false);
+
                     }
                 }
                 if (!this.inputHandler.getStackInSlot(1).isEmpty()) {
                     ItemStack item = this.inputHandler.getStackInSlot(1);
-                    if (item.getItem() instanceof UniversalBucket && GeneralUtils.canAddItemToSlot(this.inputHandler.getStackInSlot(2), new ItemStack(Items.BUCKET, 1), false)) {
+                    if (item.getItem() instanceof UniversalBucket && GeneralUtils.canAddItemToSlot(this.inputHandler.getStackInSlot(2), new ItemStack(Items.BUCKET, 1), false, false)) {
                         if (item.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null)) {
                             IFluidTankProperties tankProperties = item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null).getTankProperties()[0];
                             if (tankProperties.getContents() != null && tankProperties.getContents().getFluid().equals(ModFluids.STABILIZER)) {
@@ -390,24 +399,41 @@ public class TileCreator extends TileEntity implements  ITickable{
                                 }
                             }
                         }
-                    } else if(GeneralUtils.canAddItemToSlot(this.inputHandler.getStackInSlot(2), this.inputHandler.getStackInSlot(1), false)) {
-                        if (item.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null)) {
-                            IFluidTankProperties tankProperties = item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null).getTankProperties()[0];
+                    } else if (GeneralUtils.canAddItemToSlot(this.inputHandler.getStackInSlot(2), this.inputHandler.getStackInSlot(1), false, false)) {
+                        ItemStack currentSplit = item.copy();
+                        item.setCount(item.getCount() - 1);
+                        currentSplit.setCount(1);
+
+                        System.out.println("Count of 'item': " + item.getCount());
+                        System.out.println("Count of 'currentSplit': " + currentSplit.getCount());
+
+                        if (currentSplit.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null)) {
+                            System.out.println("Has capability! yay!");
+                            IFluidTankProperties tankProperties = currentSplit.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null).getTankProperties()[0];
                             if (tankProperties.getContents() != null) {
+                                ItemStack copy = currentSplit.copy();
+                                copy.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null).drain(copy.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null).getTankProperties()[0].getContents().amount, true);
+                                if (!GeneralUtils.canAddItemToSlot(this.inputHandler.getStackInSlot(2), copy, false, true)) {
+                                    return;
+                                }
+
                                 if (tankProperties.getContents().getFluid().equals(ModFluids.STABILIZER)) {
+                                    System.out.println(tankProperties.getContents().amount);
+
                                     if (tankProperties.getContents().amount > MAX_STABILIZER - getSTank().getFluidAmount()) { //given fluid is more than what fits in the S-Tank
-                                        getSTank().fill(item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null).drain(MAX_STABILIZER - getSTank().getFluidAmount(), true), true);
+                                        if(tankProperties.canDrainFluidType(new FluidStack(ModFluids.STABILIZER, MAX_STABILIZER - getSTank().getFluidAmount()))) {
+                                            getSTank().fill(currentSplit.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null).drain(MAX_STABILIZER - getSTank().getFluidAmount(), true), true);
+                                        }
                                     } else { //given fluid fits perfectly in S-Tank
-                                        getSTank().fill(item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null).drain(tankProperties.getContents().amount, true), true);
+                                        getSTank().fill(currentSplit.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null).drain(tankProperties.getContents().amount, true), true);
                                     }
                                 }
                             }
                         }
-                        this.inputHandler.setStackInSlot(1, ItemStack.EMPTY);
-                        this.inputHandler.insertItem(2, item, false);
+                        this.inputHandler.setStackInSlot(1, item.getCount() > 0 ? item : ItemStack.EMPTY);
+                        this.inputHandler.insertItem(2, currentSplit, false);
                     }
                 }
-
             }
             currentPartTick++;
         } else {

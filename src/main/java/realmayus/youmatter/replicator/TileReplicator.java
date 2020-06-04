@@ -229,7 +229,7 @@ public class TileReplicator extends TileEntity implements  ITickable{
 
                 if (!this.inputHandler.getStackInSlot(3).isEmpty()) {
                     ItemStack item = this.inputHandler.getStackInSlot(3);
-                    if (item.getItem() instanceof UniversalBucket && GeneralUtils.canAddItemToSlot(this.inputHandler.getStackInSlot(4), new ItemStack(Items.BUCKET, 1), false)) {
+                    if (item.getItem() instanceof UniversalBucket && GeneralUtils.canAddItemToSlot(this.inputHandler.getStackInSlot(4), new ItemStack(Items.BUCKET, 1), false, false)) {
                         if (item.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null)) {
                             IFluidTankProperties tankProperties = item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null).getTankProperties()[0];
                             if (tankProperties.getContents() != null) {
@@ -244,7 +244,7 @@ public class TileReplicator extends TileEntity implements  ITickable{
                                 }
                             }
                         }
-                    } else if (!(item.getItem() instanceof UniversalBucket) && GeneralUtils.canAddItemToSlot(this.inputHandler.getStackInSlot(4), this.inputHandler.getStackInSlot(3), false)) {
+                    } else if (!(item.getItem() instanceof UniversalBucket) && GeneralUtils.canAddItemToSlot(this.inputHandler.getStackInSlot(4), this.inputHandler.getStackInSlot(3), false, false)) {
                         if (item.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null)) {
                             IFluidTankProperties tankProperties = item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null).getTankProperties()[0];
                             if (tankProperties.getContents() != null) {
@@ -319,7 +319,7 @@ public class TileReplicator extends TileEntity implements  ITickable{
                                             if (currentItem != null) {
                                                 if (!currentItem.isEmpty()) {
                                                     if (currentItem.isItemEqual(combinedHandler.getStackInSlot(2))) { // Check if selected item hasn't changed
-                                                        if(combinedHandler.getStackInSlot(1).isEmpty() || GeneralUtils.canAddItemToSlot(combinedHandler.getStackInSlot(1), currentItem, false)) { //check if output slot is still empty
+                                                        if(combinedHandler.getStackInSlot(1).isEmpty() || GeneralUtils.canAddItemToSlot(combinedHandler.getStackInSlot(1), currentItem, false, false)) { //check if output slot is still empty
                                                             progress++;
                                                         }
                                                     } else {
