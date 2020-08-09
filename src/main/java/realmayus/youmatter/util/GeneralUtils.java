@@ -2,6 +2,8 @@ package realmayus.youmatter.util;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import realmayus.youmatter.YMConfig;
 
 public class GeneralUtils {
