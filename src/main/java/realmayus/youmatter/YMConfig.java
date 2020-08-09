@@ -34,4 +34,8 @@ public class YMConfig {
 
     @Config.Comment(value = "Determines how much U-Matter [in mB] the creator produces every work cycle. Energy is withdrawn like this: if energy more than 30% of max energy, consume 30% and add [whatever value below] of U-Matter to the tank. Default is 1mB/work cycle. Don't increase this too much due to balancing issues.")
     public static int productionPerWorkcycle = 1;
+
+    @Config.Comment(value = "Allows you to set the fluid name of an alternative to YouMatter's stabilizer fluid. Leave empty if you only want to accept the default fluid.")
+    public static String alternativeStabilizer = "";
+
 }

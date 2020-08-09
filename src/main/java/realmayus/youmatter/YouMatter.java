@@ -64,4 +64,6 @@ public class YouMatter
         MinecraftForge.EVENT_BUS.register(new LootHandler());
         LootTableList.register(new ResourceLocation(YouMatter.MODID, "inject/end_city_treasure"));
     }
+
+
 }

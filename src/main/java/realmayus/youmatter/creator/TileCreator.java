@@ -102,7 +102,7 @@ public class TileCreator extends TileEntity implements  ITickable{
 
         @Override
         public int fill(FluidStack resource, boolean doFill) {
-            if (resource.getFluid().equals(ModFluids.STABILIZER)) {
+            if (resource.getFluid().equals(ModFluids.STABILIZER) || resource.getFluid().getName().equalsIgnoreCase(YMConfig.alternativeStabilizer)) {
                 if (MAX_STABILIZER - getSTank().getFluidAmount() < resource.amount) {
                     return sTank.fill(new FluidStack(resource.getFluid(), MAX_STABILIZER), doFill);
                 } else {
@@ -391,9 +391,9 @@ public class TileCreator extends TileEntity implements  ITickable{
                     if (item.getItem() instanceof UniversalBucket && GeneralUtils.canAddItemToSlot(this.inputHandler.getStackInSlot(2), new ItemStack(Items.BUCKET, 1), false, false)) {
                         if (item.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null)) {
                             IFluidTankProperties tankProperties = item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null).getTankProperties()[0];
-                            if (tankProperties.getContents() != null && tankProperties.getContents().getFluid().equals(ModFluids.STABILIZER)) {
+                            if (tankProperties.getContents() != null && (tankProperties.getContents().getFluid().equals(ModFluids.STABILIZER) || tankProperties.getContents().getFluid().getName().equalsIgnoreCase(YMConfig.alternativeStabilizer))) {
                                 if (MAX_STABILIZER - getSTank().getFluidAmount() >= 1000) {
-                                    getSTank().fill(new FluidStack(ModFluids.STABILIZER, 1000), true);
+                                    getSTank().fill(new FluidStack(tankProperties.getContents().getFluid(), 1000), true);
                                     this.inputHandler.setStackInSlot(1, ItemStack.EMPTY);
                                     this.inputHandler.insertItem(2, new ItemStack(Items.BUCKET, 1), false);
                                 }
@@ -417,11 +417,11 @@ public class TileCreator extends TileEntity implements  ITickable{
                                     return;
                                 }
 
-                                if (tankProperties.getContents().getFluid().equals(ModFluids.STABILIZER)) {
+                                if (tankProperties.getContents().getFluid().equals(ModFluids.STABILIZER) || tankProperties.getContents().getFluid().getName().equalsIgnoreCase(YMConfig.alternativeStabilizer)) {
                                     System.out.println(tankProperties.getContents().amount);
 
                                     if (tankProperties.getContents().amount > MAX_STABILIZER - getSTank().getFluidAmount()) { //given fluid is more than what fits in the S-Tank
-                                        if(tankProperties.canDrainFluidType(new FluidStack(ModFluids.STABILIZER, MAX_STABILIZER - getSTank().getFluidAmount()))) {
+                                        if(tankProperties.canDrainFluidType(new FluidStack(tankProperties.getContents().getFluid(), MAX_STABILIZER - getSTank().getFluidAmount()))) {
                                             getSTank().fill(currentSplit.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null).drain(MAX_STABILIZER - getSTank().getFluidAmount(), true), true);
                                         }
                                     } else { //given fluid fits perfectly in S-Tank

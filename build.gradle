@@ -25,7 +25,7 @@ compileJava {
 }
 
 minecraft {
-    version = "1.12.2-14.23.5.2838"
+    version = "1.12.2-14.23.5.2847"
     runDir = "run"
     
     // the mappings can be changed at any time, and must be in the following format.
@@ -59,6 +59,12 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
     deobfCompile "curse.maven:mekanism:2745458"
+    deobfCompile "curse.maven:thermalexpansion:2926431"
+    deobfCompile "curse.maven:thermalfoundation:2926428"
+    deobfCompile "curse.maven:cofhcore:2920433"
+    deobfCompile "curse.maven:cofhworld:2920434"
+    deobfCompile "curse.maven:codechickenlib:2779848"
+    deobfCompile "curse.maven:redstoneflux:2920436"
 }
 
 processResources {

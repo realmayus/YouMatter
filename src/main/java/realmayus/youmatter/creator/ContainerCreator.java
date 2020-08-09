@@ -16,6 +16,7 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import realmayus.youmatter.ModFluids;
+import realmayus.youmatter.YMConfig;
 import realmayus.youmatter.network.PacketHandler;
 import realmayus.youmatter.network.PacketUpdateCreatorClient;
 
@@ -97,7 +98,8 @@ public class ContainerCreator extends Container implements ICreatorStateContaine
             } else {
                 if (itemstack1.getItem() instanceof UniversalBucket) {
                     UniversalBucket bucket = (UniversalBucket) itemstack1.getItem();
-                    if (bucket.getFluid(itemstack1).getFluid().equals(ModFluids.STABILIZER)) {
+                    System.out.println(bucket.getFluid(itemstack1).getFluid().getName());
+                    if (bucket.getFluid(itemstack1).getFluid().equals(ModFluids.STABILIZER) || bucket.getFluid(itemstack1).getFluid().getName().equalsIgnoreCase(YMConfig.alternativeStabilizer)) {
                         if (!this.mergeItemStack(itemstack1, 36, 37, false)) {
                             return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                         }
@@ -113,11 +115,11 @@ public class ContainerCreator extends Container implements ICreatorStateContaine
 
                 } else if (itemstack1.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null)) {
                     IFluidTankProperties tankProperties = itemstack1.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null).getTankProperties()[0];
-                    if (tankProperties.getContents() == null || tankProperties.getContents().getFluid().equals(ModFluids.UMATTER)) {
+                    if (tankProperties.getContents() == null || tankProperties.getContents().getFluid().equals(ModFluids.UMATTER) || tankProperties.getContents().getFluid().getName().equalsIgnoreCase(YMConfig.alternativeStabilizer)) {
                         if (!this.mergeItemStack(itemstack1, 38, 39, false)) {
                             return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                         }
-                    } else if (tankProperties.getContents().getFluid().equals(ModFluids.STABILIZER)) {
+                    } else if (tankProperties.getContents().getFluid().equals(ModFluids.STABILIZER) || tankProperties.getContents().getFluid().getName().equalsIgnoreCase(YMConfig.alternativeStabilizer)) {
                         if (!this.mergeItemStack(itemstack1, 36, 37, false)) {
                             return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                         }
@@ -125,8 +127,6 @@ public class ContainerCreator extends Container implements ICreatorStateContaine
                         return ItemStack.EMPTY;
                     }
                     return ItemStack.EMPTY;
-
-
                 }
                 return ItemStack.EMPTY;
             }
