@@ -218,9 +218,6 @@ public class TileCreator extends TileEntity implements  ITickable{
 
     private CombinedInvWrapper combinedHandler = new CombinedInvWrapper(inputHandler, outputHandler);
 
-    public int getClientProgress() {
-        return clientProgress;
-    }
 
     void setClientProgress(int clientProgress) {
         this.clientProgress = clientProgress;
@@ -248,13 +245,6 @@ public class TileCreator extends TileEntity implements  ITickable{
 
     public int getEnergy() {
         return myEnergyStorage.getEnergyStored();
-    }
-
-    public void setClientTank(NBTTagCompound tank) {
-        FluidTank newUTank = new FluidTank(MAX_UMATTER).readFromNBT(tank);
-        FluidTank newSTank = new FluidTank(MAX_STABILIZER).readFromNBT(tank);
-        getUTank().setFluid(newUTank.getFluid());
-        getSTank().setFluid(newSTank.getFluid());
     }
 
 
@@ -363,7 +353,6 @@ public class TileCreator extends TileEntity implements  ITickable{
                         }
                     } else {
                         for (int i = 0; i <= item.getCount(); i++) {
-//                            ItemStack currentSplit = item.splitStack(1);
                             ItemStack currentSplit = item.copy();
                             item.setCount(item.getCount() - 1);
                             currentSplit.setCount(1);
@@ -403,12 +392,7 @@ public class TileCreator extends TileEntity implements  ITickable{
                         ItemStack currentSplit = item.copy();
                         item.setCount(item.getCount() - 1);
                         currentSplit.setCount(1);
-
-                        System.out.println("Count of 'item': " + item.getCount());
-                        System.out.println("Count of 'currentSplit': " + currentSplit.getCount());
-
                         if (currentSplit.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null)) {
-                            System.out.println("Has capability! yay!");
                             IFluidTankProperties tankProperties = currentSplit.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, null).getTankProperties()[0];
                             if (tankProperties.getContents() != null) {
                                 ItemStack copy = currentSplit.copy();

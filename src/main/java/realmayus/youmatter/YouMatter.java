@@ -19,13 +19,13 @@ import realmayus.youmatter.network.PacketHandler;
 import realmayus.youmatter.util.GuiHandler;
 import realmayus.youmatter.util.LootHandler;
 
+
 @Mod(modid = YouMatter.MODID, name = YouMatter.NAME, version = YouMatter.VERSION)
 public class YouMatter
 {
     public static final String MODID = "youmatter";
     public static final String NAME = "You Matter";
     public static final String VERSION = "1.12.2-1.8";
-
     private static Logger logger;
 
     public static Logger getLogger() {
@@ -34,6 +34,7 @@ public class YouMatter
     static {
         FluidRegistry.enableUniversalBucket();
     }
+
 
     public static CreativeTabs creativeTab = new CreativeTabs("youmatter") {
         @Override
