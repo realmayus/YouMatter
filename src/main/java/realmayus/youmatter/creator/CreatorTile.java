@@ -216,8 +216,8 @@ public class CreatorTile extends TileEntity implements ITickableTileEntity, INam
     }
 
     @Override
-    public void read(CompoundNBT compound) {
-        super.read(compound);
+    public void read(BlockState state, CompoundNBT compound) {
+        super.read(state, compound);
 
         if(compound.contains("uTank")) {
             CompoundNBT tagUTank = compound.getCompound("uTank");

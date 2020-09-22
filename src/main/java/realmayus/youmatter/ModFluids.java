@@ -19,9 +19,9 @@ import realmayus.youmatter.fluid.StabilizerFluidBlock;
 
 public class ModFluids {
 
-    public static final DeferredRegister<Block> BLOCKS = new DeferredRegister<>(ForgeRegistries.BLOCKS, YouMatter.MODID);
-    public static final DeferredRegister<Item> ITEMS = new DeferredRegister<>(ForgeRegistries.ITEMS, YouMatter.MODID);
-    public static final DeferredRegister<Fluid> FLUIDS = new DeferredRegister<>(ForgeRegistries.FLUIDS, YouMatter.MODID);
+    public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, YouMatter.MODID);
+    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, YouMatter.MODID);
+    public static final DeferredRegister<Fluid> FLUIDS = DeferredRegister.create(ForgeRegistries.FLUIDS, YouMatter.MODID);
 
     public static RegistryObject<FlowingFluid> STABILIZER = FLUIDS.register("stabilizer", () -> new ForgeFlowingFluid.Source(ModFluids.STABILIZER_PROPERIES));
     public static RegistryObject<FlowingFluid> STABILIZER_FLOWING = FLUIDS.register("stabilizer_flowing", () -> new ForgeFlowingFluid.Flowing(ModFluids.STABILIZER_PROPERIES));

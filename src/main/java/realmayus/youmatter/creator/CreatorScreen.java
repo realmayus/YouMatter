@@ -1,5 +1,6 @@
 package realmayus.youmatter.creator;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
@@ -13,6 +14,7 @@ import net.minecraft.fluid.Fluids;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
 import realmayus.youmatter.ObjectHolders;
@@ -39,90 +41,89 @@ public class CreatorScreen extends ContainerScreen<CreatorContainer> {
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+    protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
         //Setting color to white because JEI is bae (gui would be yellow)
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         this.minecraft.getTextureManager().bindTexture(GUI);
 
         int relX = (this.width - WIDTH) / 2;
         int relY = (this.height - HEIGHT) / 2;
-        this.blit(relX, relY, 0, 0, WIDTH, HEIGHT);
+        this.blit(matrixStack, relX, relY, 0, 0, WIDTH, HEIGHT);
 
-        drawFluidTank(89, 22, te.getUTank());
-        drawFluidTank(31, 22, te.getSTank());
+        drawFluidTank(matrixStack, 89, 22, te.getUTank());
+        drawFluidTank(matrixStack,31, 22, te.getSTank());
     }
 
-    private void drawActiveIcon(boolean isActive) {
+    private void drawActiveIcon(MatrixStack matrixStack, boolean isActive) {
         this.minecraft.getTextureManager().bindTexture(GUI);
 
         if(isActive) {
-            this.blit(154, 13, 176, 24, 8, 9);
+            this.blit(matrixStack, 154, 13, 176, 24, 8, 9);
 
         } else {
-            this.blit(154, 13, 176, 15, 8, 9);
+            this.blit(matrixStack, 154, 13, 176, 15, 8, 9);
         }
     }
 
 
     @Override
-    protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-        super.drawGuiContainerForegroundLayer(mouseX, mouseY);
+    protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int mouseX, int mouseY) {
+        super.drawGuiContainerForegroundLayer(matrixStack, mouseX, mouseY);
 
         this.minecraft.getTextureManager().bindTexture(GUI);
 
-        drawEnergyBolt(te.getClientEnergy());
+        drawEnergyBolt(matrixStack, te.getClientEnergy());
 
-        drawActiveIcon(te.isActivatedClient());
-        font.drawString(I18n.format(ObjectHolders.CREATOR_BLOCK.getTranslationKey()), 8, 6, 0x404040);
+        drawActiveIcon(matrixStack, te.isActivatedClient());
+        font.drawString(matrixStack, I18n.format(ObjectHolders.CREATOR_BLOCK.getTranslationKey()), 8, 6, 0x404040);
     }
 
-    private void drawEnergyBolt(int energy) {
+    private void drawEnergyBolt(MatrixStack matrixStack, int energy) {
         this.minecraft.getTextureManager().bindTexture(GUI);
 
         if(energy == 0) {
-            this.blit(150, 58, 176, 114, 15, 20);
+            this.blit(matrixStack, 150, 58, 176, 114, 15, 20);
         } else {
             double percentage = energy * 100.0F / 1000000;  // i know this is dumb
             float percentagef = (float) percentage / 100; // but it works.
-            this.blit(150, 58, 176, 93, 15, Math.round(20 * percentagef)); // it's not really intended that the bolt fills from the top but it looks cool tbh.
+            this.blit(matrixStack, 150, 58, 176, 93, 15, Math.round(20 * percentagef)); // it's not really intended that the bolt fills from the top but it looks cool tbh.
 
         }
     }
 
     @Override
-    public void render(int mouseX, int mouseY, float partialTicks) {
+    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         //Render the dark background
-        this.renderBackground();
-        super.render(mouseX, mouseY, partialTicks);
+        this.renderBackground(matrixStack);
+        super.render(matrixStack, mouseX, mouseY, partialTicks);
         //Render any tooltips
-        renderHoveredToolTip(mouseX, mouseY);
+        renderHoveredTooltip(matrixStack, mouseX, mouseY);
 
         int xAxis = (mouseX - (width - xSize) / 2);
         int yAxis = (mouseY - (height - ySize) / 2);
 
         if(xAxis >= 31 && xAxis <= 44 && yAxis >= 20 && yAxis <= 75) {
-            drawTooltip(mouseX, mouseY, Stream.of(I18n.format("youmatter.gui.stabilizer.title"), I18n.format("youmatter.gui.stabilizer.description", te.getSTank().getFluidAmount())).collect(Collectors.toList()));
+            drawTooltip(matrixStack, mouseX, mouseY, Stream.of(new StringTextComponent(I18n.format("youmatter.gui.stabilizer.title")), new StringTextComponent(I18n.format("youmatter.gui.stabilizer.description", te.getSTank().getFluidAmount()))).collect(Collectors.toList()));
         }
         if(xAxis >= 89 && xAxis <= 102 && yAxis >= 20 && yAxis <= 75) {
-            drawTooltip(mouseX, mouseY, Stream.of(I18n.format("youmatter.gui.umatter.title"), I18n.format("youmatter.gui.umatter.description", te.getUTank().getFluidAmount())).collect(Collectors.toList()));
+            drawTooltip(matrixStack, mouseX, mouseY, Stream.of(new StringTextComponent(I18n.format("youmatter.gui.umatter.title")), new StringTextComponent(I18n.format("youmatter.gui.umatter.description", te.getUTank().getFluidAmount()))).collect(Collectors.toList()));
         }
         if(xAxis >= 150 && xAxis <= 164 && yAxis >= 57 && yAxis <= 77) {
-            drawTooltip(mouseX, mouseY, Stream.of(I18n.format("youmatter.gui.energy.title"), I18n.format("youmatter.gui.energy.description", te.getClientEnergy())).collect(Collectors.toList()));
+            drawTooltip(matrixStack, mouseX, mouseY, Stream.of(new StringTextComponent(I18n.format("youmatter.gui.energy.title")), new StringTextComponent(I18n.format("youmatter.gui.energy.description", te.getClientEnergy()))).collect(Collectors.toList()));
         }
         if(xAxis >= 148 && xAxis <= 167 && yAxis >= 7 && yAxis <= 27) {
-            drawTooltip(mouseX, mouseY, Stream.of(te.isActivatedClient() ? I18n.format("youmatter.gui.active") : I18n.format("youmatter.gui.paused"), I18n.format("youmatter.gui.clicktochange")).collect(Collectors.toList()));
-
+            drawTooltip(matrixStack, mouseX, mouseY, Stream.of(new StringTextComponent(te.isActivatedClient() ? I18n.format("youmatter.gui.active") : I18n.format("youmatter.gui.paused")), new StringTextComponent(I18n.format("youmatter.gui.clicktochange"))).collect(Collectors.toList()));
         }
     }
 
 
-    private void drawTooltip(int x, int y, List<String> tooltips) {
-        renderTooltip(tooltips, x, y);
+    private void drawTooltip(MatrixStack matrixStack, int x, int y, List<ITextComponent> tooltips) {
+        renderTooltip(matrixStack, tooltips, x, y);
     }
 
 
     //both drawFluid and drawFluidTank is courtesy of DarkGuardsMan and was modified to suit my needs. Go check him out: https://github.com/BuiltBrokenModding/Atomic-Science | MIT License |  Copyright (c) 2018 Built Broken Modding License: https://opensource.org/licenses/MIT
-    private void drawFluid(int x, int y, int line, int col, int width, int drawSize, FluidStack fluidStack)
+    private void drawFluid(MatrixStack matrixStack, int x, int y, int line, int col, int width, int drawSize, FluidStack fluidStack)
     {
         if (fluidStack != null && fluidStack.getFluid() != null && !fluidStack.isEmpty())
         {
@@ -161,7 +162,7 @@ public class CreatorScreen extends ContainerScreen<CreatorContainer> {
                 }
 
                 //TODO?
-                blit(x + col, y + line + 58 - renderY - start, 1000, width, textureSize - (textureSize - renderY), this.minecraft.getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE).apply(fluidIcon));
+                blit(matrixStack, x + col, y + line + 58 - renderY - start, 1000, width, textureSize - (textureSize - renderY), this.minecraft.getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE).apply(fluidIcon));
 
 
                 start = start + textureSize;
@@ -169,7 +170,7 @@ public class CreatorScreen extends ContainerScreen<CreatorContainer> {
         }
     }
 
-    private void drawFluidTank(int x, int y, IFluidTank tank) {
+    private void drawFluidTank(MatrixStack matrixStack, int x, int y, IFluidTank tank) {
 
         //Get data
         final float scale = tank.getFluidAmount() / (float) tank.getCapacity();
@@ -183,13 +184,13 @@ public class CreatorScreen extends ContainerScreen<CreatorContainer> {
         int meterHeight = 55;
         if (fluidStack != null)
         {
-            this.drawFluid(this.guiLeft + x -1, this.guiTop + y, -3, 1, 14, (int) ((meterHeight - 1) * scale), fluidStack);
+            this.drawFluid(matrixStack, this.guiLeft + x -1, this.guiTop + y, -3, 1, 14, (int) ((meterHeight - 1) * scale), fluidStack);
         }
 
         //Draw lines
         this.minecraft.getTextureManager().bindTexture(GUI);
         int meterWidth = 14;
-        this.blit(this.guiLeft + x, this.guiTop + y, 176, 35, meterWidth, meterHeight);
+        this.blit(matrixStack, this.guiLeft + x, this.guiTop + y, 176, 35, meterWidth, meterHeight);
 
         //Reset color
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);

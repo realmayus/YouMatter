@@ -1,5 +1,6 @@
 package realmayus.youmatter.scanner;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.InventoryHelper;
@@ -108,8 +109,8 @@ public class ScannerTile extends TileEntity implements INamedContainerProvider, 
     private MyEnergyStorage myEnergyStorage = new MyEnergyStorage(1000000, Integer.MAX_VALUE);
 
     @Override
-    public void read(CompoundNBT compound) {
-        super.read(compound);
+    public void read(BlockState state, CompoundNBT compound) {
+        super.read(state, compound);
         if (compound.contains("progress")) {
             setProgress(compound.getInt("progress"));
         }
