@@ -371,8 +371,8 @@ public class ReplicatorTile extends TileEntity implements ITickableTileEntity, I
     }
 
     @Override
-    public void read(CompoundNBT compound) {
-        super.read(compound);
+    public void read(BlockState state, CompoundNBT compound) {
+        super.read(state, compound);
         tank.readFromNBT(compound.getCompound("tank"));
         myEnergyStorage.setEnergy(compound.getInt("energy"));
         setActive(compound.getBoolean("isActive"));
