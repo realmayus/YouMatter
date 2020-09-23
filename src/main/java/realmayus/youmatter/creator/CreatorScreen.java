@@ -97,7 +97,7 @@ public class CreatorScreen extends ContainerScreen<CreatorContainer> {
         this.renderBackground(matrixStack);
         super.render(matrixStack, mouseX, mouseY, partialTicks);
         //Render any tooltips
-        renderHoveredTooltip(matrixStack, mouseX, mouseY);
+        func_230459_a_(matrixStack, mouseX, mouseY);
 
         int xAxis = (mouseX - (width - xSize) / 2);
         int yAxis = (mouseY - (height - ySize) / 2);

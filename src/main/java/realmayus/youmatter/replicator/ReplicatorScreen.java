@@ -126,7 +126,7 @@ public class ReplicatorScreen extends ContainerScreen<ReplicatorContainer> {
 
 
         //Render any tooltips
-        renderHoveredTooltip(matrixStack, mouseX, mouseY);
+        func_230459_a_(matrixStack, mouseX, mouseY);
 
         int xAxis = (mouseX - (width - xSize) / 2);
         int yAxis = (mouseY - (height - ySize) / 2);
