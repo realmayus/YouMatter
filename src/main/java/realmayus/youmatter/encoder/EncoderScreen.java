@@ -38,6 +38,7 @@ public class EncoderScreen extends ContainerScreen<EncoderContainer> {
     public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         this.renderBackground(matrixStack);
         super.render(matrixStack, mouseX, mouseY, partialTicks);
+        //Mappings are not complete, I took a guess that this is actually renderHoveredTooltip
         this.func_230459_a_(matrixStack, mouseX, mouseY);
 
         int xAxis = (mouseX - (width - WIDTH) / 2);
