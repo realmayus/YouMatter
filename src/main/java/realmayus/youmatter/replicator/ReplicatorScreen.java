@@ -1,13 +1,11 @@
 package realmayus.youmatter.replicator;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.renderer.texture.AtlasTexture;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.fluid.FlowingFluid;
@@ -22,7 +20,6 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
 import realmayus.youmatter.ObjectHolders;
 import realmayus.youmatter.YouMatter;
-import realmayus.youmatter.creator.CreatorContainer;
 import realmayus.youmatter.network.PacketChangeSettingsReplicatorServer;
 import realmayus.youmatter.network.PacketHandler;
 import realmayus.youmatter.network.PacketShowNext;
@@ -30,7 +27,6 @@ import realmayus.youmatter.network.PacketShowPrevious;
 import realmayus.youmatter.util.DisplaySlot;
 import realmayus.youmatter.util.GeneralUtils;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -65,8 +61,6 @@ public class ReplicatorScreen extends ContainerScreen<ReplicatorContainer> {
 
     @Override
     protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int mouseX, int mouseY) {
-        super.drawGuiContainerForegroundLayer(matrixStack, mouseX, mouseY);
-
         this.minecraft.getTextureManager().bindTexture(GUI);
         drawEnergyBolt(matrixStack, te.getClientEnergy());
         drawActiveIcon(matrixStack, te.isActiveClient());

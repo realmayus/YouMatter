@@ -114,9 +114,9 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
-    implementation fg.deobf("curse.maven:mekanism:2882991")
-    implementation fg.deobf("curse.maven:refinedstorage:2871849")
-    implementation fg.deobf("curse.maven:jei:2866141")
+//    implementation fg.deobf("curse.maven:mekanism:2882991")
+//    implementation fg.deobf("curse.maven:refinedstorage:2871849")
+//    implementation fg.deobf("curse.maven:jei:2866141")
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..

@@ -10,18 +10,17 @@ import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.util.Constants;
 import realmayus.youmatter.ObjectHolders;
 import realmayus.youmatter.YouMatter;
 import realmayus.youmatter.items.ThumbdriveItem;
-
 
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class EncoderScreen extends ContainerScreen<EncoderContainer> {
+
     private static final int WIDTH = 176;
     private static final int HEIGHT = 168;
 
@@ -38,6 +37,7 @@ public class EncoderScreen extends ContainerScreen<EncoderContainer> {
     public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         this.renderBackground(matrixStack);
         super.render(matrixStack, mouseX, mouseY, partialTicks);
+
         //Mappings are not complete, I took a guess that this is actually renderHoveredTooltip
         this.func_230459_a_(matrixStack, mouseX, mouseY);
 
@@ -47,7 +47,6 @@ public class EncoderScreen extends ContainerScreen<EncoderContainer> {
         if(xAxis >= 141 && xAxis <= 156 && yAxis >= 37 && yAxis <= 57) {
             drawTooltip(matrixStack, mouseX, mouseY, Stream.of(new StringTextComponent(I18n.format("youmatter.gui.energy.title")), new StringTextComponent(I18n.format("youmatter.gui.energy.description", te.getClientEnergy()))).collect(Collectors.toList()));
         }
-
         if (xAxis >= 16 && xAxis <= 32 && yAxis >= 59 && yAxis <= 75) {
             if (te.inventory.getStackInSlot(1).getItem() instanceof ThumbdriveItem) {
                 CompoundNBT nbt = te.inventory.getStackInSlot(1).getTag();
@@ -68,6 +67,7 @@ public class EncoderScreen extends ContainerScreen<EncoderContainer> {
         //Setting color to white because JEI is bae (gui would be yellow)
         GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         this.minecraft.getTextureManager().bindTexture(GUI);
+
         int relX = (this.width - WIDTH) / 2;
         int relY = (this.height - HEIGHT) / 2;
         this.blit(matrixStack, relX, relY, 0, 0, WIDTH, HEIGHT);
