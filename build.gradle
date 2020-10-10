@@ -15,11 +15,11 @@ plugins {
     id "com.wynprice.cursemaven" version "2.1.1"
 }
 
-repositories {
-    flatDir {
-        dirs 'deps'
-    }
-}
+//repositories {
+//    flatDir {
+//        dirs 'deps'
+//    }
+//}
 
 
 apply plugin: 'net.minecraftforge.gradle'
@@ -123,7 +123,7 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
-    implementation fg.deobf("ignored:Mekanism-1.16.1:10.0.9.432")
+//    implementation fg.deobf("ignored:Mekanism-1.16.1:10.0.9.432")
 //    implementation fg.deobf("curse.maven:refinedstorage:2871849")
 //    implementation fg.deobf("curse.maven:jei:2866141")
 }
