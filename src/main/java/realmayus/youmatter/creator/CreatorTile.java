@@ -350,7 +350,6 @@ public class CreatorTile extends TileEntity implements ITickableTileEntity, INam
         // Prioritize Replicator
         for (Map.Entry<BlockPos, Direction> entry : foundPos.entrySet()) {
             if (world.getTileEntity(entry.getKey()) instanceof ReplicatorTile) {
-                System.out.println(world.getTileEntity(entry.getKey()).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, entry.getValue()).map(h -> h.fill(new FluidStack(ModFluids.UMATTER.get(), 500), IFluidHandler.FluidAction.SIMULATE)).orElse(0) + "bla");
                 if(world.getTileEntity(entry.getKey()).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, entry.getValue()).map(h -> h.fill(new FluidStack(ModFluids.UMATTER.get(), 500), IFluidHandler.FluidAction.SIMULATE)).orElse(0) > 0) {
                     //Replicator can take fluid
                     return new Object[] {entry.getKey(), entry.getValue()}; // position, facing

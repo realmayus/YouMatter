@@ -1,6 +1,7 @@
 package realmayus.youmatter.creator;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
@@ -43,7 +44,7 @@ public class CreatorScreen extends ContainerScreen<CreatorContainer> {
     @Override
     protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
         //Setting color to white because JEI is bae (gui would be yellow)
-        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         this.minecraft.getTextureManager().bindTexture(GUI);
 
         int relX = (this.width - WIDTH) / 2;
@@ -68,13 +69,11 @@ public class CreatorScreen extends ContainerScreen<CreatorContainer> {
 
     @Override
     protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int mouseX, int mouseY) {
-        super.drawGuiContainerForegroundLayer(matrixStack, mouseX, mouseY);
+        drawEnergyBolt(matrixStack, te.getClientEnergy());
+        drawActiveIcon(matrixStack, te.isActivatedClient());
 
         this.minecraft.getTextureManager().bindTexture(GUI);
 
-        drawEnergyBolt(matrixStack, te.getClientEnergy());
-
-        drawActiveIcon(matrixStack, te.isActivatedClient());
         font.drawString(matrixStack, I18n.format(ObjectHolders.CREATOR_BLOCK.getTranslationKey()), 8, 6, 0x404040);
     }
 
@@ -98,7 +97,7 @@ public class CreatorScreen extends ContainerScreen<CreatorContainer> {
         super.render(matrixStack, mouseX, mouseY, partialTicks);
         //Render any tooltips
         //Mappings are not complete, I took a guess that this is actually renderHoveredTooltip
-        func_230459_a_(matrixStack, mouseX, mouseY);
+        this.func_230459_a_(matrixStack, mouseX, mouseY);
 
         int xAxis = (mouseX - (width - xSize) / 2);
         int yAxis = (mouseY - (height - ySize) / 2);
