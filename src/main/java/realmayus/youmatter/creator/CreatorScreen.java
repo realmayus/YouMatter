@@ -96,8 +96,7 @@ public class CreatorScreen extends ContainerScreen<CreatorContainer> {
         this.renderBackground(matrixStack);
         super.render(matrixStack, mouseX, mouseY, partialTicks);
         //Render any tooltips
-        //Mappings are not complete, I took a guess that this is actually renderHoveredTooltip
-        this.func_230459_a_(matrixStack, mouseX, mouseY);
+        this.renderHoveredTooltip(matrixStack, mouseX, mouseY);
 
         int xAxis = (mouseX - (width - xSize) / 2);
         int yAxis = (mouseY - (height - ySize) / 2);
@@ -118,7 +117,7 @@ public class CreatorScreen extends ContainerScreen<CreatorContainer> {
 
 
     private void drawTooltip(MatrixStack matrixStack, int x, int y, List<ITextComponent> tooltips) {
-        renderTooltip(matrixStack, tooltips, x, y);
+        func_243308_b(matrixStack, tooltips, x, y);
     }
 
 
