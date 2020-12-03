@@ -70,14 +70,11 @@ public class ScannerBlock extends Block {
     }
 
     @Override
-    public void onPlayerDestroy(IWorld worldIn, BlockPos pos, BlockState state) {
+    public void onBlockHarvested(World worldIn, BlockPos pos, BlockState state, PlayerEntity player) {
         TileEntity te = worldIn.getTileEntity(pos);
-        if (te != null) {
-            if(te instanceof ScannerTile){
-                te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent(h -> IntStream.range(0, h.getSlots()).forEach(i -> worldIn.addEntity(new ItemEntity(worldIn.getWorld(), pos.getX(), pos.getY(), pos.getZ(), h.getStackInSlot(i)))));
-
-            }
+        if(te instanceof ScannerTile){
+            te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent(h -> IntStream.range(0, h.getSlots()).forEach(i -> worldIn.addEntity(new ItemEntity(worldIn, pos.getX(), pos.getY(), pos.getZ(), h.getStackInSlot(i)))));
         }
-        super.onPlayerDestroy(worldIn, pos, state);
+        super.onBlockHarvested(worldIn, pos, state, player);
     }
 }

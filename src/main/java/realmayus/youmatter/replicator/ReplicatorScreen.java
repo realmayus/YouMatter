@@ -120,8 +120,7 @@ public class ReplicatorScreen extends ContainerScreen<ReplicatorContainer> {
 
 
         //Render any tooltips
-        //Mappings are not complete, I took a guess that this is actually renderHoveredTooltip
-        func_230459_a_(matrixStack, mouseX, mouseY);
+        renderHoveredTooltip(matrixStack, mouseX, mouseY);
 
         int xAxis = (mouseX - (width - xSize) / 2);
         int yAxis = (mouseY - (height - ySize) / 2);
@@ -144,7 +143,7 @@ public class ReplicatorScreen extends ContainerScreen<ReplicatorContainer> {
     }
 
     private void drawTooltip(MatrixStack matrixStack, int x, int y, List<ITextComponent> tooltips) {
-        renderTooltip(matrixStack, tooltips, x, y);
+        func_243308_b(matrixStack, tooltips, x, y);
     }
 
     @Override
