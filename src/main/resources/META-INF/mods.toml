@@ -1,11 +1,12 @@
 # The name of the mod loader type to load - for regular FML @Mod mods it should be javafml
 modLoader="javafml"
 # A version range to match for said mod loader - for regular FML @Mod it will be the forge version
-loaderVersion="[31,)"
+loaderVersion="[35,)"
 # A URL to refer people to when problems occur with this mod
 issueTrackerURL="https://github.com/realmayus/youmatter/issues"
 # If the mods defined in this file should show as seperate resource packs
 showAsResourcePack=false
+license="MIT License"
 
 [[mods]]
   modId="youmatter"
@@ -21,13 +22,13 @@ showAsResourcePack=false
   [[dependencies.youmatter]]
     modId="forge"
     mandatory=true
-    versionRange="[31,)"
+    versionRange="[35,)"
     ordering="NONE"
     side="BOTH"
 
   [[dependencies.youmatter]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.16.1]"
+    versionRange="[1.16.4]"
     ordering="NONE"
     side="BOTH"

@@ -31,8 +31,7 @@ public class ScannerScreen extends ContainerScreen<ScannerContainer> {
     public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         this.renderBackground(matrixStack);
         super.render(matrixStack, mouseX, mouseY, partialTicks);
-        //Mappings are not complete, I took a guess that this is actually renderHoveredTooltip
-        this.func_230459_a_(matrixStack, mouseX, mouseY);
+        this.renderHoveredTooltip(matrixStack, mouseX, mouseY);
 
         int xAxis = (mouseX - (width - WIDTH) / 2);
         int yAxis = (mouseY - (height - HEIGHT) / 2);
@@ -104,6 +103,6 @@ public class ScannerScreen extends ContainerScreen<ScannerContainer> {
     }
 
     private void drawTooltip(MatrixStack matrixStack, int x, int y, List<ITextComponent> tooltips) {
-        renderTooltip(matrixStack, tooltips, x, y);
+        func_243308_b(matrixStack, tooltips, x, y);
     }
 }
