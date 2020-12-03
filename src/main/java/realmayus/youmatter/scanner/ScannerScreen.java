@@ -8,13 +8,11 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
 import realmayus.youmatter.ObjectHolders;
 import realmayus.youmatter.YouMatter;
 
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class ScannerScreen extends ContainerScreen<ScannerContainer> {
     private static final int WIDTH = 176;
@@ -40,12 +38,12 @@ public class ScannerScreen extends ContainerScreen<ScannerContainer> {
         int yAxis = (mouseY - (height - HEIGHT) / 2);
 
         if (xAxis >= 141 && xAxis <= 156 && yAxis >= 37 && yAxis <= 57) {
-            drawTooltip(matrixStack, mouseX, mouseY, Stream.of(new StringTextComponent(I18n.format("youmatter.gui.energy.title")), new StringTextComponent(I18n.format("youmatter.gui.energy.description", te.getClientEnergy()))).collect(Collectors.toList()));
+            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new StringTextComponent(I18n.format("youmatter.gui.energy.title")), new StringTextComponent(I18n.format("youmatter.gui.energy.description", te.getClientEnergy()))));
         }
 
         if (!te.getHasEncoderClient()) {
             if (xAxis >= 16 && xAxis <= 32 && yAxis >= 59 && yAxis <= 75) {
-                drawTooltip(matrixStack, mouseX, mouseY, Stream.of(new StringTextComponent(I18n.format("youmatter.warning.scanner1")), new StringTextComponent(I18n.format("youmatter.warning.scanner2")), new StringTextComponent(I18n.format("youmatter.warning.scanner3"))).collect(Collectors.toList()));
+                drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new StringTextComponent(I18n.format("youmatter.warning.scanner1")), new StringTextComponent(I18n.format("youmatter.warning.scanner2")), new StringTextComponent(I18n.format("youmatter.warning.scanner3"))));
             }
         }
 

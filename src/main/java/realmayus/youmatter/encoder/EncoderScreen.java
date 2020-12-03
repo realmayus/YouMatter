@@ -15,9 +15,9 @@ import realmayus.youmatter.ObjectHolders;
 import realmayus.youmatter.YouMatter;
 import realmayus.youmatter.items.ThumbdriveItem;
 
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
 
 public class EncoderScreen extends ContainerScreen<EncoderContainer> {
 
@@ -45,7 +45,7 @@ public class EncoderScreen extends ContainerScreen<EncoderContainer> {
         int yAxis = (mouseY - (height - HEIGHT) / 2);
 
         if(xAxis >= 141 && xAxis <= 156 && yAxis >= 37 && yAxis <= 57) {
-            drawTooltip(matrixStack, mouseX, mouseY, Stream.of(new StringTextComponent(I18n.format("youmatter.gui.energy.title")), new StringTextComponent(I18n.format("youmatter.gui.energy.description", te.getClientEnergy()))).collect(Collectors.toList()));
+            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new StringTextComponent(I18n.format("youmatter.gui.energy.title")), new StringTextComponent(I18n.format("youmatter.gui.energy.description", te.getClientEnergy()))));
         }
         if (xAxis >= 16 && xAxis <= 32 && yAxis >= 59 && yAxis <= 75) {
             if (te.inventory.getStackInSlot(1).getItem() instanceof ThumbdriveItem) {
@@ -53,11 +53,11 @@ public class EncoderScreen extends ContainerScreen<EncoderContainer> {
                 if (nbt != null) {
                     ListNBT list = nbt.getList("stored_items", Constants.NBT.TAG_STRING);
                     if (list.size() >= 8) {
-                        drawTooltip(matrixStack, mouseX, mouseY, Stream.of(new StringTextComponent(I18n.format("youmatter.warning.encoder2"))).collect(Collectors.toList()));
+                        drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new StringTextComponent(I18n.format("youmatter.warning.encoder2"))));
                     }
                 }
             } else {
-                drawTooltip(matrixStack, mouseX, mouseY, Stream.of(new StringTextComponent(I18n.format("youmatter.warning.encoder1"))).collect(Collectors.toList()));
+                drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new StringTextComponent(I18n.format("youmatter.warning.encoder1"))));
             }
         }
     }

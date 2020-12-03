@@ -11,11 +11,11 @@ showAsResourcePack=false
   modId="youmatter"
   version="${version}"
   displayName="YouMatter"
-  displayURL="https://minecraftforge.net"
-  credits="I'd like to thank my mother and father."
-  authors="Author"
+  displayURL="https://www.curseforge.com/minecraft/mc-mods/youmatter"
+  credits="Thanks to Hailtothebreak and bl4ckscor3 for the 1.16.1 and 1.16.4 ports respectively!"
+  authors="realmayus"
   description='''
-  Lets you craft dirt into diamonds. This is a traditional mod that has existed for eons. It is ancient. The holy Notch created it. Jeb rainbowfied it. Dinnerbone made it upside down. Etc.
+  A mod that allows you to duplicate items using U-Matter, an expensive fluid that can be obtained using machines by consuming energy.
   '''
 
   [[dependencies.youmatter]]

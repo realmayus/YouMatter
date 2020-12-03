@@ -23,9 +23,8 @@ import realmayus.youmatter.YouMatter;
 import realmayus.youmatter.network.PacketChangeSettingsCreatorServer;
 import realmayus.youmatter.network.PacketHandler;
 
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class CreatorScreen extends ContainerScreen<CreatorContainer> {
 
@@ -103,16 +102,16 @@ public class CreatorScreen extends ContainerScreen<CreatorContainer> {
         int yAxis = (mouseY - (height - ySize) / 2);
 
         if(xAxis >= 31 && xAxis <= 44 && yAxis >= 20 && yAxis <= 75) {
-            drawTooltip(matrixStack, mouseX, mouseY, Stream.of(new StringTextComponent(I18n.format("youmatter.gui.stabilizer.title")), new StringTextComponent(I18n.format("youmatter.gui.stabilizer.description", te.getSTank().getFluidAmount()))).collect(Collectors.toList()));
+            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new StringTextComponent(I18n.format("youmatter.gui.stabilizer.title")), new StringTextComponent(I18n.format("youmatter.gui.stabilizer.description", te.getSTank().getFluidAmount()))));
         }
         if(xAxis >= 89 && xAxis <= 102 && yAxis >= 20 && yAxis <= 75) {
-            drawTooltip(matrixStack, mouseX, mouseY, Stream.of(new StringTextComponent(I18n.format("youmatter.gui.umatter.title")), new StringTextComponent(I18n.format("youmatter.gui.umatter.description", te.getUTank().getFluidAmount()))).collect(Collectors.toList()));
+            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new StringTextComponent(I18n.format("youmatter.gui.umatter.title")), new StringTextComponent(I18n.format("youmatter.gui.umatter.description", te.getUTank().getFluidAmount()))));
         }
         if(xAxis >= 150 && xAxis <= 164 && yAxis >= 57 && yAxis <= 77) {
-            drawTooltip(matrixStack, mouseX, mouseY, Stream.of(new StringTextComponent(I18n.format("youmatter.gui.energy.title")), new StringTextComponent(I18n.format("youmatter.gui.energy.description", te.getClientEnergy()))).collect(Collectors.toList()));
+            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new StringTextComponent(I18n.format("youmatter.gui.energy.title")), new StringTextComponent(I18n.format("youmatter.gui.energy.description", te.getClientEnergy()))));
         }
         if(xAxis >= 148 && xAxis <= 167 && yAxis >= 7 && yAxis <= 27) {
-            drawTooltip(matrixStack, mouseX, mouseY, Stream.of(new StringTextComponent(te.isActivatedClient() ? I18n.format("youmatter.gui.active") : I18n.format("youmatter.gui.paused")), new StringTextComponent(I18n.format("youmatter.gui.clicktochange"))).collect(Collectors.toList()));
+            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new StringTextComponent(te.isActivatedClient() ? I18n.format("youmatter.gui.active") : I18n.format("youmatter.gui.paused")), new StringTextComponent(I18n.format("youmatter.gui.clicktochange"))));
         }
     }
 
