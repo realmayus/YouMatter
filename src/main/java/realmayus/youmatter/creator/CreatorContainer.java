@@ -21,6 +21,7 @@ import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 import realmayus.youmatter.ModFluids;
 import realmayus.youmatter.ObjectHolders;
+import realmayus.youmatter.YMConfig;
 import realmayus.youmatter.network.PacketHandler;
 import realmayus.youmatter.network.PacketUpdateCreatorClient;
 
@@ -105,7 +106,7 @@ public class CreatorContainer extends Container implements ICreatorStateContaine
             } else {
                 if(itemstack1.getItem() instanceof BucketItem) {
                     BucketItem bucket = (BucketItem) itemstack1.getItem();
-                    if (bucket.getFluid().getFluid().equals(ModFluids.STABILIZER.get())) {
+                    if (bucket.getFluid().getFluid().equals(ModFluids.STABILIZER.get()) || YMConfig.CONFIG.alternativeStabilizer.get().equalsIgnoreCase(bucket.getFluid().getFluid().getRegistryName().getPath())) {
                         if(!this.mergeItemStack(itemstack1, 36, 37, false)) {
                             return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                         }
@@ -125,7 +126,7 @@ public class CreatorContainer extends Container implements ICreatorStateContaine
                            if(!this.mergeItemStack(itemstack1, 38, 39, false)) {
                                return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                            }
-                       } else if (h.getFluidInTank(0).getFluid().isEquivalentTo(ModFluids.STABILIZER.get())) {
+                       } else if (h.getFluidInTank(0).getFluid().isEquivalentTo(ModFluids.STABILIZER.get()) || YMConfig.CONFIG.alternativeStabilizer.get().equalsIgnoreCase(h.getFluidInTank(0).getFluid().getFluid().getRegistryName().getPath())) {
                            if(!this.mergeItemStack(itemstack1, 36, 37, false)) {
                                return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                            }

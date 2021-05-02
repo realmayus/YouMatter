@@ -21,6 +21,9 @@ public class YMConfig {
     public final ForgeConfigSpec.ConfigValue<Integer> energyScanner;
 
     public final ForgeConfigSpec.ConfigValue<Integer> productionPerTick;
+
+    public final ForgeConfigSpec.ConfigValue<String> alternativeStabilizer;
+    
     static {
         Pair<YMConfig, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder().configure(YMConfig::new);
         CONFIG_SPEC = specPair.getRight();
@@ -52,6 +55,9 @@ public class YMConfig {
         productionPerTick = builder
                 .comment("Determines how much U-Matter [in mB] the creator produces every work cycle. Energy is withdrawn like this: if energy more than 30% of max energy, consume 30% and add [whatever value below] of U-Matter to the tank. Default is 1mB/work cycle. Don't increase this too much due to balancing issues.")
                 .define("productionPerTick", 1);
+        alternativeStabilizer = builder
+                .comment("Allows you to specify an alternative to YouMatter's stabilizer fluid. Leave empty if you only want to accept the default fluid.")
+                .define("alternativeStabilizer", "");
 
     }
 
