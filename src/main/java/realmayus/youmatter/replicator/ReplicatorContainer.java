@@ -31,7 +31,7 @@ public class ReplicatorContainer extends AbstractContainerMenu implements IRepli
 
     public ReplicatorContainer(int windowId, Level world, BlockPos pos, Inventory playerInventory, Player player) {
         super(ObjectHolders.REPLICATOR_CONTAINER, windowId);
-        te = world.getBlockEntity(pos) instanceof ReplicatorTile ? (ReplicatorTile) world.getBlockEntity(pos) : null;
+        te = world.getBlockEntity(pos) instanceof ReplicatorTile replicator ? replicator : null;
         this.playerInventory = new InvWrapper(playerInventory);
 
         addPlayerSlots(this.playerInventory);
@@ -43,8 +43,8 @@ public class ReplicatorContainer extends AbstractContainerMenu implements IRepli
         super.broadcastChanges();
         for(ContainerListener p : this.containerListeners) {
             if(p != null) {
-                if (p instanceof ServerPlayer) {
-                    PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) p), new PacketUpdateReplicatorClient(te.getEnergy(), te.getProgress(), te.isActive(), te.isCurrentMode(), te.getTank().getFluid()));
+                if (p instanceof ServerPlayer serverPlayer) {
+                    PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new PacketUpdateReplicatorClient(te.getEnergy(), te.getProgress(), te.isActive(), te.isCurrentMode(), te.getTank().getFluid()));
                 }
             }
         }
@@ -106,8 +106,7 @@ public class ReplicatorContainer extends AbstractContainerMenu implements IRepli
                     if(!this.moveItemStackTo(itemstack1, 36, 37, false)) {
                         return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                     }
-                } else if(itemstack1.getItem() instanceof BucketItem) {
-                    BucketItem bucket = (BucketItem) itemstack1.getItem();
+                } else if(itemstack1.getItem() instanceof BucketItem bucket) {
                     if(bucket.getFluid().equals(ModFluids.UMATTER.get())) {
                         if(!this.moveItemStackTo(itemstack1, 39, 40, false)) {
                             return ItemStack.EMPTY; // custom slot is full, can't transfer item!

@@ -93,8 +93,8 @@ public class ReplicatorBlock extends BaseEntityBlock {
     public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult p_225533_6_) {        if (!worldIn.isClientSide) {
         MenuProvider containerProvider = getMenuProvider(state, worldIn, pos);
         if (containerProvider != null) {
-            if (player instanceof ServerPlayer) {
-                NetworkHooks.openGui((ServerPlayer) player, containerProvider, pos);
+            if (player instanceof ServerPlayer serverPlayer) {
+                NetworkHooks.openGui(serverPlayer, containerProvider, pos);
             }
         }
 
@@ -106,7 +106,7 @@ public class ReplicatorBlock extends BaseEntityBlock {
     public MenuProvider getMenuProvider(BlockState state, Level worldIn, BlockPos pos) {
         BlockEntity te = worldIn.getBlockEntity(pos);
 
-        return te instanceof ReplicatorTile ? (MenuProvider)te : null;
+        return te instanceof ReplicatorTile replicator ? replicator : null;
     }
 
     @Override

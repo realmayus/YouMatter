@@ -228,8 +228,7 @@ public class ReplicatorTile extends BlockEntity implements MenuProvider {
                         if (taglist != null) {
                             for(Tag nbt : taglist) {
                                 if (nbt != null) {
-                                    if(nbt instanceof StringTag) {
-                                        StringTag item = (StringTag) nbt;
+                                    if(nbt instanceof StringTag item) {
                                         ItemStack newitem = new ItemStack(Objects.requireNonNull(ForgeRegistries.ITEMS.getValue(new ResourceLocation(item.getAsString()))), 1);
                                         cachedItems.add(newitem);
                                     }
@@ -280,7 +279,6 @@ public class ReplicatorTile extends BlockEntity implements MenuProvider {
                                             }
                                         }
                                     }
-
                                 }
                             }
                         }

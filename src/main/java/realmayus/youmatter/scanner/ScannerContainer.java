@@ -26,7 +26,7 @@ public class ScannerContainer extends AbstractContainerMenu implements IScannerS
 
     public ScannerContainer(int windowId, Level world, BlockPos pos, Inventory playerInventory, Player player) {
         super(ObjectHolders.SCANNER_CONTAINER, windowId);
-        te = world.getBlockEntity(pos) instanceof ScannerTile ? (ScannerTile) world.getBlockEntity(pos) : null;
+        te = world.getBlockEntity(pos) instanceof ScannerTile scanner ? scanner : null;
         this.playerInventory = new InvWrapper(playerInventory);
 
         addPlayerSlots(this.playerInventory);
@@ -38,8 +38,8 @@ public class ScannerContainer extends AbstractContainerMenu implements IScannerS
         super.broadcastChanges();
         for(ContainerListener p : this.containerListeners) {
             if(p != null) {
-                if (p instanceof ServerPlayer) {
-                    PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) p), new PacketUpdateScannerClient(te.getEnergy(), te.getProgress(), te.getHasEncoder()));
+                if (p instanceof ServerPlayer serverPlayer) {
+                    PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new PacketUpdateScannerClient(te.getEnergy(), te.getProgress(), te.getHasEncoder()));
                 }
             }
         }

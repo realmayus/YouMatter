@@ -35,7 +35,7 @@ public class CreatorContainer extends AbstractContainerMenu implements ICreatorS
 
     public CreatorContainer(int windowId, Level world, BlockPos pos, Inventory playerInventory, Player player) {
         super(ObjectHolders.CREATOR_CONTAINER, windowId);
-        te = world.getBlockEntity(pos) instanceof CreatorTile ? (CreatorTile) world.getBlockEntity(pos) : null;
+        te = world.getBlockEntity(pos) instanceof CreatorTile creator ? creator : null;
         this.playerInventory = new InvWrapper(playerInventory);
 
         addPlayerSlots(this.playerInventory);
@@ -46,10 +46,8 @@ public class CreatorContainer extends AbstractContainerMenu implements ICreatorS
     public void broadcastChanges() {
         super.broadcastChanges();
         for(ContainerListener p : this.containerListeners) {
-            if(p != null) {
-                if (p instanceof ServerPlayer) {
-                    PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) p), new PacketUpdateCreatorClient(te.getEnergy(), 0, te.getUTank().getFluid(), te.getSTank().getFluid(), te.isActivated()));
-                }
+            if (p instanceof ServerPlayer serverPlayer) {
+                PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new PacketUpdateCreatorClient(te.getEnergy(), 0, te.getUTank().getFluid(), te.getSTank().getFluid(), te.isActivated()));
             }
         }
     }
@@ -102,8 +100,7 @@ public class CreatorContainer extends AbstractContainerMenu implements ICreatorS
                     return ItemStack.EMPTY; // Inventory is full, can't transfer item!
                 }
             } else {
-                if(itemstack1.getItem() instanceof BucketItem) {
-                    BucketItem bucket = (BucketItem) itemstack1.getItem();
+                if(itemstack1.getItem() instanceof BucketItem bucket) {
                     if (bucket.getFluid().equals(ModFluids.STABILIZER.get()) || YMConfig.CONFIG.alternativeStabilizer.get().equalsIgnoreCase(bucket.getFluid().getRegistryName().getPath())) {
                         if(!this.moveItemStackTo(itemstack1, 36, 37, false)) {
                             return ItemStack.EMPTY; // custom slot is full, can't transfer item!

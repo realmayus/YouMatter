@@ -336,16 +336,18 @@ public class CreatorTile extends BlockEntity implements MenuProvider {
     private Object[] getNeighborTileEntity(BlockPos creatorPos) {
         HashMap<BlockPos, Direction> foundPos = new HashMap<>();
         for(Direction facing : Direction.values()) {
-            if(level.getBlockEntity(creatorPos.relative(facing)) != null) {
-                Objects.requireNonNull(level.getBlockEntity(creatorPos.relative(facing))).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, facing).ifPresent(x -> foundPos.put(creatorPos.relative(facing), facing));
+            BlockPos offsetPos = creatorPos.relative(facing);
+            BlockEntity offsetBe = level.getBlockEntity(offsetPos);
 
+            if(offsetBe != null) {
+                offsetBe.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, facing).ifPresent(x -> foundPos.put(offsetPos, facing));
             }
         }
 
         // Prioritize Replicator
         for (Map.Entry<BlockPos, Direction> entry : foundPos.entrySet()) {
-            if (level.getBlockEntity(entry.getKey()) instanceof ReplicatorTile) {
-                if(level.getBlockEntity(entry.getKey()).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, entry.getValue()).map(h -> h.fill(new FluidStack(ModFluids.UMATTER.get(), 500), IFluidHandler.FluidAction.SIMULATE)).orElse(0) > 0) {
+            if (level.getBlockEntity(entry.getKey()) instanceof ReplicatorTile replicator) {
+                if(replicator.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, entry.getValue()).map(h -> h.fill(new FluidStack(ModFluids.UMATTER.get(), 500), IFluidHandler.FluidAction.SIMULATE)).orElse(0) > 0) {
                     //Replicator can take fluid
                     return new Object[] {entry.getKey(), entry.getValue()}; // position, facing
                 }

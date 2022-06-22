@@ -28,7 +28,7 @@ public class EncoderContainer extends AbstractContainerMenu implements IEncoderS
 
     public EncoderContainer(int windowId, Level world, BlockPos pos, Inventory playerInventory, Player player) {
         super(ObjectHolders.ENCODER_CONTAINER, windowId);
-        te = world.getBlockEntity(pos) instanceof EncoderTile ? (EncoderTile) world.getBlockEntity(pos) : null;
+        te = world.getBlockEntity(pos) instanceof EncoderTile encoder ? encoder : null;
         this.playerInventory = new InvWrapper(playerInventory);
 
         addPlayerSlots(this.playerInventory);
@@ -40,8 +40,8 @@ public class EncoderContainer extends AbstractContainerMenu implements IEncoderS
         super.broadcastChanges();
         for(ContainerListener p : this.containerListeners) {
             if(p != null) {
-                if (p instanceof ServerPlayer) {
-                    PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) p), new PacketUpdateEncoderClient(te.getEnergy(), te.getProgress()));
+                if (p instanceof ServerPlayer serverPlayer) {
+                    PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new PacketUpdateEncoderClient(te.getEnergy(), te.getProgress()));
                 }
             }
         }

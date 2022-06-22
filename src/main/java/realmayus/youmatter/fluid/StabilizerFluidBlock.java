@@ -19,8 +19,8 @@ public class StabilizerFluidBlock extends LiquidBlock {
 
     @Override
     public void entityInside(BlockState state, Level worldIn, BlockPos pos, Entity entityIn) {
-        if (entityIn instanceof LivingEntity) {
-            ((LivingEntity)entityIn).addEffect(new MobEffectInstance(MobEffects.JUMP, 200, 5));
+        if (entityIn instanceof LivingEntity livingEntity) {
+            livingEntity.addEffect(new MobEffectInstance(MobEffects.JUMP, 200, 5));
         }
         super.entityInside(state, worldIn, pos, entityIn);
     }

@@ -22,8 +22,7 @@ public class PacketShowNext {
     void handle(Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
             ServerPlayer player = ctx.get().getSender();
-            if (player.containerMenu instanceof ReplicatorContainer) {
-                ReplicatorContainer openContainer = (ReplicatorContainer) player.containerMenu;
+            if (player.containerMenu instanceof ReplicatorContainer openContainer) {
                 openContainer.te.renderNext();
             }
         });

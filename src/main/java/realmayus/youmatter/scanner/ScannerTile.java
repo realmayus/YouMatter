@@ -130,20 +130,21 @@ public class ScannerTile extends BlockEntity implements MenuProvider {
 
     public void tick(Level level, BlockPos pos, BlockState state) {
         if(currentPartTick >= 2) {
-            if (getNeighborEncoder(this.worldPosition) != null) {
+            BlockPos encoderPos = getNeighborEncoder(this.worldPosition);
+
+            if (encoderPos != null) {
                 if(!hasEncoder) {
                     setChanged();
                     level.sendBlockUpdated(pos, state, state, 3);
                 }
 
                 hasEncoder = true;
-                BlockPos encoderPos = getNeighborEncoder(this.worldPosition);
                 if(!inventory.getStackInSlot(1).isEmpty() && isItemAllowed(inventory.getStackInSlot(1))) {
                     if(getEnergy() > YMConfig.CONFIG.energyScanner.get()) {
                         if (getProgress() < 100) {
                             setProgress(getProgress() + 1);
                             myEnergyStorage.consumePower(YMConfig.CONFIG.energyScanner.get());
-                        } else if (encoderPos != null) {
+                        } else {
                             // Notifying the neighboring encoder of this scanner having finished its operation
                             ((EncoderTile)level.getBlockEntity(encoderPos)).ignite(this.inventory.getStackInSlot(1)); //don't worry, this is already checked by getNeighborEncoder() c:
                             inventory.setStackInSlot(1, ItemStack.EMPTY);
@@ -186,11 +187,11 @@ public class ScannerTile extends BlockEntity implements MenuProvider {
     @Nullable
     private BlockPos getNeighborEncoder(BlockPos scannerPos) {
         for(Direction facing : Direction.values()) {
-            if(level.getBlockState(scannerPos.relative(facing)).getBlock() instanceof EncoderBlock) {
-                if(level.getBlockEntity(scannerPos.relative(facing)) != null) {
-                    if(level.getBlockEntity(scannerPos.relative(facing)) instanceof EncoderTile) {
-                        return scannerPos.relative(facing);
-                    }
+            BlockPos offsetPos = scannerPos.relative(facing);
+
+            if(level.getBlockState(offsetPos).getBlock() instanceof EncoderBlock) {
+                if(level.getBlockEntity(offsetPos) instanceof EncoderTile) {
+                    return offsetPos;
                 }
             }
         }
