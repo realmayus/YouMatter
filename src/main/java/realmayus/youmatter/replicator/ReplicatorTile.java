@@ -6,7 +6,6 @@ import static realmayus.youmatter.util.GeneralUtils.getUMatterAmountForItem;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.IntStream;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -21,7 +20,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -170,11 +168,6 @@ public class ReplicatorTile extends BlockEntity implements MenuProvider {
     CustomInvWrapper invWrapper = new CustomInvWrapper(inventory);
 
     private List<ItemStack> cachedItems;
-
-    @Override
-    public void setRemoved() {
-        this.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent(h -> IntStream.range(0, h.getSlots()).forEach(i -> Containers.dropItemStack(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), h.getStackInSlot(i))));
-    }
 
     // Current displayed item index -> cachedItems
     private int currentIndex = 0;
