@@ -105,7 +105,7 @@ public class EncoderContainer extends AbstractContainerMenu implements IEncoderS
 
     @Override
     public void sync(int energy, int progress) {
-        te.setClientEnergy(energy);
-        te.setClientProgress(progress);
+        te.setEnergy(energy);
+        te.setProgress(progress);
     }
 }

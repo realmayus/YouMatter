@@ -72,9 +72,6 @@ public class EncoderTile extends BlockEntity implements MenuProvider {
         }
     }
 
-    private int clientEnergy = -1;
-    private int clientProgress = -1;
-
     private int progress = 0;
 
 
@@ -86,24 +83,12 @@ public class EncoderTile extends BlockEntity implements MenuProvider {
         this.progress = progress;
     }
 
-    int getClientProgress() {
-        return clientProgress;
-    }
-
-    void setClientProgress(int clientProgress) {
-        this.clientProgress = clientProgress;
-    }
-
-    int getClientEnergy() {
-        return clientEnergy;
-    }
-
-    void setClientEnergy(int clientEnergy) {
-        this.clientEnergy = clientEnergy;
-    }
-
     public int getEnergy() {
         return myEnergyStorage.getEnergyStored();
+    }
+
+    public void setEnergy(int energy) {
+        myEnergyStorage.setEnergy(energy);
     }
 
     private MyEnergyStorage myEnergyStorage = new MyEnergyStorage(1000000, Integer.MAX_VALUE);

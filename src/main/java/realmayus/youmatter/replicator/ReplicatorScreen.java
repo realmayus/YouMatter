@@ -63,10 +63,10 @@ public class ReplicatorScreen extends AbstractContainerScreen<ReplicatorContaine
     @Override
     protected void renderLabels(PoseStack matrixStack, int mouseX, int mouseY) {
         RenderSystem._setShaderTexture(0, GUI);
-        drawEnergyBolt(matrixStack, te.getClientEnergy());
-        drawActiveIcon(matrixStack, te.isActiveClient());
-        drawModeIcon(matrixStack, te.isCurrentClientMode());
-        drawProgressArrow(matrixStack, te.getClientProgress());
+        drawEnergyBolt(matrixStack, te.getEnergy());
+        drawActiveIcon(matrixStack, te.isActive());
+        drawModeIcon(matrixStack, te.isCurrentMode());
+        drawProgressArrow(matrixStack, te.getProgress());
 
         font.draw(matrixStack, I18n.get(ObjectHolders.REPLICATOR_BLOCK.getDescriptionId()), 8, 6, 0x404040);
     }
@@ -74,7 +74,7 @@ public class ReplicatorScreen extends AbstractContainerScreen<ReplicatorContaine
     private void drawEnergyBolt(PoseStack matrixStack, int energy) {
         RenderSystem._setShaderTexture(0, GUI);
 
-        if(te.getClientEnergy() == 0) {
+        if(te.getEnergy() == 0) {
             this.blit(matrixStack, 127, 58, 176, 114, 15, 20);
         } else {
             double percentage = energy * 100.0F / 1000000;  // i know this is dumb
@@ -131,15 +131,15 @@ public class ReplicatorScreen extends AbstractContainerScreen<ReplicatorContaine
         }
 
         if(xAxis >= 127 && xAxis <= 142 && yAxis >= 59 && yAxis <= 79) {
-            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new TextComponent(I18n.get("youmatter.gui.energy.title")), new TextComponent(I18n.get("youmatter.gui.energy.description", te.getClientEnergy()))));
+            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new TextComponent(I18n.get("youmatter.gui.energy.title")), new TextComponent(I18n.get("youmatter.gui.energy.description", te.getEnergy()))));
         }
 
         if(xAxis >= 148 && xAxis <= 167 && yAxis >= 7 && yAxis <= 27) {
-            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new TextComponent(te.isActiveClient() ? I18n.get("youmatter.gui.active") : I18n.get("youmatter.gui.paused")), new TextComponent(I18n.get("youmatter.gui.clicktochange"))));
+            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new TextComponent(te.isActive() ? I18n.get("youmatter.gui.active") : I18n.get("youmatter.gui.paused")), new TextComponent(I18n.get("youmatter.gui.clicktochange"))));
         }
 
         if(xAxis >= 148 && xAxis <= 167 && yAxis >= 31 && yAxis <= 51) {
-            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new TextComponent(te.isCurrentClientMode() ? I18n.get("youmatter.gui.performInfiniteRuns") : I18n.get("youmatter.gui.performSingleRun")), new TextComponent(I18n.get("youmatter.gui.clicktochange"))));
+            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new TextComponent(te.isCurrentMode() ? I18n.get("youmatter.gui.performInfiniteRuns") : I18n.get("youmatter.gui.performSingleRun")), new TextComponent(I18n.get("youmatter.gui.clicktochange"))));
         }
     }
 
@@ -251,12 +251,12 @@ public class ReplicatorScreen extends AbstractContainerScreen<ReplicatorContaine
                 //Playing Click sound
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 //Sending packet to server
-                PacketHandler.INSTANCE.sendToServer(new PacketChangeSettingsReplicatorServer(!te.isActiveClient(), te.isCurrentClientMode()) );
+                PacketHandler.INSTANCE.sendToServer(new PacketChangeSettingsReplicatorServer(!te.isActive(), te.isCurrentMode()) );
             } else if(xAxis >= 148 && xAxis <= 167 && yAxis >= 31 && yAxis <= 51) {
                 //Playing Click sound
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 //Sending packet to server
-                PacketHandler.INSTANCE.sendToServer(new PacketChangeSettingsReplicatorServer(te.isActiveClient(), !te.isCurrentClientMode()) );
+                PacketHandler.INSTANCE.sendToServer(new PacketChangeSettingsReplicatorServer(te.isActive(), !te.isCurrentMode()) );
             }
         }
         return true;

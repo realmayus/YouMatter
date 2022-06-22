@@ -68,8 +68,8 @@ public class CreatorScreen extends AbstractContainerScreen<CreatorContainer> {
 
     @Override
     protected void renderLabels(PoseStack matrixStack, int mouseX, int mouseY) {
-        drawEnergyBolt(matrixStack, te.getClientEnergy());
-        drawActiveIcon(matrixStack, te.isActivatedClient());
+        drawEnergyBolt(matrixStack, te.getEnergy());
+        drawActiveIcon(matrixStack, te.isActivated());
 
         RenderSystem._setShaderTexture(0, GUI);
 
@@ -107,10 +107,10 @@ public class CreatorScreen extends AbstractContainerScreen<CreatorContainer> {
             drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new TextComponent(I18n.get("youmatter.gui.umatter.title")), new TextComponent(I18n.get("youmatter.gui.umatter.description", te.getUTank().getFluidAmount()))));
         }
         if(xAxis >= 150 && xAxis <= 164 && yAxis >= 57 && yAxis <= 77) {
-            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new TextComponent(I18n.get("youmatter.gui.energy.title")), new TextComponent(I18n.get("youmatter.gui.energy.description", te.getClientEnergy()))));
+            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new TextComponent(I18n.get("youmatter.gui.energy.title")), new TextComponent(I18n.get("youmatter.gui.energy.description", te.getEnergy()))));
         }
         if(xAxis >= 148 && xAxis <= 167 && yAxis >= 7 && yAxis <= 27) {
-            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new TextComponent(te.isActivatedClient() ? I18n.get("youmatter.gui.active") : I18n.get("youmatter.gui.paused")), new TextComponent(I18n.get("youmatter.gui.clicktochange"))));
+            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new TextComponent(te.isActivated() ? I18n.get("youmatter.gui.active") : I18n.get("youmatter.gui.paused")), new TextComponent(I18n.get("youmatter.gui.clicktochange"))));
         }
     }
 
@@ -205,7 +205,7 @@ public class CreatorScreen extends AbstractContainerScreen<CreatorContainer> {
                 //Playing Click sound
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 //Sending packet to server
-                PacketHandler.INSTANCE.sendToServer(new PacketChangeSettingsCreatorServer(!te.isActivatedClient()));
+                PacketHandler.INSTANCE.sendToServer(new PacketChangeSettingsCreatorServer(!te.isActivated()));
             }
         }
         return true;

@@ -48,16 +48,6 @@ public class ScannerTile extends BlockEntity implements MenuProvider {
         this.hasEncoder = hasEncoder;
     }
 
-    public boolean getHasEncoderClient() {
-        return hasEncoderClient;
-    }
-
-    public void setHasEncoderClient(boolean hasEncoderClient) {
-        this.hasEncoderClient = hasEncoderClient;
-    }
-
-    public boolean hasEncoderClient = false;
-
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
@@ -76,8 +66,6 @@ public class ScannerTile extends BlockEntity implements MenuProvider {
         }
     };
 
-    private int clientEnergy = -1;
-    private int clientProgress = -1;
     private int progress = 0;
 
     public int getProgress() {
@@ -88,24 +76,12 @@ public class ScannerTile extends BlockEntity implements MenuProvider {
         this.progress = progress;
     }
 
-    public int getClientProgress() {
-        return clientProgress;
-    }
-
-    public void setClientProgress(int clientProgress) {
-        this.clientProgress = clientProgress;
-    }
-
-    public int getClientEnergy() {
-        return clientEnergy;
-    }
-
-    public void setClientEnergy(int clientEnergy) {
-        this.clientEnergy = clientEnergy;
-    }
-
     public int getEnergy() {
         return myEnergyStorage.getEnergyStored();
+    }
+
+    public void setEnergy(int energy) {
+        myEnergyStorage.setEnergy(energy);
     }
 
     private MyEnergyStorage myEnergyStorage = new MyEnergyStorage(1000000, Integer.MAX_VALUE);
@@ -122,6 +98,8 @@ public class ScannerTile extends BlockEntity implements MenuProvider {
         if(compound.contains("inventory")) {
             inventory.deserializeNBT((CompoundTag) compound.get("inventory"));
         }
+
+        setHasEncoder(compound.getBoolean("encoder"));
     }
 
     @Override
@@ -129,6 +107,7 @@ public class ScannerTile extends BlockEntity implements MenuProvider {
         super.saveAdditional(compound);
         compound.putInt("progress", getProgress());
         compound.putInt("energy", getEnergy());
+        compound.putBoolean("encoder", getHasEncoder());
         if (inventory != null) {
             compound.put("inventory", inventory.serializeNBT());
         }
@@ -152,6 +131,11 @@ public class ScannerTile extends BlockEntity implements MenuProvider {
     public void tick(Level level, BlockPos pos, BlockState state) {
         if(currentPartTick >= 2) {
             if (getNeighborEncoder(this.worldPosition) != null) {
+                if(!hasEncoder) {
+                    setChanged();
+                    level.sendBlockUpdated(pos, state, state, 3);
+                }
+
                 hasEncoder = true;
                 BlockPos encoderPos = getNeighborEncoder(this.worldPosition);
                 if(!inventory.getStackInSlot(1).isEmpty() && isItemAllowed(inventory.getStackInSlot(1))) {
@@ -170,6 +154,11 @@ public class ScannerTile extends BlockEntity implements MenuProvider {
                     setProgress(0); // if item was suddenly removed, reset progress to 0
                 }
             } else {
+                if(hasEncoder) {
+                    setChanged();
+                    level.sendBlockUpdated(pos, state, state, 3);
+                }
+
                 hasEncoder = false;
             }
             currentPartTick = 0;

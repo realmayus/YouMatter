@@ -58,11 +58,7 @@ public class ReplicatorTile extends BlockEntity implements MenuProvider {
 
     private boolean currentMode = true;  //true = loop; false = one time
 
-    private boolean currentClientMode = false;
-
     private boolean isActive = false;
-
-    private boolean isActiveClient = false;
 
     boolean isCurrentMode() {
         return currentMode;
@@ -72,28 +68,12 @@ public class ReplicatorTile extends BlockEntity implements MenuProvider {
         this.currentMode = currentMode;
     }
 
-    boolean isCurrentClientMode() {
-        return currentClientMode;
-    }
-
-    void setCurrentClientMode(boolean currentClientMode) {
-        this.currentClientMode = currentClientMode;
-    }
-
     boolean isActive() {
         return isActive;
     }
 
     public void setActive(boolean active) {
         isActive = active;
-    }
-
-    boolean isActiveClient() {
-        return isActiveClient;
-    }
-
-    void setActiveClient(boolean activeClient) {
-        isActiveClient = activeClient;
     }
 
     private static final int MAX_UMATTER = 10500;
@@ -339,9 +319,6 @@ public class ReplicatorTile extends BlockEntity implements MenuProvider {
 
     private MyEnergyStorage myEnergyStorage = new MyEnergyStorage(1000000, 2000);
 
-    private int clientEnergy = -1;
-
-    private int clientProgress = -1;
     private int progress = 0;
 
     public int getProgress() {
@@ -352,24 +329,12 @@ public class ReplicatorTile extends BlockEntity implements MenuProvider {
         this.progress = progress;
     }
 
-    int getClientProgress() {
-        return clientProgress;
-    }
-
-    void setClientProgress(int clientProgress) {
-        this.clientProgress = clientProgress;
-    }
-
-    int getClientEnergy() {
-        return clientEnergy;
-    }
-
-    void setClientEnergy(int clientEnergy) {
-        this.clientEnergy = clientEnergy;
-    }
-
     public int getEnergy() {
         return myEnergyStorage.getEnergyStored();
+    }
+
+    public void setEnergy(int energy) {
+        myEnergyStorage.setEnergy(energy);
     }
 
     @Override

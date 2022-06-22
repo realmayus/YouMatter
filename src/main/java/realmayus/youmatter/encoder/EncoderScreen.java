@@ -45,7 +45,7 @@ public class EncoderScreen extends AbstractContainerScreen<EncoderContainer> {
         int yAxis = (mouseY - (height - HEIGHT) / 2);
 
         if(xAxis >= 141 && xAxis <= 156 && yAxis >= 37 && yAxis <= 57) {
-            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new TextComponent(I18n.get("youmatter.gui.energy.title")), new TextComponent(I18n.get("youmatter.gui.energy.description", te.getClientEnergy()))));
+            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new TextComponent(I18n.get("youmatter.gui.energy.title")), new TextComponent(I18n.get("youmatter.gui.energy.description", te.getEnergy()))));
         }
         if (xAxis >= 16 && xAxis <= 32 && yAxis >= 59 && yAxis <= 75) {
             if (te.inventory.getStackInSlot(1).getItem() instanceof ThumbdriveItem) {
@@ -75,8 +75,8 @@ public class EncoderScreen extends AbstractContainerScreen<EncoderContainer> {
 
     @Override
     protected void renderLabels(PoseStack matrixStack, int mouseX, int mouseY) {
-        drawEnergyBolt(matrixStack, te.getClientEnergy());
-        drawProgressDisplayChain(matrixStack, te.getClientProgress());
+        drawEnergyBolt(matrixStack, te.getEnergy());
+        drawProgressDisplayChain(matrixStack, te.getProgress());
 
         if (!(te.inventory.getStackInSlot(1).getItem() instanceof ThumbdriveItem)) {
             this.blit(matrixStack, 16, 59, 176, 66, 16, 16);

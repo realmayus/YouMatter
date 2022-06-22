@@ -51,16 +51,7 @@ public class CreatorTile extends BlockEntity implements MenuProvider {
     private static final int MAX_UMATTER = 11000;
     private static final int MAX_STABILIZER = 11000;
 
-    private boolean isActivatedClient = true;
     private boolean isActivated = true;
-
-    boolean isActivatedClient() {
-        return isActivatedClient;
-    }
-
-    void setActivatedClient(boolean activatedClient) {
-        isActivatedClient = activatedClient;
-    }
 
     boolean isActivated() {
         return isActivated;
@@ -196,19 +187,13 @@ public class CreatorTile extends BlockEntity implements MenuProvider {
         }
     };
 
-    int getClientEnergy() {
-        return clientEnergy;
-    }
-
-    void setClientEnergy(int clientEnergy) {
-        this.clientEnergy = clientEnergy;
-    }
-
     public int getEnergy() {
         return myEnergyStorage.getEnergyStored();
     }
 
-    private int clientEnergy = -1;
+    public void setEnergy(int energy) {
+        myEnergyStorage.setEnergy(energy);
+    }
 
     private MyEnergyStorage myEnergyStorage = new MyEnergyStorage(1000000, Integer.MAX_VALUE);
 

@@ -105,8 +105,8 @@ public class ScannerContainer extends AbstractContainerMenu implements IScannerS
 
     @Override
     public void sync(int energy, int progress, boolean hasEncoder) {
-        te.setClientEnergy(energy);
-        te.setClientProgress(progress);
-        te.setHasEncoderClient(hasEncoder);
+        te.setEnergy(energy);
+        te.setProgress(progress);
+        te.setHasEncoder(hasEncoder);
     }
 }

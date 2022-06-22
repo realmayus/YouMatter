@@ -148,9 +148,9 @@ public class CreatorContainer extends AbstractContainerMenu implements ICreatorS
 
     @Override
     public void sync(int energy, int progress, FluidStack uTank, FluidStack sTank, boolean isActivated) {
-        te.setClientEnergy(energy);
+        te.setEnergy(energy);
         te.getUTank().setFluid(uTank);
         te.getSTank().setFluid(sTank);
-        te.setActivatedClient(isActivated);
+        te.setActivated(isActivated);
     }
 }

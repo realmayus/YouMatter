@@ -38,10 +38,10 @@ public class ScannerScreen extends AbstractContainerScreen<ScannerContainer> {
         int yAxis = (mouseY - (height - HEIGHT) / 2);
 
         if (xAxis >= 141 && xAxis <= 156 && yAxis >= 37 && yAxis <= 57) {
-            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new TextComponent(I18n.get("youmatter.gui.energy.title")), new TextComponent(I18n.get("youmatter.gui.energy.description", te.getClientEnergy()))));
+            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new TextComponent(I18n.get("youmatter.gui.energy.title")), new TextComponent(I18n.get("youmatter.gui.energy.description", te.getEnergy()))));
         }
 
-        if (!te.getHasEncoderClient()) {
+        if (!te.getHasEncoder()) {
             if (xAxis >= 16 && xAxis <= 32 && yAxis >= 59 && yAxis <= 75) {
                 drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new TextComponent(I18n.get("youmatter.warning.scanner1")), new TextComponent(I18n.get("youmatter.warning.scanner2")), new TextComponent(I18n.get("youmatter.warning.scanner3"))));
             }
@@ -51,10 +51,10 @@ public class ScannerScreen extends AbstractContainerScreen<ScannerContainer> {
 
     @Override
     protected void renderLabels(PoseStack matrixStack, int mouseX, int mouseY) {
-        drawEnergyBolt(matrixStack, te.getClientEnergy());
-        drawProgressDisplayChain(matrixStack, te.getClientProgress());
+        drawEnergyBolt(matrixStack, te.getEnergy());
+        drawProgressDisplayChain(matrixStack, te.getProgress());
 
-        if(!te.getHasEncoderClient()) {
+        if(!te.getHasEncoder()) {
             this.blit(matrixStack, 16, 59, 176, 101, 16, 16);
         }
         font.draw(matrixStack, I18n.get(ObjectHolders.SCANNER_BLOCK.getDescriptionId()), 8, 6, 0x404040);

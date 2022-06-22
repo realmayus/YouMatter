@@ -139,10 +139,10 @@ public class ReplicatorContainer extends AbstractContainerMenu implements IRepli
 
     @Override
     public void sync(int energy, int progress, FluidStack tank, boolean isActivated, boolean mode) {
-        te.setClientEnergy(energy);
-        te.setClientProgress(progress);
+        te.setEnergy(energy);
+        te.setProgress(progress);
         te.getTank().setFluid(tank);
-        te.setCurrentClientMode(mode);
-        te.setActiveClient(isActivated);
+        te.setCurrentMode(mode);
+        te.setActive(isActivated);
     }
 }
