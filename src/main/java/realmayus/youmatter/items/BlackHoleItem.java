@@ -13,16 +13,18 @@ import realmayus.youmatter.YouMatter;
 import javax.annotation.Nullable;
 import java.util.List;
 
+import net.minecraft.item.Item.Properties;
+
 public class BlackHoleItem extends Item {
 
     public BlackHoleItem() {
-        super(new Properties().maxStackSize(1).group(YouMatter.ITEM_GROUP));
+        super(new Properties().stacksTo(1).tab(YouMatter.ITEM_GROUP));
     }
 
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        super.addInformation(stack, worldIn, tooltip, flagIn);
-        tooltip.add(new StringTextComponent(I18n.format("youmatter.tooltip.craftingItemEndCities")));
+    public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+        super.appendHoverText(stack, worldIn, tooltip, flagIn);
+        tooltip.add(new StringTextComponent(I18n.get("youmatter.tooltip.craftingItemEndCities")));
     }
 }

@@ -29,7 +29,7 @@ public class EncoderContainer extends Container implements IEncoderStateContaine
 
     public EncoderContainer(int windowId, World world, BlockPos pos, PlayerInventory playerInventory, PlayerEntity player) {
         super(ObjectHolders.ENCODER_CONTAINER, windowId);
-        te = world.getTileEntity(pos) instanceof EncoderTile ? (EncoderTile) world.getTileEntity(pos) : null;
+        te = world.getBlockEntity(pos) instanceof EncoderTile ? (EncoderTile) world.getBlockEntity(pos) : null;
         this.playerEntity = player;
         this.playerInventory = new InvWrapper(playerInventory);
 
@@ -38,9 +38,9 @@ public class EncoderContainer extends Container implements IEncoderStateContaine
     }
 
     @Override
-    public void detectAndSendChanges() {
-        super.detectAndSendChanges();
-        for(IContainerListener p : this.listeners) {
+    public void broadcastChanges() {
+        super.broadcastChanges();
+        for(IContainerListener p : this.containerListeners) {
             if(p != null) {
                 if (p instanceof ServerPlayerEntity) {
                     PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) p), new PacketUpdateEncoderClient(te.getEnergy(), te.getProgress()));
@@ -50,7 +50,7 @@ public class EncoderContainer extends Container implements IEncoderStateContaine
     }
 
     @Override
-    public boolean canInteractWith(PlayerEntity playerIn) {
+    public boolean stillValid(PlayerEntity playerIn) {
         return true;
     }
 
@@ -79,26 +79,26 @@ public class EncoderContainer extends Container implements IEncoderStateContaine
      * This is actually needed in order to achieve shift click functionality in the GUI. If this method isn't overridden, the game crashes.
      */
     @Override
-    public ItemStack transferStackInSlot(PlayerEntity playerIn, int index) {
+    public ItemStack quickMoveStack(PlayerEntity playerIn, int index) {
         ItemStack itemstack = ItemStack.EMPTY;
-        Slot slot = this.inventorySlots.get(index);
+        Slot slot = this.slots.get(index);
 
-        if (slot != null && slot.getHasStack() && slot.getStack().getItem() instanceof ThumbdriveItem) {
-            ItemStack itemstack1 = slot.getStack();
+        if (slot != null && slot.hasItem() && slot.getItem().getItem() instanceof ThumbdriveItem) {
+            ItemStack itemstack1 = slot.getItem();
             itemstack = itemstack1.copy();
 
             if (index == 36) { //originating slot is custom slot
-                if (!this.mergeItemStack(itemstack1, 0, 36, true)) {
+                if (!this.moveItemStackTo(itemstack1, 0, 36, true)) {
                     return ItemStack.EMPTY; // Inventory is full, can't transfer item!
                 }
-            } else if (!this.mergeItemStack(itemstack1, 36, 37, false)) { //move from inv to custom slot
+            } else if (!this.moveItemStackTo(itemstack1, 36, 37, false)) { //move from inv to custom slot
                 return ItemStack.EMPTY; // custom slot is full, can't transfer item!
             }
 
             if (itemstack1.isEmpty()) {
-                slot.putStack(ItemStack.EMPTY);
+                slot.set(ItemStack.EMPTY);
             } else {
-                slot.onSlotChanged();
+                slot.setChanged();
             }
         }
 

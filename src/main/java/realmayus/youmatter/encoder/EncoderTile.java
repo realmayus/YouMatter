@@ -58,7 +58,7 @@ public class EncoderTile extends TileEntity implements INamedContainerProvider, 
     public ItemStackHandler inventory = new ItemStackHandler(5) {
         @Override
         protected void onContentsChanged(int slot) {
-            EncoderTile.this.markDirty();
+            EncoderTile.this.setChanged();
         }
     };
 
@@ -107,8 +107,8 @@ public class EncoderTile extends TileEntity implements INamedContainerProvider, 
     private MyEnergyStorage myEnergyStorage = new MyEnergyStorage(1000000, Integer.MAX_VALUE);
 
     @Override
-    public void read(BlockState state, CompoundNBT compound) {
-        super.read(state, compound);
+    public void load(BlockState state, CompoundNBT compound) {
+        super.load(state, compound);
         setProgress(compound.getInt("progress"));
         myEnergyStorage.setEnergy(compound.getInt("energy"));
         if(compound.contains("inventory")) {
@@ -120,8 +120,8 @@ public class EncoderTile extends TileEntity implements INamedContainerProvider, 
                 for(INBT base: compound.getList("queue", Constants.NBT.TAG_COMPOUND)) {
                     if (base instanceof CompoundNBT) {
                         CompoundNBT nbtTagCompound = (CompoundNBT) base;
-                        if(!ItemStack.read(nbtTagCompound).isEmpty()) {
-                            queueBuilder.add(ItemStack.read(nbtTagCompound));
+                        if(!ItemStack.of(nbtTagCompound).isEmpty()) {
+                            queueBuilder.add(ItemStack.of(nbtTagCompound));
                         }
                     }
                 }
@@ -131,8 +131,8 @@ public class EncoderTile extends TileEntity implements INamedContainerProvider, 
     }
 
     @Override
-    public CompoundNBT write(CompoundNBT compound) {
-        super.write(compound);
+    public CompoundNBT save(CompoundNBT compound) {
+        super.save(compound);
         compound.putInt("progress", getProgress());
         compound.putInt("energy", getEnergy());
         if (inventory != null) {
@@ -141,21 +141,21 @@ public class EncoderTile extends TileEntity implements INamedContainerProvider, 
         ListNBT tempCompoundList = new ListNBT();
         for (ItemStack is : queue) {
             if (!is.isEmpty()) {
-                tempCompoundList.add(is.write(new CompoundNBT()));
+                tempCompoundList.add(is.save(new CompoundNBT()));
             }
         }
         compound.put("queue", tempCompoundList);
         return compound;
     }
     @Override
-    public void remove() {
-        this.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent(h -> IntStream.range(0, h.getSlots()).forEach(i -> InventoryHelper.spawnItemStack(world, pos.getX(), pos.getY(), pos.getZ(), h.getStackInSlot(i))));
+    public void setRemoved() {
+        this.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent(h -> IntStream.range(0, h.getSlots()).forEach(i -> InventoryHelper.dropItemStack(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), h.getStackInSlot(i))));
     }
 
     @Override
     public void tick() {
         // only run on server
-        if (!world.isRemote) {
+        if (!level.isClientSide) {
             if(queue.size() > 0){
                 ItemStack processIS = queue.get(queue.size() - 1);
                 if(processIS != ItemStack.EMPTY) {
@@ -209,13 +209,13 @@ public class EncoderTile extends TileEntity implements INamedContainerProvider, 
 
     @Override
     public ITextComponent getDisplayName() {
-        return new TranslationTextComponent(ObjectHolders.ENCODER_BLOCK.getTranslationKey());
+        return new TranslationTextComponent(ObjectHolders.ENCODER_BLOCK.getDescriptionId());
     }
 
     @Nullable
     @Override
     public Container createMenu(int windowID, PlayerInventory playerInventory, PlayerEntity playerEntity) {
-        return new EncoderContainer(windowID, world, pos, playerInventory, playerEntity);
+        return new EncoderContainer(windowID, level, worldPosition, playerInventory, playerEntity);
     }
 }
 

@@ -28,8 +28,8 @@ public class PacketChangeSettingsCreatorServer{
         // This is the player the packet was sent to the server from
         ctx.get().enqueueWork(() -> {
             ServerPlayerEntity player = ctx.get().getSender();
-            if (player.openContainer instanceof CreatorContainer) {
-                CreatorContainer openContainer = (CreatorContainer) player.openContainer;
+            if (player.containerMenu instanceof CreatorContainer) {
+                CreatorContainer openContainer = (CreatorContainer) player.containerMenu;
                 openContainer.te.setActivated(isActivated);
             }
         });

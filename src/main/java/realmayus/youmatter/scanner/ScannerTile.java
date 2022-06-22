@@ -70,7 +70,7 @@ public class ScannerTile extends TileEntity implements INamedContainerProvider, 
     public ItemStackHandler inventory = new ItemStackHandler(5) {
         @Override
         protected void onContentsChanged(int slot) {
-            ScannerTile.this.markDirty();
+            ScannerTile.this.setChanged();
         }
     };
 
@@ -109,8 +109,8 @@ public class ScannerTile extends TileEntity implements INamedContainerProvider, 
     private MyEnergyStorage myEnergyStorage = new MyEnergyStorage(1000000, Integer.MAX_VALUE);
 
     @Override
-    public void read(BlockState state, CompoundNBT compound) {
-        super.read(state, compound);
+    public void load(BlockState state, CompoundNBT compound) {
+        super.load(state, compound);
         if (compound.contains("progress")) {
             setProgress(compound.getInt("progress"));
         }
@@ -123,8 +123,8 @@ public class ScannerTile extends TileEntity implements INamedContainerProvider, 
     }
 
     @Override
-    public CompoundNBT write(CompoundNBT compound) {
-        super.write(compound);
+    public CompoundNBT save(CompoundNBT compound) {
+        super.save(compound);
         compound.putInt("progress", getProgress());
         compound.putInt("energy", getEnergy());
         if (inventory != null) {
@@ -138,9 +138,9 @@ public class ScannerTile extends TileEntity implements INamedContainerProvider, 
     @Override
     public void tick() {
         if(currentPartTick >= 2) {
-            if (getNeighborEncoder(this.pos) != null) {
+            if (getNeighborEncoder(this.worldPosition) != null) {
                 hasEncoder = true;
-                BlockPos encoderPos = getNeighborEncoder(this.pos);
+                BlockPos encoderPos = getNeighborEncoder(this.worldPosition);
                 if(!inventory.getStackInSlot(1).isEmpty() && isItemAllowed(inventory.getStackInSlot(1))) {
                     if(getEnergy() > YMConfig.CONFIG.energyScanner.get()) {
                         if (getProgress() < 100) {
@@ -148,7 +148,7 @@ public class ScannerTile extends TileEntity implements INamedContainerProvider, 
                             myEnergyStorage.consumePower(YMConfig.CONFIG.energyScanner.get());
                        } else if (encoderPos != null) {
                             // Notifying the neighboring encoder of this scanner having finished its operation
-                            ((EncoderTile)world.getTileEntity(encoderPos)).ignite(this.inventory.getStackInSlot(1)); //don't worry, this is already checked by getNeighborEncoder() c:
+                            ((EncoderTile)level.getBlockEntity(encoderPos)).ignite(this.inventory.getStackInSlot(1)); //don't worry, this is already checked by getNeighborEncoder() c:
                             inventory.setStackInSlot(1, ItemStack.EMPTY);
                             setProgress(0);
                         }
@@ -177,17 +177,17 @@ public class ScannerTile extends TileEntity implements INamedContainerProvider, 
     }
 
     @Override
-    public void remove() {
-        this.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent(h -> IntStream.range(0, h.getSlots()).forEach(i -> InventoryHelper.spawnItemStack(world, pos.getX(), pos.getY(), pos.getZ(), h.getStackInSlot(i))));
+    public void setRemoved() {
+        this.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent(h -> IntStream.range(0, h.getSlots()).forEach(i -> InventoryHelper.dropItemStack(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), h.getStackInSlot(i))));
     }
 
     @Nullable
     private BlockPos getNeighborEncoder(BlockPos scannerPos) {
         for(Direction facing : Direction.values()) {
-            if(world.getBlockState(scannerPos.offset(facing)).getBlock() instanceof EncoderBlock) {
-                if(world.getTileEntity(scannerPos.offset(facing)) != null) {
-                    if(world.getTileEntity(scannerPos.offset(facing)) instanceof EncoderTile) {
-                        return scannerPos.offset(facing);
+            if(level.getBlockState(scannerPos.relative(facing)).getBlock() instanceof EncoderBlock) {
+                if(level.getBlockEntity(scannerPos.relative(facing)) != null) {
+                    if(level.getBlockEntity(scannerPos.relative(facing)) instanceof EncoderTile) {
+                        return scannerPos.relative(facing);
                     }
                 }
             }
@@ -197,12 +197,12 @@ public class ScannerTile extends TileEntity implements INamedContainerProvider, 
 
     @Override
     public ITextComponent getDisplayName() {
-        return new TranslationTextComponent(ObjectHolders.SCANNER_BLOCK.getTranslationKey());
+        return new TranslationTextComponent(ObjectHolders.SCANNER_BLOCK.getDescriptionId());
     }
 
     @Nullable
     @Override
     public Container createMenu(int windowID, PlayerInventory playerInventory, PlayerEntity playerEntity) {
-        return new ScannerContainer(windowID, world, pos, playerInventory, playerEntity);
+        return new ScannerContainer(windowID, level, worldPosition, playerInventory, playerEntity);
     }
 }

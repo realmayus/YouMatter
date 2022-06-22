@@ -36,7 +36,7 @@ public class CreatorContainer extends Container implements ICreatorStateContaine
 
     public CreatorContainer(int windowId, World world, BlockPos pos, PlayerInventory playerInventory, PlayerEntity player) {
         super(ObjectHolders.CREATOR_CONTAINER, windowId);
-        te = world.getTileEntity(pos) instanceof CreatorTile ? (CreatorTile) world.getTileEntity(pos) : null;
+        te = world.getBlockEntity(pos) instanceof CreatorTile ? (CreatorTile) world.getBlockEntity(pos) : null;
         this.playerEntity = player;
         this.playerInventory = new InvWrapper(playerInventory);
 
@@ -45,9 +45,9 @@ public class CreatorContainer extends Container implements ICreatorStateContaine
     }
 
     @Override
-    public void detectAndSendChanges() {
-        super.detectAndSendChanges();
-        for(IContainerListener p : this.listeners) {
+    public void broadcastChanges() {
+        super.broadcastChanges();
+        for(IContainerListener p : this.containerListeners) {
             if(p != null) {
                 if (p instanceof ServerPlayerEntity) {
                     PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) p), new PacketUpdateCreatorClient(te.getEnergy(), 0, te.getUTank().getFluid(), te.getSTank().getFluid(), te.isActivated()));
@@ -57,7 +57,7 @@ public class CreatorContainer extends Container implements ICreatorStateContaine
     }
 
     @Override
-    public boolean canInteractWith(PlayerEntity playerIn) {
+    public boolean stillValid(PlayerEntity playerIn) {
         return true;
     }
 
@@ -91,43 +91,43 @@ public class CreatorContainer extends Container implements ICreatorStateContaine
      * This is actually needed in order to achieve shift click functionality in the Controller GUI. If this method isn't overridden, the game crashes.
      */
     @Override
-    public ItemStack transferStackInSlot(PlayerEntity playerIn, int index) {
+    public ItemStack quickMoveStack(PlayerEntity playerIn, int index) {
         ItemStack itemstack = ItemStack.EMPTY;
-        Slot slot = this.inventorySlots.get(index);
+        Slot slot = this.slots.get(index);
 
-        if (slot != null && slot.getHasStack()) {
-            ItemStack itemstack1 = slot.getStack();
+        if (slot != null && slot.hasItem()) {
+            ItemStack itemstack1 = slot.getItem();
             itemstack = itemstack1.copy();
 
             if (index >= 36 && index <= 39) { //originating slot is custom slot
-                if (!this.mergeItemStack(itemstack1, 0, 36, true)) {
+                if (!this.moveItemStackTo(itemstack1, 0, 36, true)) {
                     return ItemStack.EMPTY; // Inventory is full, can't transfer item!
                 }
             } else {
                 if(itemstack1.getItem() instanceof BucketItem) {
                     BucketItem bucket = (BucketItem) itemstack1.getItem();
                     if (bucket.getFluid().getFluid().equals(ModFluids.STABILIZER.get()) || YMConfig.CONFIG.alternativeStabilizer.get().equalsIgnoreCase(bucket.getFluid().getFluid().getRegistryName().getPath())) {
-                        if(!this.mergeItemStack(itemstack1, 36, 37, false)) {
+                        if(!this.moveItemStackTo(itemstack1, 36, 37, false)) {
                             return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                         }
                     } else if(bucket == Items.BUCKET) {
-                        if(!this.mergeItemStack(itemstack1, 38, 39, false)) {
+                        if(!this.moveItemStackTo(itemstack1, 38, 39, false)) {
                             return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                         }
                     }
                 } else if(itemstack1.getItem().equals(Items.BUCKET)) {
-                    if(!this.mergeItemStack(itemstack1, 38, 39, false)) {
+                    if(!this.moveItemStackTo(itemstack1, 38, 39, false)) {
                         return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                     }
 
                 } else if(itemstack1.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).isPresent()) {
                     return itemstack1.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).map(h -> {
-                       if (h.getFluidInTank(0).isEmpty() || h.getFluidInTank(0).getFluid().isEquivalentTo(ModFluids.UMATTER.get())) {
-                           if(!this.mergeItemStack(itemstack1, 38, 39, false)) {
+                       if (h.getFluidInTank(0).isEmpty() || h.getFluidInTank(0).getFluid().isSame(ModFluids.UMATTER.get())) {
+                           if(!this.moveItemStackTo(itemstack1, 38, 39, false)) {
                                return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                            }
-                       } else if (h.getFluidInTank(0).getFluid().isEquivalentTo(ModFluids.STABILIZER.get()) || YMConfig.CONFIG.alternativeStabilizer.get().equalsIgnoreCase(h.getFluidInTank(0).getFluid().getFluid().getRegistryName().getPath())) {
-                           if(!this.mergeItemStack(itemstack1, 36, 37, false)) {
+                       } else if (h.getFluidInTank(0).getFluid().isSame(ModFluids.STABILIZER.get()) || YMConfig.CONFIG.alternativeStabilizer.get().equalsIgnoreCase(h.getFluidInTank(0).getFluid().getFluid().getRegistryName().getPath())) {
+                           if(!this.moveItemStackTo(itemstack1, 36, 37, false)) {
                                return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                            }
                        } else {
@@ -140,9 +140,9 @@ public class CreatorContainer extends Container implements ICreatorStateContaine
             }
 
             if (itemstack1.isEmpty()) {
-                slot.putStack(ItemStack.EMPTY);
+                slot.set(ItemStack.EMPTY);
             } else {
-                slot.onSlotChanged();
+                slot.setChanged();
             }
         }
         return itemstack;

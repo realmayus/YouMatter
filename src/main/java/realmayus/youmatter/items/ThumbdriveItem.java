@@ -18,18 +18,18 @@ import java.util.List;
 public class ThumbdriveItem extends Item {
 
     public ThumbdriveItem() {
-        super(new Item.Properties().maxStackSize(1).group(YouMatter.ITEM_GROUP));
+        super(new Item.Properties().stacksTo(1).tab(YouMatter.ITEM_GROUP));
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+    public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         if(stack.hasTag()) {
             if(stack.getTag() != null) {
                 if (stack.getTag().contains("stored_items", Constants.NBT.TAG_LIST)) {
-                    tooltip.add(new StringTextComponent(I18n.format("youmatter.tooltip.dataStored")));
-                    tooltip.add(new StringTextComponent(I18n.format("youmatter.tooltip.remainingSpace", stack.getTag().getList("stored_items", Constants.NBT.TAG_STRING).size(), 8)));
+                    tooltip.add(new StringTextComponent(I18n.get("youmatter.tooltip.dataStored")));
+                    tooltip.add(new StringTextComponent(I18n.get("youmatter.tooltip.remainingSpace", stack.getTag().getList("stored_items", Constants.NBT.TAG_STRING).size(), 8)));
                 } else {
-                    tooltip.add(new StringTextComponent(I18n.format("youmatter.tooltip.noDataStored")));
+                    tooltip.add(new StringTextComponent(I18n.get("youmatter.tooltip.noDataStored")));
                 }
             }
         }

@@ -31,38 +31,38 @@ public class ScannerScreen extends ContainerScreen<ScannerContainer> {
     public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         this.renderBackground(matrixStack);
         super.render(matrixStack, mouseX, mouseY, partialTicks);
-        this.renderHoveredTooltip(matrixStack, mouseX, mouseY);
+        this.renderTooltip(matrixStack, mouseX, mouseY);
 
         int xAxis = (mouseX - (width - WIDTH) / 2);
         int yAxis = (mouseY - (height - HEIGHT) / 2);
 
         if (xAxis >= 141 && xAxis <= 156 && yAxis >= 37 && yAxis <= 57) {
-            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new StringTextComponent(I18n.format("youmatter.gui.energy.title")), new StringTextComponent(I18n.format("youmatter.gui.energy.description", te.getClientEnergy()))));
+            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new StringTextComponent(I18n.get("youmatter.gui.energy.title")), new StringTextComponent(I18n.get("youmatter.gui.energy.description", te.getClientEnergy()))));
         }
 
         if (!te.getHasEncoderClient()) {
             if (xAxis >= 16 && xAxis <= 32 && yAxis >= 59 && yAxis <= 75) {
-                drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new StringTextComponent(I18n.format("youmatter.warning.scanner1")), new StringTextComponent(I18n.format("youmatter.warning.scanner2")), new StringTextComponent(I18n.format("youmatter.warning.scanner3"))));
+                drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new StringTextComponent(I18n.get("youmatter.warning.scanner1")), new StringTextComponent(I18n.get("youmatter.warning.scanner2")), new StringTextComponent(I18n.get("youmatter.warning.scanner3"))));
             }
         }
 
     }
 
     @Override
-    protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int mouseX, int mouseY) {
+    protected void renderLabels(MatrixStack matrixStack, int mouseX, int mouseY) {
         drawEnergyBolt(matrixStack, te.getClientEnergy());
         drawProgressDisplayChain(matrixStack, te.getClientProgress());
 
         if(!te.getHasEncoderClient()) {
             this.blit(matrixStack, 16, 59, 176, 101, 16, 16);
         }
-        font.drawString(matrixStack, I18n.format(ObjectHolders.SCANNER_BLOCK.getTranslationKey()), 8, 6, 0x404040);
+        font.draw(matrixStack, I18n.get(ObjectHolders.SCANNER_BLOCK.getDescriptionId()), 8, 6, 0x404040);
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
-        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        this.minecraft.getTextureManager().bindTexture(GUI);
+    protected void renderBg(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
+        GlStateManager._color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        this.minecraft.getTextureManager().bind(GUI);
         int relX = (this.width - WIDTH) / 2;
         int relY = (this.height - HEIGHT) / 2;
         this.blit(matrixStack, relX, relY, 0, 0, WIDTH, HEIGHT);
@@ -83,14 +83,14 @@ public class ScannerScreen extends ContainerScreen<ScannerContainer> {
             arrow = 100;
         }
 
-        this.minecraft.getTextureManager().bindTexture(GUI);
+        this.minecraft.getTextureManager().bind(GUI);
         this.blit(matrixStack, 79, 62, 176, 41, Math.round((arrow / 100.0f) * 18), 12);
         this.blit(matrixStack, 104, 34, 176, 53, 17, Math.round((circuits / 100.0f) * 24));
         this.blit(matrixStack, 54, 34, 176, 77, 17, Math.round((circuits / 100.0f) * 24));
     }
 
     private void drawEnergyBolt(MatrixStack matrixStack, int energy) {
-        this.minecraft.getTextureManager().bindTexture(GUI);
+        this.minecraft.getTextureManager().bind(GUI);
 
         if(energy == 0) {
             this.blit(matrixStack, 141, 35, 176, 21, 15, 20);
@@ -103,6 +103,6 @@ public class ScannerScreen extends ContainerScreen<ScannerContainer> {
     }
 
     private void drawTooltip(MatrixStack matrixStack, int x, int y, List<ITextComponent> tooltips) {
-        func_243308_b(matrixStack, tooltips, x, y);
+        renderComponentTooltip(matrixStack, tooltips, x, y);
     }
 }

@@ -27,7 +27,7 @@ public class YouMatter {
 
     public static ItemGroup ITEM_GROUP = new ItemGroup("YouMatter") { //todo localize
         @Override
-        public ItemStack createIcon() {
+        public ItemStack makeIcon() {
             return new ItemStack(ObjectHolders.SCANNER_BLOCK, 1);
         }
     };

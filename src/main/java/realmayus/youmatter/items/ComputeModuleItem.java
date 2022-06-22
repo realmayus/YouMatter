@@ -12,14 +12,16 @@ import realmayus.youmatter.YouMatter;
 import javax.annotation.Nullable;
 import java.util.List;
 
+import net.minecraft.item.Item.Properties;
+
 public class ComputeModuleItem extends Item {
     public ComputeModuleItem() {
-        super(new Properties().group(YouMatter.ITEM_GROUP));
+        super(new Properties().tab(YouMatter.ITEM_GROUP));
     }
 
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        tooltip.add(new StringTextComponent(I18n.format("youmatter.tooltip.craftingItem")));
+    public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+        tooltip.add(new StringTextComponent(I18n.get("youmatter.tooltip.craftingItem")));
     }
 }

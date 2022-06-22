@@ -23,11 +23,13 @@ import realmayus.youmatter.scanner.ScannerTile;
 import javax.annotation.Nullable;
 import java.util.stream.IntStream;
 
+import net.minecraft.block.AbstractBlock;
+
 public class CreatorBlock extends Block {
 
 
     public CreatorBlock() {
-        super(Block.Properties.create(Material.IRON).hardnessAndResistance(5.0F).sound(SoundType.METAL));
+        super(AbstractBlock.Properties.of(Material.METAL).strength(5.0F).sound(SoundType.METAL));
     }
 
     @Override
@@ -46,9 +48,9 @@ public class CreatorBlock extends Block {
      * EVENT that is called when you right-click the block,
      */
     @Override
-    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-        if (!worldIn.isRemote) {
-            INamedContainerProvider containerProvider = getContainer(state, worldIn, pos);
+    public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+        if (!worldIn.isClientSide) {
+            INamedContainerProvider containerProvider = getMenuProvider(state, worldIn, pos);
             if (containerProvider != null) {
                 if (player instanceof ServerPlayerEntity) {
                     NetworkHooks.openGui((ServerPlayerEntity) player, containerProvider, pos);
@@ -59,8 +61,8 @@ public class CreatorBlock extends Block {
     }
     @Nullable
     @Override
-    public INamedContainerProvider getContainer(BlockState state, World worldIn, BlockPos pos) {
-        TileEntity te = worldIn.getTileEntity(pos);
+    public INamedContainerProvider getMenuProvider(BlockState state, World worldIn, BlockPos pos) {
+        TileEntity te = worldIn.getBlockEntity(pos);
 
         return te instanceof CreatorTile ? (INamedContainerProvider)te : null;
     }

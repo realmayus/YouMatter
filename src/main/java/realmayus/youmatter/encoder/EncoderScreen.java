@@ -38,13 +38,13 @@ public class EncoderScreen extends ContainerScreen<EncoderContainer> {
         this.renderBackground(matrixStack);
         super.render(matrixStack, mouseX, mouseY, partialTicks);
 
-        this.renderHoveredTooltip(matrixStack, mouseX, mouseY);
+        this.renderTooltip(matrixStack, mouseX, mouseY);
 
         int xAxis = (mouseX - (width - WIDTH) / 2);
         int yAxis = (mouseY - (height - HEIGHT) / 2);
 
         if(xAxis >= 141 && xAxis <= 156 && yAxis >= 37 && yAxis <= 57) {
-            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new StringTextComponent(I18n.format("youmatter.gui.energy.title")), new StringTextComponent(I18n.format("youmatter.gui.energy.description", te.getClientEnergy()))));
+            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new StringTextComponent(I18n.get("youmatter.gui.energy.title")), new StringTextComponent(I18n.get("youmatter.gui.energy.description", te.getClientEnergy()))));
         }
         if (xAxis >= 16 && xAxis <= 32 && yAxis >= 59 && yAxis <= 75) {
             if (te.inventory.getStackInSlot(1).getItem() instanceof ThumbdriveItem) {
@@ -52,20 +52,20 @@ public class EncoderScreen extends ContainerScreen<EncoderContainer> {
                 if (nbt != null) {
                     ListNBT list = nbt.getList("stored_items", Constants.NBT.TAG_STRING);
                     if (list.size() >= 8) {
-                        drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new StringTextComponent(I18n.format("youmatter.warning.encoder2"))));
+                        drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new StringTextComponent(I18n.get("youmatter.warning.encoder2"))));
                     }
                 }
             } else {
-                drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new StringTextComponent(I18n.format("youmatter.warning.encoder1"))));
+                drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new StringTextComponent(I18n.get("youmatter.warning.encoder1"))));
             }
         }
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
+    protected void renderBg(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
         //Setting color to white because JEI is bae (gui would be yellow)
-        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        this.minecraft.getTextureManager().bindTexture(GUI);
+        GlStateManager._color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        this.minecraft.getTextureManager().bind(GUI);
 
         int relX = (this.width - WIDTH) / 2;
         int relY = (this.height - HEIGHT) / 2;
@@ -73,7 +73,7 @@ public class EncoderScreen extends ContainerScreen<EncoderContainer> {
     }
 
     @Override
-    protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int mouseX, int mouseY) {
+    protected void renderLabels(MatrixStack matrixStack, int mouseX, int mouseY) {
         drawEnergyBolt(matrixStack, te.getClientEnergy());
         drawProgressDisplayChain(matrixStack, te.getClientProgress());
 
@@ -88,7 +88,7 @@ public class EncoderScreen extends ContainerScreen<EncoderContainer> {
                 }
             }
         }
-        font.drawString(matrixStack, I18n.format(ObjectHolders.ENCODER_BLOCK.getTranslationKey()), 8, 6, 0x404040);
+        font.draw(matrixStack, I18n.get(ObjectHolders.ENCODER_BLOCK.getDescriptionId()), 8, 6, 0x404040);
     }
 
     private void drawProgressDisplayChain(MatrixStack matrixStack, int progress) {
@@ -114,7 +114,7 @@ public class EncoderScreen extends ContainerScreen<EncoderContainer> {
             arrow2 = 100;
         }
 
-        this.minecraft.getTextureManager().bindTexture(GUI);
+        this.minecraft.getTextureManager().bind(GUI);
         this.blit(matrixStack, 22, 41, 176, 41, Math.round((arrow1 / 100.0f) * 18), 12);
         this.blit(matrixStack, 47, 40, 176, 53, 7, Math.round((lock / 100.0f) * 13));
         this.blit(matrixStack, 61, 41, 176, 41, Math.round((arrow2 / 100.0f) * 18), 12);
@@ -122,7 +122,7 @@ public class EncoderScreen extends ContainerScreen<EncoderContainer> {
     }
 
     private void drawEnergyBolt(MatrixStack matrixStack, int energy) {
-        this.minecraft.getTextureManager().bindTexture(GUI);
+        this.minecraft.getTextureManager().bind(GUI);
 
         if(energy == 0) {
             this.blit(matrixStack, 141, 36, 176, 21, 15, 20);
@@ -134,6 +134,6 @@ public class EncoderScreen extends ContainerScreen<EncoderContainer> {
     }
 
     private void drawTooltip(MatrixStack matrixStack, int x, int y, List<ITextComponent> tooltips) {
-        func_243308_b(matrixStack, tooltips, x, y);
+        renderComponentTooltip(matrixStack, tooltips, x, y);
     }
 }

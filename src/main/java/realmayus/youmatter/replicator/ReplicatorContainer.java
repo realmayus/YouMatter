@@ -32,7 +32,7 @@ public class ReplicatorContainer extends Container implements IReplicatorStateCo
 
     public ReplicatorContainer(int windowId, World world, BlockPos pos, PlayerInventory playerInventory, PlayerEntity player) {
         super(ObjectHolders.REPLICATOR_CONTAINER, windowId);
-        te = world.getTileEntity(pos) instanceof ReplicatorTile ? (ReplicatorTile) world.getTileEntity(pos) : null;
+        te = world.getBlockEntity(pos) instanceof ReplicatorTile ? (ReplicatorTile) world.getBlockEntity(pos) : null;
         this.playerEntity = player;
         this.playerInventory = new InvWrapper(playerInventory);
 
@@ -41,9 +41,9 @@ public class ReplicatorContainer extends Container implements IReplicatorStateCo
     }
 
     @Override
-    public void detectAndSendChanges() {
-        super.detectAndSendChanges();
-        for(IContainerListener p : this.listeners) {
+    public void broadcastChanges() {
+        super.broadcastChanges();
+        for(IContainerListener p : this.containerListeners) {
             if(p != null) {
                 if (p instanceof ServerPlayerEntity) {
                     PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) p), new PacketUpdateReplicatorClient(te.getEnergy(), te.getProgress(), te.isActive(), te.isCurrentMode(), te.getTank().getFluid()));
@@ -53,7 +53,7 @@ public class ReplicatorContainer extends Container implements IReplicatorStateCo
     }
 
     @Override
-    public boolean canInteractWith(PlayerEntity playerIn) {
+    public boolean stillValid(PlayerEntity playerIn) {
         return true;
     }
 
@@ -91,34 +91,34 @@ public class ReplicatorContainer extends Container implements IReplicatorStateCo
     }
 
     @Override
-    public ItemStack transferStackInSlot(PlayerEntity playerIn, int index) {
+    public ItemStack quickMoveStack(PlayerEntity playerIn, int index) {
         ItemStack itemstack = ItemStack.EMPTY;
-        Slot slot = this.inventorySlots.get(index);
+        Slot slot = this.slots.get(index);
 
-        if (slot != null && slot.getHasStack()) {
-            ItemStack itemstack1 = slot.getStack();
+        if (slot != null && slot.hasItem()) {
+            ItemStack itemstack1 = slot.getItem();
             itemstack = itemstack1.copy();
 
             if (index >= 36 && index <= 40) { //originating slot is custom slot
-                if (!this.mergeItemStack(itemstack1, 0, 36, true)) {
+                if (!this.moveItemStackTo(itemstack1, 0, 36, true)) {
                     return ItemStack.EMPTY; // Inventory is full, can't transfer item!
                 }
             } else {
                 if (itemstack1.getItem() instanceof ThumbdriveItem) {
-                    if(!this.mergeItemStack(itemstack1, 36, 37, false)) {
+                    if(!this.moveItemStackTo(itemstack1, 36, 37, false)) {
                         return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                     }
                 } else if(itemstack1.getItem() instanceof BucketItem) {
                     BucketItem bucket = (BucketItem) itemstack1.getItem();
                     if(bucket.getFluid().getFluid().equals(ModFluids.UMATTER.get())) {
-                        if(!this.mergeItemStack(itemstack1, 39, 40, false)) {
+                        if(!this.moveItemStackTo(itemstack1, 39, 40, false)) {
                             return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                         }
                     }
                 } else if(itemstack1.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).isPresent()) {
                     return itemstack1.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).map(h -> {
-                        if (h.getFluidInTank(0).getFluid().isEquivalentTo(ModFluids.UMATTER.get())) {
-                            if(!this.mergeItemStack(itemstack1, 39, 40, false)) {
+                        if (h.getFluidInTank(0).getFluid().isSame(ModFluids.UMATTER.get())) {
+                            if(!this.moveItemStackTo(itemstack1, 39, 40, false)) {
                                 return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                             }
                         } else {
@@ -131,9 +131,9 @@ public class ReplicatorContainer extends Container implements IReplicatorStateCo
             }
 
             if (itemstack1.isEmpty()) {
-                slot.putStack(ItemStack.EMPTY);
+                slot.set(ItemStack.EMPTY);
             } else {
-                slot.onSlotChanged();
+                slot.setChanged();
             }
         }
         return itemstack;

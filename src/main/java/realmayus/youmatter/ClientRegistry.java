@@ -15,9 +15,9 @@ public class ClientRegistry {
     @SubscribeEvent
     public static void onFMLClientSetup(FMLClientSetupEvent event)
     {
-        ScreenManager.registerFactory(ObjectHolders.SCANNER_CONTAINER, ScannerScreen::new);
-        ScreenManager.registerFactory(ObjectHolders.ENCODER_CONTAINER, EncoderScreen::new);
-        ScreenManager.registerFactory(ObjectHolders.CREATOR_CONTAINER, CreatorScreen::new);
-        ScreenManager.registerFactory(ObjectHolders.REPLICATOR_CONTAINER, ReplicatorScreen::new);
+        ScreenManager.register(ObjectHolders.SCANNER_CONTAINER, ScannerScreen::new);
+        ScreenManager.register(ObjectHolders.ENCODER_CONTAINER, EncoderScreen::new);
+        ScreenManager.register(ObjectHolders.CREATOR_CONTAINER, CreatorScreen::new);
+        ScreenManager.register(ObjectHolders.REPLICATOR_CONTAINER, ReplicatorScreen::new);
     }
 }

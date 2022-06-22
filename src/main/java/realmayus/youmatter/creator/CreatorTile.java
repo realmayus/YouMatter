@@ -40,6 +40,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
+import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
+
 public class CreatorTile extends TileEntity implements ITickableTileEntity, INamedContainerProvider {
 
     public CreatorTile() {
@@ -89,25 +91,25 @@ public class CreatorTile extends TileEntity implements ITickableTileEntity, INam
     public ItemStackHandler inventory = new ItemStackHandler(5) {
         @Override
         protected void onContentsChanged(int slot) {
-            CreatorTile.this.markDirty();
+            CreatorTile.this.setChanged();
         }
     };
     
     private FluidTank uTank = new FluidTank(MAX_UMATTER) {
         @Override
         protected void onContentsChanged() {
-            BlockState state = world.getBlockState(pos);
-            world.notifyBlockUpdate(pos, state, state, 3);
-            markDirty();
+            BlockState state = level.getBlockState(worldPosition);
+            level.sendBlockUpdated(worldPosition, state, state, 3);
+            setChanged();
         }
     };
 
     private FluidTank sTank = new FluidTank(MAX_STABILIZER) {
         @Override
         protected void onContentsChanged() {
-            BlockState state = world.getBlockState(pos);
-            world.notifyBlockUpdate(pos, state, state, 3);
-            markDirty();
+            BlockState state = level.getBlockState(worldPosition);
+            level.sendBlockUpdated(worldPosition, state, state, 3);
+            setChanged();
         }
     }; 
 
@@ -211,13 +213,13 @@ public class CreatorTile extends TileEntity implements ITickableTileEntity, INam
     private MyEnergyStorage myEnergyStorage = new MyEnergyStorage(1000000, Integer.MAX_VALUE);
 
     @Override
-    public void remove() {
-        this.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent(h -> IntStream.range(0, h.getSlots()).forEach(i -> InventoryHelper.spawnItemStack(world, pos.getX(), pos.getY(), pos.getZ(), h.getStackInSlot(i))));
+    public void setRemoved() {
+        this.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent(h -> IntStream.range(0, h.getSlots()).forEach(i -> InventoryHelper.dropItemStack(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), h.getStackInSlot(i))));
     }
 
     @Override
-    public void read(BlockState state, CompoundNBT compound) {
-        super.read(state, compound);
+    public void load(BlockState state, CompoundNBT compound) {
+        super.load(state, compound);
 
         if(compound.contains("uTank")) {
             CompoundNBT tagUTank = compound.getCompound("uTank");
@@ -240,8 +242,8 @@ public class CreatorTile extends TileEntity implements ITickableTileEntity, INam
 
 
     @Override
-    public CompoundNBT write(CompoundNBT compound) {
-        super.write(compound);
+    public CompoundNBT save(CompoundNBT compound) {
+        super.save(compound);
         CompoundNBT tagSTank = new CompoundNBT();
         CompoundNBT tagUTank = new CompoundNBT();
         sTank.writeToNBT(tagSTank);
@@ -260,7 +262,7 @@ public class CreatorTile extends TileEntity implements ITickableTileEntity, INam
     @Override
     public void tick() {
         if (currentPartTick == 40) { // every 2 sec
-            if (!world.isRemote) {
+            if (!level.isClientSide) {
                 if(isActivated()) {
                     if (getEnergy() >= 0.3f * 1000000 && sTank.getFluidAmount() >= 125) { // if energy more than 30 % of max energy
                         if (uTank.getFluidAmount() + YMConfig.CONFIG.productionPerTick.get() <= MAX_UMATTER) {
@@ -271,18 +273,18 @@ public class CreatorTile extends TileEntity implements ITickableTileEntity, INam
                     }
                 }
                 //Auto-outputting U-Matter
-                Object[] neighborTE = getNeighborTileEntity(pos);
+                Object[] neighborTE = getNeighborTileEntity(worldPosition);
                 if(neighborTE != null){
                     if (uTank.getFluidAmount() >= 500) { // set a maximum output of 500 mB (every two seconds)
-                        uTank.drain(world.getTileEntity((BlockPos)neighborTE[0]).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, (Direction)neighborTE[1]).map(h -> h.fill(new FluidStack(ModFluids.UMATTER.get(), 500), IFluidHandler.FluidAction.EXECUTE)).orElse(0), IFluidHandler.FluidAction.EXECUTE);
+                        uTank.drain(level.getBlockEntity((BlockPos)neighborTE[0]).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, (Direction)neighborTE[1]).map(h -> h.fill(new FluidStack(ModFluids.UMATTER.get(), 500), IFluidHandler.FluidAction.EXECUTE)).orElse(0), IFluidHandler.FluidAction.EXECUTE);
                     } else {
-                        uTank.drain(world.getTileEntity((BlockPos)neighborTE[0]).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, (Direction)neighborTE[1]).map(h -> h.fill(new FluidStack(ModFluids.UMATTER.get(), uTank.getFluidAmount()), IFluidHandler.FluidAction.EXECUTE)).orElse(0), IFluidHandler.FluidAction.EXECUTE);
+                        uTank.drain(level.getBlockEntity((BlockPos)neighborTE[0]).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, (Direction)neighborTE[1]).map(h -> h.fill(new FluidStack(ModFluids.UMATTER.get(), uTank.getFluidAmount()), IFluidHandler.FluidAction.EXECUTE)).orElse(0), IFluidHandler.FluidAction.EXECUTE);
                     }
                 }
             }
             currentPartTick = 0;
         } else if ((currentPartTick % 5) == 0) { // every five ticks
-            if (!world.isRemote) {
+            if (!level.isClientSide) {
                 if (!(this.inventory.getStackInSlot(3).isEmpty()) && GeneralUtils.canAddItemToSlot(this.inventory.getStackInSlot(4).getStack(), this.inventory.getStackInSlot(3).getStack(), false)) {
                     ItemStack item = this.inventory.getStackInSlot(3);
                     if (item.getItem() instanceof BucketItem) {
@@ -293,7 +295,7 @@ public class CreatorTile extends TileEntity implements ITickableTileEntity, INam
                         }
                     } else {
                         item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).ifPresent(h -> {
-                            if (h.getFluidInTank(0).getFluid().isEquivalentTo(ModFluids.UMATTER.get()) || h.getFluidInTank(0).isEmpty()) {
+                            if (h.getFluidInTank(0).getFluid().isSame(ModFluids.UMATTER.get()) || h.getFluidInTank(0).isEmpty()) {
                                 if (h.getTankCapacity(0) - h.getFluidInTank(0).getAmount() < getUTank().getFluidAmount()) { //fluid in S-Tank is more than what fits in the item's tank
                                     getUTank().drain(h.fill(new FluidStack(ModFluids.UMATTER.get(), h.getTankCapacity(0) - h.getFluidInTank(0).getAmount()), IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
                                 } else { //S-Tank's fluid fits perfectly in item's tank
@@ -309,7 +311,7 @@ public class CreatorTile extends TileEntity implements ITickableTileEntity, INam
                     ItemStack item = this.inventory.getStackInSlot(1);
                     if (item.getItem() instanceof BucketItem && GeneralUtils.canAddItemToSlot(this.inventory.getStackInSlot(2).getStack(), new ItemStack(Items.BUCKET, 1), false)) {
                         item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).ifPresent(h -> {
-                            if (!h.getFluidInTank(0).isEmpty() && (h.getFluidInTank(0).getFluid().isEquivalentTo(ModFluids.STABILIZER.get()) || YMConfig.CONFIG.alternativeStabilizer.get().equalsIgnoreCase(h.getFluidInTank(0).getFluid().getFluid().getRegistryName().getPath()))) {
+                            if (!h.getFluidInTank(0).isEmpty() && (h.getFluidInTank(0).getFluid().isSame(ModFluids.STABILIZER.get()) || YMConfig.CONFIG.alternativeStabilizer.get().equalsIgnoreCase(h.getFluidInTank(0).getFluid().getFluid().getRegistryName().getPath()))) {
                                 if (MAX_STABILIZER - getSTank().getFluidAmount() >= 1000) {
                                     getSTank().fill(new FluidStack(ModFluids.STABILIZER.get(), 1000), IFluidHandler.FluidAction.EXECUTE);
                                     this.inventory.setStackInSlot(1, ItemStack.EMPTY);
@@ -319,7 +321,7 @@ public class CreatorTile extends TileEntity implements ITickableTileEntity, INam
                         });
                     } else if(GeneralUtils.canAddItemToSlot(this.inventory.getStackInSlot(2).getStack(), this.inventory.getStackInSlot(1).getStack(), false)) {
                         item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).ifPresent(h -> {
-                            if (h.getFluidInTank(0).getFluid().isEquivalentTo(ModFluids.STABILIZER.get()) || YMConfig.CONFIG.alternativeStabilizer.get().equalsIgnoreCase(h.getFluidInTank(0).getFluid().getFluid().getRegistryName().getPath())) {
+                            if (h.getFluidInTank(0).getFluid().isSame(ModFluids.STABILIZER.get()) || YMConfig.CONFIG.alternativeStabilizer.get().equalsIgnoreCase(h.getFluidInTank(0).getFluid().getFluid().getRegistryName().getPath())) {
                                 if (h.getFluidInTank(0).getAmount() > MAX_STABILIZER - getSTank().getFluidAmount()) { //given fluid is more than what fits in the S-Tank
                                     getSTank().fill(h.drain(MAX_STABILIZER - getSTank().getFluidAmount(), IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
                                 } else { //given fluid fits perfectly in S-Tank
@@ -341,16 +343,16 @@ public class CreatorTile extends TileEntity implements ITickableTileEntity, INam
     private Object[] getNeighborTileEntity(BlockPos creatorPos) {
         HashMap<BlockPos, Direction> foundPos = new HashMap<>();
         for(Direction facing : Direction.values()) {
-            if(world.getTileEntity(creatorPos.offset(facing)) != null) {
-                Objects.requireNonNull(world.getTileEntity(creatorPos.offset(facing))).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, facing).ifPresent(x -> foundPos.put(creatorPos.offset(facing), facing));
+            if(level.getBlockEntity(creatorPos.relative(facing)) != null) {
+                Objects.requireNonNull(level.getBlockEntity(creatorPos.relative(facing))).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, facing).ifPresent(x -> foundPos.put(creatorPos.relative(facing), facing));
 
             }
         }
 
         // Prioritize Replicator
         for (Map.Entry<BlockPos, Direction> entry : foundPos.entrySet()) {
-            if (world.getTileEntity(entry.getKey()) instanceof ReplicatorTile) {
-                if(world.getTileEntity(entry.getKey()).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, entry.getValue()).map(h -> h.fill(new FluidStack(ModFluids.UMATTER.get(), 500), IFluidHandler.FluidAction.SIMULATE)).orElse(0) > 0) {
+            if (level.getBlockEntity(entry.getKey()) instanceof ReplicatorTile) {
+                if(level.getBlockEntity(entry.getKey()).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, entry.getValue()).map(h -> h.fill(new FluidStack(ModFluids.UMATTER.get(), 500), IFluidHandler.FluidAction.SIMULATE)).orElse(0) > 0) {
                     //Replicator can take fluid
                     return new Object[] {entry.getKey(), entry.getValue()}; // position, facing
                 }
@@ -359,7 +361,7 @@ public class CreatorTile extends TileEntity implements ITickableTileEntity, INam
 
         // Replicator not found / can't take fluid, now trying other blocks
         for (Map.Entry<BlockPos, Direction> entry : foundPos.entrySet()) {
-            if(Objects.requireNonNull(world.getTileEntity(entry.getKey())).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, entry.getValue()).map(h -> h.fill(new FluidStack(ModFluids.UMATTER.get(), 500), IFluidHandler.FluidAction.SIMULATE)).orElse(0) > 0) {
+            if(Objects.requireNonNull(level.getBlockEntity(entry.getKey())).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, entry.getValue()).map(h -> h.fill(new FluidStack(ModFluids.UMATTER.get(), 500), IFluidHandler.FluidAction.SIMULATE)).orElse(0) > 0) {
                 //Tile can take fluid
                 return new Object[] {entry.getKey(), entry.getValue()}; // position, facing
             }
@@ -371,13 +373,13 @@ public class CreatorTile extends TileEntity implements ITickableTileEntity, INam
 
     @Override
     public ITextComponent getDisplayName() {
-        return new TranslationTextComponent(ObjectHolders.CREATOR_BLOCK.getTranslationKey());
+        return new TranslationTextComponent(ObjectHolders.CREATOR_BLOCK.getDescriptionId());
     }
 
     @Nullable
     @Override
     public Container createMenu(int windowID, PlayerInventory playerInventory, PlayerEntity playerEntity) {
-        return new CreatorContainer(windowID, world, pos, playerInventory, playerEntity);
+        return new CreatorContainer(windowID, level, worldPosition, playerInventory, playerEntity);
 
     }
 }

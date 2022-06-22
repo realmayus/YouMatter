@@ -15,16 +15,16 @@ public class ClientPacketHandlers {
     public static void handlePacketUpdateScannerClient(PacketUpdateScannerClient message) {
         PlayerEntity player = Minecraft.getInstance().player;
 
-        if (player.openContainer instanceof IScannerStateContainer) {
-            ((IScannerStateContainer) player.openContainer).sync(message.energy, message.progress, message.hasEncoder);
+        if (player.containerMenu instanceof IScannerStateContainer) {
+            ((IScannerStateContainer) player.containerMenu).sync(message.energy, message.progress, message.hasEncoder);
         }
     }
 
     public static void handlePacketUpdateCreatorClient(PacketUpdateCreatorClient message) {
         PlayerEntity player = Minecraft.getInstance().player;
 
-        if (player.openContainer instanceof ICreatorStateContainer) {
-            ((ICreatorStateContainer) player.openContainer).sync(message.energy, message.progress, message.uTank, message.sTank, message.isActivated);
+        if (player.containerMenu instanceof ICreatorStateContainer) {
+            ((ICreatorStateContainer) player.containerMenu).sync(message.energy, message.progress, message.uTank, message.sTank, message.isActivated);
         }
     }
 
@@ -32,16 +32,16 @@ public class ClientPacketHandlers {
 
         PlayerEntity player = Minecraft.getInstance().player;
 
-        if (player.openContainer instanceof IEncoderStateContainer) {
-            ((IEncoderStateContainer) player.openContainer).sync(message.energy, message.progress);
+        if (player.containerMenu instanceof IEncoderStateContainer) {
+            ((IEncoderStateContainer) player.containerMenu).sync(message.energy, message.progress);
         }
     }
 
     public static void handlePacketUpdateReplicatorClient(PacketUpdateReplicatorClient message) {
         PlayerEntity player = Minecraft.getInstance().player;
 
-        if (player.openContainer instanceof IReplicatorStateContainer) {
-            ((IReplicatorStateContainer) player.openContainer).sync(message.energy, message.progress, message.fluidStack, message.isActivated, message.mode);
+        if (player.containerMenu instanceof IReplicatorStateContainer) {
+            ((IReplicatorStateContainer) player.containerMenu).sync(message.energy, message.progress, message.fluidStack, message.isActivated, message.mode);
         }
     }
 }

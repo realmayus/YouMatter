@@ -41,10 +41,10 @@ public class CreatorScreen extends ContainerScreen<CreatorContainer> {
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
+    protected void renderBg(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
         //Setting color to white because JEI is bae (gui would be yellow)
-        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        this.minecraft.getTextureManager().bindTexture(GUI);
+        GlStateManager._color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        this.minecraft.getTextureManager().bind(GUI);
 
         int relX = (this.width - WIDTH) / 2;
         int relY = (this.height - HEIGHT) / 2;
@@ -55,7 +55,7 @@ public class CreatorScreen extends ContainerScreen<CreatorContainer> {
     }
 
     private void drawActiveIcon(MatrixStack matrixStack, boolean isActive) {
-        this.minecraft.getTextureManager().bindTexture(GUI);
+        this.minecraft.getTextureManager().bind(GUI);
 
         if(isActive) {
             this.blit(matrixStack, 154, 13, 176, 24, 8, 9);
@@ -67,17 +67,17 @@ public class CreatorScreen extends ContainerScreen<CreatorContainer> {
 
 
     @Override
-    protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int mouseX, int mouseY) {
+    protected void renderLabels(MatrixStack matrixStack, int mouseX, int mouseY) {
         drawEnergyBolt(matrixStack, te.getClientEnergy());
         drawActiveIcon(matrixStack, te.isActivatedClient());
 
-        this.minecraft.getTextureManager().bindTexture(GUI);
+        this.minecraft.getTextureManager().bind(GUI);
 
-        font.drawString(matrixStack, I18n.format(ObjectHolders.CREATOR_BLOCK.getTranslationKey()), 8, 6, 0x404040);
+        font.draw(matrixStack, I18n.get(ObjectHolders.CREATOR_BLOCK.getDescriptionId()), 8, 6, 0x404040);
     }
 
     private void drawEnergyBolt(MatrixStack matrixStack, int energy) {
-        this.minecraft.getTextureManager().bindTexture(GUI);
+        this.minecraft.getTextureManager().bind(GUI);
 
         if(energy == 0) {
             this.blit(matrixStack, 150, 58, 176, 114, 15, 20);
@@ -95,28 +95,28 @@ public class CreatorScreen extends ContainerScreen<CreatorContainer> {
         this.renderBackground(matrixStack);
         super.render(matrixStack, mouseX, mouseY, partialTicks);
         //Render any tooltips
-        this.renderHoveredTooltip(matrixStack, mouseX, mouseY);
+        this.renderTooltip(matrixStack, mouseX, mouseY);
 
-        int xAxis = (mouseX - (width - xSize) / 2);
-        int yAxis = (mouseY - (height - ySize) / 2);
+        int xAxis = (mouseX - (width - imageWidth) / 2);
+        int yAxis = (mouseY - (height - imageHeight) / 2);
 
         if(xAxis >= 31 && xAxis <= 44 && yAxis >= 20 && yAxis <= 75) {
-            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new StringTextComponent(I18n.format("youmatter.gui.stabilizer.title")), new StringTextComponent(I18n.format("youmatter.gui.stabilizer.description", te.getSTank().getFluidAmount()))));
+            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new StringTextComponent(I18n.get("youmatter.gui.stabilizer.title")), new StringTextComponent(I18n.get("youmatter.gui.stabilizer.description", te.getSTank().getFluidAmount()))));
         }
         if(xAxis >= 89 && xAxis <= 102 && yAxis >= 20 && yAxis <= 75) {
-            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new StringTextComponent(I18n.format("youmatter.gui.umatter.title")), new StringTextComponent(I18n.format("youmatter.gui.umatter.description", te.getUTank().getFluidAmount()))));
+            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new StringTextComponent(I18n.get("youmatter.gui.umatter.title")), new StringTextComponent(I18n.get("youmatter.gui.umatter.description", te.getUTank().getFluidAmount()))));
         }
         if(xAxis >= 150 && xAxis <= 164 && yAxis >= 57 && yAxis <= 77) {
-            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new StringTextComponent(I18n.format("youmatter.gui.energy.title")), new StringTextComponent(I18n.format("youmatter.gui.energy.description", te.getClientEnergy()))));
+            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new StringTextComponent(I18n.get("youmatter.gui.energy.title")), new StringTextComponent(I18n.get("youmatter.gui.energy.description", te.getClientEnergy()))));
         }
         if(xAxis >= 148 && xAxis <= 167 && yAxis >= 7 && yAxis <= 27) {
-            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new StringTextComponent(te.isActivatedClient() ? I18n.format("youmatter.gui.active") : I18n.format("youmatter.gui.paused")), new StringTextComponent(I18n.format("youmatter.gui.clicktochange"))));
+            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new StringTextComponent(te.isActivatedClient() ? I18n.get("youmatter.gui.active") : I18n.get("youmatter.gui.paused")), new StringTextComponent(I18n.get("youmatter.gui.clicktochange"))));
         }
     }
 
 
     private void drawTooltip(MatrixStack matrixStack, int x, int y, List<ITextComponent> tooltips) {
-        func_243308_b(matrixStack, tooltips, x, y);
+        renderComponentTooltip(matrixStack, tooltips, x, y);
     }
 
 
@@ -145,7 +145,7 @@ public class CreatorScreen extends ContainerScreen<CreatorContainer> {
 
             //Bind fluid texture
 
-            this.getMinecraft().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
+            this.getMinecraft().getTextureManager().bind(AtlasTexture.LOCATION_BLOCKS);
 
             final int textureSize = 16;
             int start = 0;
@@ -160,7 +160,7 @@ public class CreatorScreen extends ContainerScreen<CreatorContainer> {
                 }
 
                 //TODO?
-                blit(matrixStack, x + col, y + line + 58 - renderY - start, 1000, width, textureSize - (textureSize - renderY), this.minecraft.getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE).apply(fluidIcon));
+                blit(matrixStack, x + col, y + line + 58 - renderY - start, 1000, width, textureSize - (textureSize - renderY), this.minecraft.getTextureAtlas(AtlasTexture.LOCATION_BLOCKS).apply(fluidIcon));
 
 
                 start = start + textureSize;
@@ -182,13 +182,13 @@ public class CreatorScreen extends ContainerScreen<CreatorContainer> {
         int meterHeight = 55;
         if (fluidStack != null)
         {
-            this.drawFluid(matrixStack, this.guiLeft + x -1, this.guiTop + y, -3, 1, 14, (int) ((meterHeight - 1) * scale), fluidStack);
+            this.drawFluid(matrixStack, this.leftPos + x -1, this.topPos + y, -3, 1, 14, (int) ((meterHeight - 1) * scale), fluidStack);
         }
 
         //Draw lines
-        this.minecraft.getTextureManager().bindTexture(GUI);
+        this.minecraft.getTextureManager().bind(GUI);
         int meterWidth = 14;
-        this.blit(matrixStack, this.guiLeft + x, this.guiTop + y, 176, 35, meterWidth, meterHeight);
+        this.blit(matrixStack, this.leftPos + x, this.topPos + y, 176, 35, meterWidth, meterHeight);
 
         //Reset color
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -199,11 +199,11 @@ public class CreatorScreen extends ContainerScreen<CreatorContainer> {
     public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
         super.mouseClicked(mouseX, mouseY, mouseButton);
         if(mouseButton == 0) {
-            double xAxis = (mouseX - (width - xSize) / 2);
-            double yAxis = (mouseY - (height - ySize) / 2);
+            double xAxis = (mouseX - (width - imageWidth) / 2);
+            double yAxis = (mouseY - (height - imageHeight) / 2);
             if(xAxis >= 148 && xAxis <= 167 && yAxis >= 7 && yAxis <= 27) {
                 //Playing Click sound
-                Minecraft.getInstance().getSoundHandler().play(SimpleSound.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                Minecraft.getInstance().getSoundManager().play(SimpleSound.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 //Sending packet to server
                 PacketHandler.INSTANCE.sendToServer(new PacketChangeSettingsCreatorServer(!te.isActivatedClient()));
             }

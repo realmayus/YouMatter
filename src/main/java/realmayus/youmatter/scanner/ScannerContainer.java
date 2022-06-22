@@ -29,7 +29,7 @@ public class ScannerContainer extends Container implements IScannerStateContaine
 
     public ScannerContainer(int windowId, World world, BlockPos pos, PlayerInventory playerInventory, PlayerEntity player) {
         super(ObjectHolders.SCANNER_CONTAINER, windowId);
-        te = world.getTileEntity(pos) instanceof ScannerTile ? (ScannerTile) world.getTileEntity(pos) : null;
+        te = world.getBlockEntity(pos) instanceof ScannerTile ? (ScannerTile) world.getBlockEntity(pos) : null;
         this.playerEntity = player;
         this.playerInventory = new InvWrapper(playerInventory);
 
@@ -38,9 +38,9 @@ public class ScannerContainer extends Container implements IScannerStateContaine
     }
 
     @Override
-    public void detectAndSendChanges() {
-        super.detectAndSendChanges();
-        for(IContainerListener p : this.listeners) {
+    public void broadcastChanges() {
+        super.broadcastChanges();
+        for(IContainerListener p : this.containerListeners) {
             if(p != null) {
                 if (p instanceof ServerPlayerEntity) {
                     PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) p), new PacketUpdateScannerClient(te.getEnergy(), te.getProgress(), te.getHasEncoder()));
@@ -50,7 +50,7 @@ public class ScannerContainer extends Container implements IScannerStateContaine
     }
 
     @Override
-    public boolean canInteractWith(PlayerEntity playerIn) {
+    public boolean stillValid(PlayerEntity playerIn) {
         return true;
     }
 
@@ -81,26 +81,26 @@ public class ScannerContainer extends Container implements IScannerStateContaine
      * This is actually needed in order to achieve shift click functionality in the GUI. If this method isn't overridden, the game crashes.
      */
     @Override
-    public ItemStack transferStackInSlot(PlayerEntity playerIn, int index) {
+    public ItemStack quickMoveStack(PlayerEntity playerIn, int index) {
         ItemStack itemstack = ItemStack.EMPTY;
-        Slot slot = this.inventorySlots.get(index);
+        Slot slot = this.slots.get(index);
 
-        if (slot != null && slot.getHasStack()) {
-            ItemStack itemstack1 = slot.getStack();
+        if (slot != null && slot.hasItem()) {
+            ItemStack itemstack1 = slot.getItem();
             itemstack = itemstack1.copy();
 
             if (index == 36) {
-                if (!this.mergeItemStack(itemstack1, 0, 36, true)) {
+                if (!this.moveItemStackTo(itemstack1, 0, 36, true)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (!this.mergeItemStack(itemstack1, 36, 37, false)) {
+            } else if (!this.moveItemStackTo(itemstack1, 36, 37, false)) {
                 return ItemStack.EMPTY;
             }
 
             if (itemstack1.isEmpty()) {
-                slot.putStack(ItemStack.EMPTY);
+                slot.set(ItemStack.EMPTY);
             } else {
-                slot.onSlotChanged();
+                slot.setChanged();
             }
         }
 

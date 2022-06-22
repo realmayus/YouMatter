@@ -12,16 +12,18 @@ import net.minecraft.world.World;
 
 import java.util.function.Supplier;
 
+import net.minecraft.block.AbstractBlock.Properties;
+
 public class UMatterFluidBlock extends FlowingFluidBlock {
     public UMatterFluidBlock(Supplier<? extends FlowingFluid> supplier, Properties properties) {
         super(supplier, properties);
     }
 
     @Override
-    public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn) {
+    public void entityInside(BlockState state, World worldIn, BlockPos pos, Entity entityIn) {
         if (entityIn instanceof LivingEntity) {
-            ((LivingEntity)entityIn).addPotionEffect(new EffectInstance(Effects.JUMP_BOOST, 200, 5));
+            ((LivingEntity)entityIn).addEffect(new EffectInstance(Effects.JUMP, 200, 5));
         }
-        super.onEntityCollision(state, worldIn, pos, entityIn);
+        super.entityInside(state, worldIn, pos, entityIn);
     }
 }
