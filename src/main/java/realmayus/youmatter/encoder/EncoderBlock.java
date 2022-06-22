@@ -29,7 +29,7 @@ import realmayus.youmatter.ObjectHolders;
 public class EncoderBlock extends BaseEntityBlock {
 
     public EncoderBlock() {
-        super(BlockBehaviour.Properties.of(Material.METAL).strength(5.0F).sound(SoundType.METAL));
+        super(BlockBehaviour.Properties.of(Material.METAL).strength(5.0F).sound(SoundType.METAL).requiresCorrectToolForDrops());
     }
 
     @Override
