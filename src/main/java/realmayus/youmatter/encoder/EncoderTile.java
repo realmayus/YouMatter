@@ -1,21 +1,21 @@
 package realmayus.youmatter.encoder;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.InventoryHelper;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.StringNBT;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.Containers;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.world.level.block.entity.TickableBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.LazyOptional;
@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
-public class EncoderTile extends TileEntity implements INamedContainerProvider, ITickableTileEntity {
+public class EncoderTile extends BlockEntity implements MenuProvider, TickableBlockEntity {
 
     private List<ItemStack> queue = new ArrayList<>();
 
@@ -107,19 +107,19 @@ public class EncoderTile extends TileEntity implements INamedContainerProvider, 
     private MyEnergyStorage myEnergyStorage = new MyEnergyStorage(1000000, Integer.MAX_VALUE);
 
     @Override
-    public void load(BlockState state, CompoundNBT compound) {
+    public void load(BlockState state, CompoundTag compound) {
         super.load(state, compound);
         setProgress(compound.getInt("progress"));
         myEnergyStorage.setEnergy(compound.getInt("energy"));
         if(compound.contains("inventory")) {
-            inventory.deserializeNBT((CompoundNBT) compound.get("inventory"));
+            inventory.deserializeNBT((CompoundTag) compound.get("inventory"));
         }
         if(compound.contains("queue")) {
-            if (compound.get("queue") instanceof ListNBT) {
+            if (compound.get("queue") instanceof ListTag) {
                 List<ItemStack> queueBuilder = new ArrayList<>();
-                for(INBT base: compound.getList("queue", Constants.NBT.TAG_COMPOUND)) {
-                    if (base instanceof CompoundNBT) {
-                        CompoundNBT nbtTagCompound = (CompoundNBT) base;
+                for(Tag base: compound.getList("queue", Constants.NBT.TAG_COMPOUND)) {
+                    if (base instanceof CompoundTag) {
+                        CompoundTag nbtTagCompound = (CompoundTag) base;
                         if(!ItemStack.of(nbtTagCompound).isEmpty()) {
                             queueBuilder.add(ItemStack.of(nbtTagCompound));
                         }
@@ -131,17 +131,17 @@ public class EncoderTile extends TileEntity implements INamedContainerProvider, 
     }
 
     @Override
-    public CompoundNBT save(CompoundNBT compound) {
+    public CompoundTag save(CompoundTag compound) {
         super.save(compound);
         compound.putInt("progress", getProgress());
         compound.putInt("energy", getEnergy());
         if (inventory != null) {
             compound.put("inventory", inventory.serializeNBT());
         }
-        ListNBT tempCompoundList = new ListNBT();
+        ListTag tempCompoundList = new ListTag();
         for (ItemStack is : queue) {
             if (!is.isEmpty()) {
-                tempCompoundList.add(is.save(new CompoundNBT()));
+                tempCompoundList.add(is.save(new CompoundTag()));
             }
         }
         compound.put("queue", tempCompoundList);
@@ -149,7 +149,7 @@ public class EncoderTile extends TileEntity implements INamedContainerProvider, 
     }
     @Override
     public void setRemoved() {
-        this.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent(h -> IntStream.range(0, h.getSlots()).forEach(i -> InventoryHelper.dropItemStack(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), h.getStackInSlot(i))));
+        this.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent(h -> IntStream.range(0, h.getSlots()).forEach(i -> Containers.dropItemStack(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), h.getStackInSlot(i))));
     }
 
     @Override
@@ -162,10 +162,10 @@ public class EncoderTile extends TileEntity implements INamedContainerProvider, 
                     if(this.inventory.getStackInSlot(1).getItem() instanceof ThumbdriveItem) {
                         if (progress < 100) {
                             if(getEnergy() >= YMConfig.CONFIG.energyEncoder.get()) {
-                                CompoundNBT nbt = this.inventory.getStackInSlot(1).getTag();
+                                CompoundTag nbt = this.inventory.getStackInSlot(1).getTag();
                                 if (nbt != null) {
                                     if (nbt.contains("stored_items")) {
-                                        ListNBT list = nbt.getList("stored_items", Constants.NBT.TAG_STRING);
+                                        ListTag list = nbt.getList("stored_items", Constants.NBT.TAG_STRING);
                                         if (list.size() < 8) {
                                             progress = progress + 1;
                                             myEnergyStorage.consumePower(YMConfig.CONFIG.energyEncoder.get());
@@ -177,23 +177,23 @@ public class EncoderTile extends TileEntity implements INamedContainerProvider, 
                                 }
                             }
                         } else {
-                            CompoundNBT nbt = this.inventory.getStackInSlot(1).getTag();
+                            CompoundTag nbt = this.inventory.getStackInSlot(1).getTag();
                             if (nbt != null) {
                                 if(nbt.contains("stored_items")) {
-                                    ListNBT list = nbt.getList("stored_items", Constants.NBT.TAG_STRING);
+                                    ListTag list = nbt.getList("stored_items", Constants.NBT.TAG_STRING);
                                     if(list.size() < 8) {
-                                        list.add(StringNBT.valueOf(processIS.getItem().getRegistryName() + ""));
+                                        list.add(StringTag.valueOf(processIS.getItem().getRegistryName() + ""));
                                         nbt.put("stored_items", list);
                                     }
                                 } else {
-                                    ListNBT list = new ListNBT();
-                                    list.add(StringNBT.valueOf(processIS.getItem().getRegistryName() + ""));
+                                    ListTag list = new ListTag();
+                                    list.add(StringTag.valueOf(processIS.getItem().getRegistryName() + ""));
                                     nbt.put("stored_items", list);
                                 }
                             } else {
-                                nbt = new CompoundNBT();
-                                ListNBT list = new ListNBT();
-                                list.add(StringNBT.valueOf(processIS.getItem().getRegistryName() + ""));
+                                nbt = new CompoundTag();
+                                ListTag list = new ListTag();
+                                list.add(StringTag.valueOf(processIS.getItem().getRegistryName() + ""));
                                 nbt.put("stored_items", list);
                                 this.inventory.getStackInSlot(1).setTag(nbt);
                             }
@@ -208,13 +208,13 @@ public class EncoderTile extends TileEntity implements INamedContainerProvider, 
     }
 
     @Override
-    public ITextComponent getDisplayName() {
-        return new TranslationTextComponent(ObjectHolders.ENCODER_BLOCK.getDescriptionId());
+    public Component getDisplayName() {
+        return new TranslatableComponent(ObjectHolders.ENCODER_BLOCK.getDescriptionId());
     }
 
     @Nullable
     @Override
-    public Container createMenu(int windowID, PlayerInventory playerInventory, PlayerEntity playerEntity) {
+    public AbstractContainerMenu createMenu(int windowID, Inventory playerInventory, Player playerEntity) {
         return new EncoderContainer(windowID, level, worldPosition, playerInventory, playerEntity);
     }
 }

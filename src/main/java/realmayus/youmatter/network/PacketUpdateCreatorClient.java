@@ -1,6 +1,6 @@
 package realmayus.youmatter.network;
 
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.network.NetworkEvent;
 
@@ -14,7 +14,7 @@ public class PacketUpdateCreatorClient {
     public FluidStack sTank;
     public boolean isActivated;
 
-    public void encode(PacketBuffer buf) {
+    public void encode(FriendlyByteBuf buf) {
         buf.writeInt(energy);
         buf.writeInt(progress);
         buf.writeFluidStack(uTank);
@@ -22,7 +22,7 @@ public class PacketUpdateCreatorClient {
         buf.writeBoolean(isActivated);
     }
 
-    public PacketUpdateCreatorClient(PacketBuffer buf) {
+    public PacketUpdateCreatorClient(FriendlyByteBuf buf) {
         energy = buf.readInt();
         progress = buf.readInt();
         uTank = buf.readFluidStack();

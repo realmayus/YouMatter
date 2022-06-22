@@ -1,19 +1,19 @@
 package realmayus.youmatter.scanner;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.InventoryHelper;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.Containers;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.TickableBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -30,7 +30,7 @@ import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
-public class ScannerTile extends TileEntity implements INamedContainerProvider, ITickableTileEntity {
+public class ScannerTile extends BlockEntity implements MenuProvider, TickableBlockEntity {
 
     public boolean hasEncoder = false;
 
@@ -109,7 +109,7 @@ public class ScannerTile extends TileEntity implements INamedContainerProvider, 
     private MyEnergyStorage myEnergyStorage = new MyEnergyStorage(1000000, Integer.MAX_VALUE);
 
     @Override
-    public void load(BlockState state, CompoundNBT compound) {
+    public void load(BlockState state, CompoundTag compound) {
         super.load(state, compound);
         if (compound.contains("progress")) {
             setProgress(compound.getInt("progress"));
@@ -118,12 +118,12 @@ public class ScannerTile extends TileEntity implements INamedContainerProvider, 
             myEnergyStorage.setEnergy(compound.getInt("energy"));
         }
         if(compound.contains("inventory")) {
-            inventory.deserializeNBT((CompoundNBT) compound.get("inventory"));
+            inventory.deserializeNBT((CompoundTag) compound.get("inventory"));
         }
     }
 
     @Override
-    public CompoundNBT save(CompoundNBT compound) {
+    public CompoundTag save(CompoundTag compound) {
         super.save(compound);
         compound.putInt("progress", getProgress());
         compound.putInt("energy", getEnergy());
@@ -178,7 +178,7 @@ public class ScannerTile extends TileEntity implements INamedContainerProvider, 
 
     @Override
     public void setRemoved() {
-        this.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent(h -> IntStream.range(0, h.getSlots()).forEach(i -> InventoryHelper.dropItemStack(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), h.getStackInSlot(i))));
+        this.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent(h -> IntStream.range(0, h.getSlots()).forEach(i -> Containers.dropItemStack(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), h.getStackInSlot(i))));
     }
 
     @Nullable
@@ -196,13 +196,13 @@ public class ScannerTile extends TileEntity implements INamedContainerProvider, 
     }
 
     @Override
-    public ITextComponent getDisplayName() {
-        return new TranslationTextComponent(ObjectHolders.SCANNER_BLOCK.getDescriptionId());
+    public Component getDisplayName() {
+        return new TranslatableComponent(ObjectHolders.SCANNER_BLOCK.getDescriptionId());
     }
 
     @Nullable
     @Override
-    public Container createMenu(int windowID, PlayerInventory playerInventory, PlayerEntity playerEntity) {
+    public AbstractContainerMenu createMenu(int windowID, Inventory playerInventory, Player playerEntity) {
         return new ScannerContainer(windowID, level, worldPosition, playerInventory, playerEntity);
     }
 }

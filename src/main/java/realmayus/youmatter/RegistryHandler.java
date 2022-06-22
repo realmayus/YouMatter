@@ -1,10 +1,10 @@
 package realmayus.youmatter;
 
-import net.minecraft.block.Block;
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -35,11 +35,11 @@ public class RegistryHandler {
     }
 
     @SubscribeEvent
-    public static void registerTileEntites(RegistryEvent.Register<TileEntityType<?>> event) {
-        event.getRegistry().register(TileEntityType.Builder.of(ScannerTile::new, ObjectHolders.SCANNER_BLOCK).build(null).setRegistryName(YouMatter.MODID, "scanner"));
-        event.getRegistry().register(TileEntityType.Builder.of(EncoderTile::new, ObjectHolders.ENCODER_BLOCK).build(null).setRegistryName(YouMatter.MODID, "encoder"));
-        event.getRegistry().register(TileEntityType.Builder.of(CreatorTile::new, ObjectHolders.CREATOR_BLOCK).build(null).setRegistryName(YouMatter.MODID, "creator"));
-        event.getRegistry().register(TileEntityType.Builder.of(ReplicatorTile::new, ObjectHolders.REPLICATOR_BLOCK).build(null).setRegistryName(YouMatter.MODID, "replicator"));
+    public static void registerTileEntites(RegistryEvent.Register<BlockEntityType<?>> event) {
+        event.getRegistry().register(BlockEntityType.Builder.of(ScannerTile::new, ObjectHolders.SCANNER_BLOCK).build(null).setRegistryName(YouMatter.MODID, "scanner"));
+        event.getRegistry().register(BlockEntityType.Builder.of(EncoderTile::new, ObjectHolders.ENCODER_BLOCK).build(null).setRegistryName(YouMatter.MODID, "encoder"));
+        event.getRegistry().register(BlockEntityType.Builder.of(CreatorTile::new, ObjectHolders.CREATOR_BLOCK).build(null).setRegistryName(YouMatter.MODID, "creator"));
+        event.getRegistry().register(BlockEntityType.Builder.of(ReplicatorTile::new, ObjectHolders.REPLICATOR_BLOCK).build(null).setRegistryName(YouMatter.MODID, "replicator"));
     }
 
     @SubscribeEvent
@@ -57,7 +57,7 @@ public class RegistryHandler {
     }
 
     @SubscribeEvent
-    public static void registerContainerTypes(RegistryEvent.Register<ContainerType<?>> event) {
+    public static void registerContainerTypes(RegistryEvent.Register<MenuType<?>> event) {
         event.getRegistry().register(IForgeContainerType.create((windowId, inv, data) -> new ScannerContainer(windowId, inv.player.level, data.readBlockPos(), inv, inv.player)).setRegistryName(YouMatter.MODID + ":scanner"));
         event.getRegistry().register(IForgeContainerType.create((windowId, inv, data) -> new EncoderContainer(windowId, inv.player.level, data.readBlockPos(), inv, inv.player)).setRegistryName(YouMatter.MODID + ":encoder"));
         event.getRegistry().register(IForgeContainerType.create((windowId, inv, data) -> new CreatorContainer(windowId, inv.player.level, data.readBlockPos(), inv, inv.player)).setRegistryName(YouMatter.MODID + ":creator"));

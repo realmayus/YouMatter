@@ -1,6 +1,6 @@
 package realmayus.youmatter;
 
-import net.minecraft.client.gui.ScreenManager;
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -15,9 +15,9 @@ public class ClientRegistry {
     @SubscribeEvent
     public static void onFMLClientSetup(FMLClientSetupEvent event)
     {
-        ScreenManager.register(ObjectHolders.SCANNER_CONTAINER, ScannerScreen::new);
-        ScreenManager.register(ObjectHolders.ENCODER_CONTAINER, EncoderScreen::new);
-        ScreenManager.register(ObjectHolders.CREATOR_CONTAINER, CreatorScreen::new);
-        ScreenManager.register(ObjectHolders.REPLICATOR_CONTAINER, ReplicatorScreen::new);
+        MenuScreens.register(ObjectHolders.SCANNER_CONTAINER, ScannerScreen::new);
+        MenuScreens.register(ObjectHolders.ENCODER_CONTAINER, EncoderScreen::new);
+        MenuScreens.register(ObjectHolders.CREATOR_CONTAINER, CreatorScreen::new);
+        MenuScreens.register(ObjectHolders.REPLICATOR_CONTAINER, ReplicatorScreen::new);
     }
 }

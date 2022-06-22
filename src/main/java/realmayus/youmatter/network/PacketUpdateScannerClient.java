@@ -1,6 +1,6 @@
 package realmayus.youmatter.network;
 
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.function.Supplier;
@@ -11,7 +11,7 @@ public class PacketUpdateScannerClient {
     public int progress;
     public boolean hasEncoder;
 
-    public PacketUpdateScannerClient(PacketBuffer buf) {
+    public PacketUpdateScannerClient(FriendlyByteBuf buf) {
         this.energy = buf.readInt();
         this.progress = buf.readInt();
         this.hasEncoder = buf.readBoolean();
@@ -23,7 +23,7 @@ public class PacketUpdateScannerClient {
         this.hasEncoder = hasEncoder;
     }
 
-    void encode(PacketBuffer buf) {
+    void encode(FriendlyByteBuf buf) {
         buf.writeInt(energy);
         buf.writeInt(progress);
         buf.writeBoolean(hasEncoder);

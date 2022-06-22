@@ -1,25 +1,25 @@
 package realmayus.youmatter.replicator;
 
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.InventoryHelper;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.item.BucketItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.StringNBT;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.Containers;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.item.BucketItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.world.level.block.entity.TickableBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -48,7 +48,7 @@ import static realmayus.youmatter.util.GeneralUtils.getUMatterAmountForItem;
 
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 
-public class ReplicatorTile extends TileEntity implements ITickableTileEntity, INamedContainerProvider {
+public class ReplicatorTile extends BlockEntity implements TickableBlockEntity, MenuProvider {
 
     public ReplicatorTile() {
         super(ObjectHolders.REPLICATOR_TILE);
@@ -192,7 +192,7 @@ public class ReplicatorTile extends TileEntity implements ITickableTileEntity, I
 
     @Override
     public void setRemoved() {
-        this.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent(h -> IntStream.range(0, h.getSlots()).forEach(i -> InventoryHelper.dropItemStack(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), h.getStackInSlot(i))));
+        this.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent(h -> IntStream.range(0, h.getSlots()).forEach(i -> Containers.dropItemStack(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), h.getStackInSlot(i))));
     }
 
     // Current displayed item index -> cachedItems
@@ -241,13 +241,13 @@ public class ReplicatorTile extends TileEntity implements ITickableTileEntity, I
                 } else {
                     if (thumbdrive.hasTag()) {
                         if(thumbdrive.getTag() != null) {
-                            ListNBT taglist = (ListNBT) thumbdrive.getTag().get("stored_items");
+                            ListTag taglist = (ListTag) thumbdrive.getTag().get("stored_items");
                             cachedItems = new ArrayList<>();
                             if (taglist != null) {
-                                for(INBT nbt : taglist) {
+                                for(Tag nbt : taglist) {
                                     if (nbt != null) {
-                                        if(nbt instanceof StringNBT) {
-                                            StringNBT item = (StringNBT) nbt;
+                                        if(nbt instanceof StringTag) {
+                                            StringTag item = (StringTag) nbt;
                                             ItemStack newitem = new ItemStack(Objects.requireNonNull(ForgeRegistries.ITEMS.getValue(new ResourceLocation(item.getAsString()))), 1);
                                             cachedItems.add(newitem);
                                         }
@@ -373,7 +373,7 @@ public class ReplicatorTile extends TileEntity implements ITickableTileEntity, I
     }
 
     @Override
-    public void load(BlockState state, CompoundNBT compound) {
+    public void load(BlockState state, CompoundTag compound) {
         super.load(state, compound);
         tank.readFromNBT(compound.getCompound("tank"));
         myEnergyStorage.setEnergy(compound.getInt("energy"));
@@ -381,14 +381,14 @@ public class ReplicatorTile extends TileEntity implements ITickableTileEntity, I
         setProgress(compound.getInt("progress"));
         setCurrentMode(compound.getBoolean("mode"));
         if (compound.contains("inventory")) {
-            inventory.deserializeNBT((CompoundNBT) compound.get("inventory"));
+            inventory.deserializeNBT((CompoundTag) compound.get("inventory"));
         }
     }
 
     @Override
-    public CompoundNBT save(CompoundNBT compound) {
+    public CompoundTag save(CompoundTag compound) {
         super.save(compound);
-        CompoundNBT tagTank = new CompoundNBT();
+        CompoundTag tagTank = new CompoundTag();
         tank.writeToNBT(tagTank);
         compound.put("tank", tagTank);
         compound.putInt("energy", getEnergy());
@@ -402,13 +402,13 @@ public class ReplicatorTile extends TileEntity implements ITickableTileEntity, I
     }
 
     @Override
-    public ITextComponent getDisplayName() {
-        return new TranslationTextComponent(ObjectHolders.REPLICATOR_BLOCK.getDescriptionId());
+    public Component getDisplayName() {
+        return new TranslatableComponent(ObjectHolders.REPLICATOR_BLOCK.getDescriptionId());
     }
 
     @Nullable
     @Override
-    public Container createMenu(int windowID, PlayerInventory playerInventory, PlayerEntity playerEntity) {
+    public AbstractContainerMenu createMenu(int windowID, Inventory playerInventory, Player playerEntity) {
         return new ReplicatorContainer(windowID, level, worldPosition, playerInventory, playerEntity);
 
     }

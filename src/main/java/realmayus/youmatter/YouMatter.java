@@ -1,8 +1,8 @@
 package realmayus.youmatter;
 
 
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -25,7 +25,7 @@ public class YouMatter {
         ModFluids.init();
     }
 
-    public static ItemGroup ITEM_GROUP = new ItemGroup("YouMatter") { //todo localize
+    public static CreativeModeTab ITEM_GROUP = new CreativeModeTab("YouMatter") { //todo localize
         @Override
         public ItemStack makeIcon() {
             return new ItemStack(ObjectHolders.SCANNER_BLOCK, 1);

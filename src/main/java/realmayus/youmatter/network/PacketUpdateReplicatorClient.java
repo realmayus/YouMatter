@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.network.NetworkEvent;
 
@@ -19,7 +19,7 @@ public class PacketUpdateReplicatorClient {
     public boolean mode;
 
 
-    public PacketUpdateReplicatorClient(PacketBuffer buf) {
+    public PacketUpdateReplicatorClient(FriendlyByteBuf buf) {
         energy = buf.readInt();
         progress = buf.readInt();
         isActivated = buf.readBoolean();
@@ -35,7 +35,7 @@ public class PacketUpdateReplicatorClient {
         this.fluidStack = fluidStack;
     }
 
-    void encode(PacketBuffer buf) {
+    void encode(FriendlyByteBuf buf) {
         buf.writeInt(energy);
         buf.writeInt(progress);
         buf.writeBoolean(isActivated);

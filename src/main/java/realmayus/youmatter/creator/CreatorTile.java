@@ -1,22 +1,22 @@
 package realmayus.youmatter.creator;
 
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.InventoryHelper;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.item.BucketItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.Containers;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.item.BucketItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.TickableBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -42,7 +42,7 @@ import java.util.stream.IntStream;
 
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 
-public class CreatorTile extends TileEntity implements ITickableTileEntity, INamedContainerProvider {
+public class CreatorTile extends BlockEntity implements TickableBlockEntity, MenuProvider {
 
     public CreatorTile() {
         super(ObjectHolders.CREATOR_TILE);
@@ -214,19 +214,19 @@ public class CreatorTile extends TileEntity implements ITickableTileEntity, INam
 
     @Override
     public void setRemoved() {
-        this.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent(h -> IntStream.range(0, h.getSlots()).forEach(i -> InventoryHelper.dropItemStack(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), h.getStackInSlot(i))));
+        this.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent(h -> IntStream.range(0, h.getSlots()).forEach(i -> Containers.dropItemStack(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), h.getStackInSlot(i))));
     }
 
     @Override
-    public void load(BlockState state, CompoundNBT compound) {
+    public void load(BlockState state, CompoundTag compound) {
         super.load(state, compound);
 
         if(compound.contains("uTank")) {
-            CompoundNBT tagUTank = compound.getCompound("uTank");
+            CompoundTag tagUTank = compound.getCompound("uTank");
             uTank.readFromNBT(tagUTank);
         }
         if (compound.contains("sTank")) {
-            CompoundNBT tagSTank = compound.getCompound("sTank");
+            CompoundTag tagSTank = compound.getCompound("sTank");
             sTank.readFromNBT(tagSTank);
         }
         if (compound.contains("energy")) {
@@ -236,16 +236,16 @@ public class CreatorTile extends TileEntity implements ITickableTileEntity, INam
             isActivated = compound.getBoolean("isActivated");
         }
         if(compound.contains("inventory")) {
-            inventory.deserializeNBT((CompoundNBT) compound.get("inventory"));
+            inventory.deserializeNBT((CompoundTag) compound.get("inventory"));
         }
     }
 
 
     @Override
-    public CompoundNBT save(CompoundNBT compound) {
+    public CompoundTag save(CompoundTag compound) {
         super.save(compound);
-        CompoundNBT tagSTank = new CompoundNBT();
-        CompoundNBT tagUTank = new CompoundNBT();
+        CompoundTag tagSTank = new CompoundTag();
+        CompoundTag tagUTank = new CompoundTag();
         sTank.writeToNBT(tagSTank);
         uTank.writeToNBT(tagUTank);
         compound.put("uTank", tagUTank);
@@ -253,7 +253,7 @@ public class CreatorTile extends TileEntity implements ITickableTileEntity, INam
         compound.putInt("energy", getEnergy());
         compound.putBoolean("isActivated", isActivated);
         if(compound.contains("inventory")) {
-            inventory.deserializeNBT((CompoundNBT) compound.get("inventory"));
+            inventory.deserializeNBT((CompoundTag) compound.get("inventory"));
         }
         return compound;
     }
@@ -372,13 +372,13 @@ public class CreatorTile extends TileEntity implements ITickableTileEntity, INam
     }
 
     @Override
-    public ITextComponent getDisplayName() {
-        return new TranslationTextComponent(ObjectHolders.CREATOR_BLOCK.getDescriptionId());
+    public Component getDisplayName() {
+        return new TranslatableComponent(ObjectHolders.CREATOR_BLOCK.getDescriptionId());
     }
 
     @Nullable
     @Override
-    public Container createMenu(int windowID, PlayerInventory playerInventory, PlayerEntity playerEntity) {
+    public AbstractContainerMenu createMenu(int windowID, Inventory playerInventory, Player playerEntity) {
         return new CreatorContainer(windowID, level, worldPosition, playerInventory, playerEntity);
 
     }

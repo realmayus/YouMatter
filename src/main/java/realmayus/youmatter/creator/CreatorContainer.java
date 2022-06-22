@@ -1,17 +1,17 @@
 package realmayus.youmatter.creator;
 
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.IContainerListener;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.BucketItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerListener;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.BucketItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fml.network.PacketDistributor;
@@ -27,14 +27,14 @@ import realmayus.youmatter.network.PacketUpdateCreatorClient;
 
 
 
-public class CreatorContainer extends Container implements ICreatorStateContainer {
+public class CreatorContainer extends AbstractContainerMenu implements ICreatorStateContainer {
 
     public CreatorTile te;
-    private PlayerEntity playerEntity;
+    private Player playerEntity;
     private IItemHandler playerInventory;
 
 
-    public CreatorContainer(int windowId, World world, BlockPos pos, PlayerInventory playerInventory, PlayerEntity player) {
+    public CreatorContainer(int windowId, Level world, BlockPos pos, Inventory playerInventory, Player player) {
         super(ObjectHolders.CREATOR_CONTAINER, windowId);
         te = world.getBlockEntity(pos) instanceof CreatorTile ? (CreatorTile) world.getBlockEntity(pos) : null;
         this.playerEntity = player;
@@ -47,17 +47,17 @@ public class CreatorContainer extends Container implements ICreatorStateContaine
     @Override
     public void broadcastChanges() {
         super.broadcastChanges();
-        for(IContainerListener p : this.containerListeners) {
+        for(ContainerListener p : this.containerListeners) {
             if(p != null) {
-                if (p instanceof ServerPlayerEntity) {
-                    PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) p), new PacketUpdateCreatorClient(te.getEnergy(), 0, te.getUTank().getFluid(), te.getSTank().getFluid(), te.isActivated()));
+                if (p instanceof ServerPlayer) {
+                    PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) p), new PacketUpdateCreatorClient(te.getEnergy(), 0, te.getUTank().getFluid(), te.getSTank().getFluid(), te.isActivated()));
                 }
             }
         }
     }
 
     @Override
-    public boolean stillValid(PlayerEntity playerIn) {
+    public boolean stillValid(Player playerIn) {
         return true;
     }
 
@@ -91,7 +91,7 @@ public class CreatorContainer extends Container implements ICreatorStateContaine
      * This is actually needed in order to achieve shift click functionality in the Controller GUI. If this method isn't overridden, the game crashes.
      */
     @Override
-    public ItemStack quickMoveStack(PlayerEntity playerIn, int index) {
+    public ItemStack quickMoveStack(Player playerIn, int index) {
         ItemStack itemstack = ItemStack.EMPTY;
         Slot slot = this.slots.get(index);
 

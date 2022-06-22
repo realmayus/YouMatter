@@ -1,21 +1,21 @@
 package realmayus.youmatter.creator;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.SimpleSound;
-import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.client.renderer.texture.AtlasTexture;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.fluid.FlowingFluid;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.level.material.FlowingFluid;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
 import realmayus.youmatter.ObjectHolders;
@@ -26,7 +26,7 @@ import realmayus.youmatter.network.PacketHandler;
 import java.util.Arrays;
 import java.util.List;
 
-public class CreatorScreen extends ContainerScreen<CreatorContainer> {
+public class CreatorScreen extends AbstractContainerScreen<CreatorContainer> {
 
     private static final int WIDTH = 176;
     private static final int HEIGHT = 168;
@@ -35,13 +35,13 @@ public class CreatorScreen extends ContainerScreen<CreatorContainer> {
 
     private static final ResourceLocation GUI = new ResourceLocation(YouMatter.MODID, "textures/gui/creator.png");
 
-    public CreatorScreen(CreatorContainer container, PlayerInventory inv, ITextComponent name) {
+    public CreatorScreen(CreatorContainer container, Inventory inv, Component name) {
         super(container, inv, name);
         this.te = container.te;
     }
 
     @Override
-    protected void renderBg(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
+    protected void renderBg(PoseStack matrixStack, float partialTicks, int mouseX, int mouseY) {
         //Setting color to white because JEI is bae (gui would be yellow)
         GlStateManager._color4f(1.0F, 1.0F, 1.0F, 1.0F);
         this.minecraft.getTextureManager().bind(GUI);
@@ -54,7 +54,7 @@ public class CreatorScreen extends ContainerScreen<CreatorContainer> {
         drawFluidTank(matrixStack,31, 22, te.getSTank());
     }
 
-    private void drawActiveIcon(MatrixStack matrixStack, boolean isActive) {
+    private void drawActiveIcon(PoseStack matrixStack, boolean isActive) {
         this.minecraft.getTextureManager().bind(GUI);
 
         if(isActive) {
@@ -67,7 +67,7 @@ public class CreatorScreen extends ContainerScreen<CreatorContainer> {
 
 
     @Override
-    protected void renderLabels(MatrixStack matrixStack, int mouseX, int mouseY) {
+    protected void renderLabels(PoseStack matrixStack, int mouseX, int mouseY) {
         drawEnergyBolt(matrixStack, te.getClientEnergy());
         drawActiveIcon(matrixStack, te.isActivatedClient());
 
@@ -76,7 +76,7 @@ public class CreatorScreen extends ContainerScreen<CreatorContainer> {
         font.draw(matrixStack, I18n.get(ObjectHolders.CREATOR_BLOCK.getDescriptionId()), 8, 6, 0x404040);
     }
 
-    private void drawEnergyBolt(MatrixStack matrixStack, int energy) {
+    private void drawEnergyBolt(PoseStack matrixStack, int energy) {
         this.minecraft.getTextureManager().bind(GUI);
 
         if(energy == 0) {
@@ -90,7 +90,7 @@ public class CreatorScreen extends ContainerScreen<CreatorContainer> {
     }
 
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         //Render the dark background
         this.renderBackground(matrixStack);
         super.render(matrixStack, mouseX, mouseY, partialTicks);
@@ -101,27 +101,27 @@ public class CreatorScreen extends ContainerScreen<CreatorContainer> {
         int yAxis = (mouseY - (height - imageHeight) / 2);
 
         if(xAxis >= 31 && xAxis <= 44 && yAxis >= 20 && yAxis <= 75) {
-            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new StringTextComponent(I18n.get("youmatter.gui.stabilizer.title")), new StringTextComponent(I18n.get("youmatter.gui.stabilizer.description", te.getSTank().getFluidAmount()))));
+            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new TextComponent(I18n.get("youmatter.gui.stabilizer.title")), new TextComponent(I18n.get("youmatter.gui.stabilizer.description", te.getSTank().getFluidAmount()))));
         }
         if(xAxis >= 89 && xAxis <= 102 && yAxis >= 20 && yAxis <= 75) {
-            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new StringTextComponent(I18n.get("youmatter.gui.umatter.title")), new StringTextComponent(I18n.get("youmatter.gui.umatter.description", te.getUTank().getFluidAmount()))));
+            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new TextComponent(I18n.get("youmatter.gui.umatter.title")), new TextComponent(I18n.get("youmatter.gui.umatter.description", te.getUTank().getFluidAmount()))));
         }
         if(xAxis >= 150 && xAxis <= 164 && yAxis >= 57 && yAxis <= 77) {
-            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new StringTextComponent(I18n.get("youmatter.gui.energy.title")), new StringTextComponent(I18n.get("youmatter.gui.energy.description", te.getClientEnergy()))));
+            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new TextComponent(I18n.get("youmatter.gui.energy.title")), new TextComponent(I18n.get("youmatter.gui.energy.description", te.getClientEnergy()))));
         }
         if(xAxis >= 148 && xAxis <= 167 && yAxis >= 7 && yAxis <= 27) {
-            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new StringTextComponent(te.isActivatedClient() ? I18n.get("youmatter.gui.active") : I18n.get("youmatter.gui.paused")), new StringTextComponent(I18n.get("youmatter.gui.clicktochange"))));
+            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new TextComponent(te.isActivatedClient() ? I18n.get("youmatter.gui.active") : I18n.get("youmatter.gui.paused")), new TextComponent(I18n.get("youmatter.gui.clicktochange"))));
         }
     }
 
 
-    private void drawTooltip(MatrixStack matrixStack, int x, int y, List<ITextComponent> tooltips) {
+    private void drawTooltip(PoseStack matrixStack, int x, int y, List<Component> tooltips) {
         renderComponentTooltip(matrixStack, tooltips, x, y);
     }
 
 
     //both drawFluid and drawFluidTank is courtesy of DarkGuardsMan and was modified to suit my needs. Go check him out: https://github.com/BuiltBrokenModding/Atomic-Science | MIT License |  Copyright (c) 2018 Built Broken Modding License: https://opensource.org/licenses/MIT
-    private void drawFluid(MatrixStack matrixStack, int x, int y, int line, int col, int width, int drawSize, FluidStack fluidStack)
+    private void drawFluid(PoseStack matrixStack, int x, int y, int line, int col, int width, int drawSize, FluidStack fluidStack)
     {
         if (fluidStack != null && fluidStack.getFluid() != null && !fluidStack.isEmpty())
         {
@@ -145,7 +145,7 @@ public class CreatorScreen extends ContainerScreen<CreatorContainer> {
 
             //Bind fluid texture
 
-            this.getMinecraft().getTextureManager().bind(AtlasTexture.LOCATION_BLOCKS);
+            this.getMinecraft().getTextureManager().bind(TextureAtlas.LOCATION_BLOCKS);
 
             final int textureSize = 16;
             int start = 0;
@@ -160,7 +160,7 @@ public class CreatorScreen extends ContainerScreen<CreatorContainer> {
                 }
 
                 //TODO?
-                blit(matrixStack, x + col, y + line + 58 - renderY - start, 1000, width, textureSize - (textureSize - renderY), this.minecraft.getTextureAtlas(AtlasTexture.LOCATION_BLOCKS).apply(fluidIcon));
+                blit(matrixStack, x + col, y + line + 58 - renderY - start, 1000, width, textureSize - (textureSize - renderY), this.minecraft.getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(fluidIcon));
 
 
                 start = start + textureSize;
@@ -168,7 +168,7 @@ public class CreatorScreen extends ContainerScreen<CreatorContainer> {
         }
     }
 
-    private void drawFluidTank(MatrixStack matrixStack, int x, int y, IFluidTank tank) {
+    private void drawFluidTank(PoseStack matrixStack, int x, int y, IFluidTank tank) {
 
         //Get data
         final float scale = tank.getFluidAmount() / (float) tank.getCapacity();
@@ -203,7 +203,7 @@ public class CreatorScreen extends ContainerScreen<CreatorContainer> {
             double yAxis = (mouseY - (height - imageHeight) / 2);
             if(xAxis >= 148 && xAxis <= 167 && yAxis >= 7 && yAxis <= 27) {
                 //Playing Click sound
-                Minecraft.getInstance().getSoundManager().play(SimpleSound.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 //Sending packet to server
                 PacketHandler.INSTANCE.sendToServer(new PacketChangeSettingsCreatorServer(!te.isActivatedClient()));
             }

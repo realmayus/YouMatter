@@ -1,9 +1,9 @@
 package realmayus.youmatter.util;
 
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.RecipeManager;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeManager;
 import realmayus.youmatter.YMConfig;
 
 import java.util.ArrayList;
@@ -16,9 +16,9 @@ public class GeneralUtils {
      * @param manager a RecipeManager object.
      * @return every recipe that is available in a handy list.
      */
-    public static List<IRecipe<?>> getMatchingRecipes(RecipeManager manager, ItemStack is) { // List of Recipes > List of Required Items For that recipe > List of allowed ItemStacks as an ingredient (see OreDict)
-        List<IRecipe<?>> returnValue = new ArrayList<>();
-        for(IRecipe<?> recipe : manager.getRecipes()) {
+    public static List<Recipe<?>> getMatchingRecipes(RecipeManager manager, ItemStack is) { // List of Recipes > List of Required Items For that recipe > List of allowed ItemStacks as an ingredient (see OreDict)
+        List<Recipe<?>> returnValue = new ArrayList<>();
+        for(Recipe<?> recipe : manager.getRecipes()) {
             if(recipe.getResultItem().sameItem(is)) {
                 returnValue.add(recipe);
             }

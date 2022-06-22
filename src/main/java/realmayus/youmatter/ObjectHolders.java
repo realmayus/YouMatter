@@ -1,9 +1,9 @@
 package realmayus.youmatter;
 
 
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.item.BucketItem;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.BucketItem;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.registries.ObjectHolder;
 import realmayus.youmatter.creator.CreatorBlock;
 import realmayus.youmatter.creator.CreatorContainer;
@@ -38,30 +38,30 @@ public class ObjectHolders {
     @ObjectHolder(YouMatter.MODID + ":scanner")
     public static ScannerBlock SCANNER_BLOCK;
     @ObjectHolder(YouMatter.MODID + ":scanner")
-    public static ContainerType<ScannerContainer> SCANNER_CONTAINER;
+    public static MenuType<ScannerContainer> SCANNER_CONTAINER;
     @ObjectHolder(YouMatter.MODID + ":scanner")
-    public static TileEntityType<ScannerTile> SCANNER_TILE;
+    public static BlockEntityType<ScannerTile> SCANNER_TILE;
 
     @ObjectHolder(YouMatter.MODID + ":encoder")
     public static EncoderBlock ENCODER_BLOCK;
     @ObjectHolder(YouMatter.MODID + ":encoder")
-    public static ContainerType<EncoderContainer> ENCODER_CONTAINER;
+    public static MenuType<EncoderContainer> ENCODER_CONTAINER;
     @ObjectHolder(YouMatter.MODID + ":encoder")
-    public static TileEntityType<EncoderTile> ENCODER_TILE;
+    public static BlockEntityType<EncoderTile> ENCODER_TILE;
 
     @ObjectHolder(YouMatter.MODID + ":creator")
     public static CreatorBlock CREATOR_BLOCK;
     @ObjectHolder(YouMatter.MODID + ":creator")
-    public static ContainerType<CreatorContainer> CREATOR_CONTAINER;
+    public static MenuType<CreatorContainer> CREATOR_CONTAINER;
     @ObjectHolder(YouMatter.MODID + ":creator")
-    public static TileEntityType<CreatorTile> CREATOR_TILE;
+    public static BlockEntityType<CreatorTile> CREATOR_TILE;
 
     @ObjectHolder(YouMatter.MODID + ":replicator")
     public static ReplicatorBlock REPLICATOR_BLOCK;
     @ObjectHolder(YouMatter.MODID + ":replicator")
-    public static ContainerType<ReplicatorContainer> REPLICATOR_CONTAINER;
+    public static MenuType<ReplicatorContainer> REPLICATOR_CONTAINER;
     @ObjectHolder(YouMatter.MODID + ":replicator")
-    public static TileEntityType<CreatorTile> REPLICATOR_TILE;
+    public static BlockEntityType<CreatorTile> REPLICATOR_TILE;
 
     @ObjectHolder(YouMatter.MODID + ":stabilizer_bucket")
     public static BucketItem STABILIZER_BUCKET;
