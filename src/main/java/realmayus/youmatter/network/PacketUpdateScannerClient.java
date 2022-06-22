@@ -1,9 +1,9 @@
 package realmayus.youmatter.network;
 
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.fml.network.NetworkEvent;
-
 import java.util.function.Supplier;
+
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.network.NetworkEvent;
 
 
 public class PacketUpdateScannerClient {

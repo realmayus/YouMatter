@@ -1,13 +1,13 @@
 package realmayus.youmatter.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeManager;
 import realmayus.youmatter.YMConfig;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class GeneralUtils {
 

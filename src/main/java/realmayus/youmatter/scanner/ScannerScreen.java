@@ -1,18 +1,19 @@
 package realmayus.youmatter.scanner;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.resources.language.I18n;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import realmayus.youmatter.ObjectHolders;
-import realmayus.youmatter.YouMatter;
-
 import java.util.Arrays;
 import java.util.List;
+
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
+import realmayus.youmatter.ObjectHolders;
+import realmayus.youmatter.YouMatter;
 
 public class ScannerScreen extends AbstractContainerScreen<ScannerContainer> {
     private static final int WIDTH = 176;
@@ -61,8 +62,8 @@ public class ScannerScreen extends AbstractContainerScreen<ScannerContainer> {
 
     @Override
     protected void renderBg(PoseStack matrixStack, float partialTicks, int mouseX, int mouseY) {
-        GlStateManager._color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        this.minecraft.getTextureManager().bind(GUI);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem._setShaderTexture(0, GUI);
         int relX = (this.width - WIDTH) / 2;
         int relY = (this.height - HEIGHT) / 2;
         this.blit(matrixStack, relX, relY, 0, 0, WIDTH, HEIGHT);
@@ -83,14 +84,14 @@ public class ScannerScreen extends AbstractContainerScreen<ScannerContainer> {
             arrow = 100;
         }
 
-        this.minecraft.getTextureManager().bind(GUI);
+        RenderSystem._setShaderTexture(0, GUI);
         this.blit(matrixStack, 79, 62, 176, 41, Math.round((arrow / 100.0f) * 18), 12);
         this.blit(matrixStack, 104, 34, 176, 53, 17, Math.round((circuits / 100.0f) * 24));
         this.blit(matrixStack, 54, 34, 176, 77, 17, Math.round((circuits / 100.0f) * 24));
     }
 
     private void drawEnergyBolt(PoseStack matrixStack, int energy) {
-        this.minecraft.getTextureManager().bind(GUI);
+        RenderSystem._setShaderTexture(0, GUI);
 
         if(energy == 0) {
             this.blit(matrixStack, 141, 35, 176, 21, 15, 20);

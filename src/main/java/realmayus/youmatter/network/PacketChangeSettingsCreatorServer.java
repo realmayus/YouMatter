@@ -1,11 +1,12 @@
 package realmayus.youmatter.network;
 
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.fml.network.NetworkEvent;
-import realmayus.youmatter.creator.CreatorContainer;
 //import realmayus.youmatter.creator.ContainerCreator;
 import java.util.function.Supplier;
+
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.network.NetworkEvent;
+import realmayus.youmatter.creator.CreatorContainer;
 
 public class PacketChangeSettingsCreatorServer{
 

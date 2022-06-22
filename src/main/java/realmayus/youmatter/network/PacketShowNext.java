@@ -1,12 +1,12 @@
 package realmayus.youmatter.network;
 
-import net.minecraft.server.level.ServerPlayer;
+import java.util.function.Supplier;
+
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.network.NetworkEvent;
 import realmayus.youmatter.replicator.ReplicatorContainer;
 //import realmayus.youmatter.replicator.ContainerReplicator;
-
-import java.util.function.Supplier;
 
 public class PacketShowNext {
 

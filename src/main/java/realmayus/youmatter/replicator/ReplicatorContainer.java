@@ -1,22 +1,22 @@
 package realmayus.youmatter.replicator;
 
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerListener;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
+import net.minecraftforge.network.PacketDistributor;
 import realmayus.youmatter.ModFluids;
 import realmayus.youmatter.ObjectHolders;
 import realmayus.youmatter.items.ThumbdriveItem;
@@ -27,13 +27,11 @@ import realmayus.youmatter.util.DisplaySlot;
 public class ReplicatorContainer extends AbstractContainerMenu implements IReplicatorStateContainer {
 
     public ReplicatorTile te;
-    private Player playerEntity;
     private IItemHandler playerInventory;
 
     public ReplicatorContainer(int windowId, Level world, BlockPos pos, Inventory playerInventory, Player player) {
         super(ObjectHolders.REPLICATOR_CONTAINER, windowId);
         te = world.getBlockEntity(pos) instanceof ReplicatorTile ? (ReplicatorTile) world.getBlockEntity(pos) : null;
-        this.playerEntity = player;
         this.playerInventory = new InvWrapper(playerInventory);
 
         addPlayerSlots(this.playerInventory);
@@ -110,7 +108,7 @@ public class ReplicatorContainer extends AbstractContainerMenu implements IRepli
                     }
                 } else if(itemstack1.getItem() instanceof BucketItem) {
                     BucketItem bucket = (BucketItem) itemstack1.getItem();
-                    if(bucket.getFluid().getFluid().equals(ModFluids.UMATTER.get())) {
+                    if(bucket.getFluid().equals(ModFluids.UMATTER.get())) {
                         if(!this.moveItemStackTo(itemstack1, 39, 40, false)) {
                             return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                         }

@@ -1,20 +1,20 @@
 package realmayus.youmatter.encoder;
 
 
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerListener;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
+import net.minecraftforge.network.PacketDistributor;
 import realmayus.youmatter.ObjectHolders;
 import realmayus.youmatter.items.ThumbdriveItem;
 import realmayus.youmatter.network.PacketHandler;
@@ -24,13 +24,11 @@ public class EncoderContainer extends AbstractContainerMenu implements IEncoderS
 
 
     public EncoderTile te;
-    private Player playerEntity;
     private IItemHandler playerInventory;
 
     public EncoderContainer(int windowId, Level world, BlockPos pos, Inventory playerInventory, Player player) {
         super(ObjectHolders.ENCODER_CONTAINER, windowId);
         te = world.getBlockEntity(pos) instanceof EncoderTile ? (EncoderTile) world.getBlockEntity(pos) : null;
-        this.playerEntity = player;
         this.playerInventory = new InvWrapper(playerInventory);
 
         addPlayerSlots(this.playerInventory);

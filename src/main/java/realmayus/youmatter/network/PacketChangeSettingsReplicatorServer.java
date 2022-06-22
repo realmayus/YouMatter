@@ -1,17 +1,13 @@
 package realmayus.youmatter.network;
 
-import io.netty.buffer.ByteBuf;
+import java.util.function.Supplier;
+
+import net.minecraft.network.FriendlyByteBuf;
 //import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.network.FriendlyByteBuf;
-//import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-//import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-//import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.network.NetworkEvent;
 import realmayus.youmatter.replicator.ReplicatorContainer;
 //import realmayus.youmatter.replicator.ContainerReplicator;
-
-import java.util.function.Supplier;
 
 public class PacketChangeSettingsReplicatorServer {
 

@@ -1,22 +1,23 @@
 package realmayus.youmatter.encoder;
 
+import java.util.Arrays;
+import java.util.List;
+
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.platform.GlStateManager;
+
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraftforge.common.util.Constants;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
 import realmayus.youmatter.ObjectHolders;
 import realmayus.youmatter.YouMatter;
 import realmayus.youmatter.items.ThumbdriveItem;
-
-import java.util.Arrays;
-import java.util.List;
 
 
 public class EncoderScreen extends AbstractContainerScreen<EncoderContainer> {
@@ -50,7 +51,7 @@ public class EncoderScreen extends AbstractContainerScreen<EncoderContainer> {
             if (te.inventory.getStackInSlot(1).getItem() instanceof ThumbdriveItem) {
                 CompoundTag nbt = te.inventory.getStackInSlot(1).getTag();
                 if (nbt != null) {
-                    ListTag list = nbt.getList("stored_items", Constants.NBT.TAG_STRING);
+                    ListTag list = nbt.getList("stored_items", Tag.TAG_STRING);
                     if (list.size() >= 8) {
                         drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new TextComponent(I18n.get("youmatter.warning.encoder2"))));
                     }
@@ -64,8 +65,8 @@ public class EncoderScreen extends AbstractContainerScreen<EncoderContainer> {
     @Override
     protected void renderBg(PoseStack matrixStack, float partialTicks, int mouseX, int mouseY) {
         //Setting color to white because JEI is bae (gui would be yellow)
-        GlStateManager._color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        this.minecraft.getTextureManager().bind(GUI);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem._setShaderTexture(0, GUI);
 
         int relX = (this.width - WIDTH) / 2;
         int relY = (this.height - HEIGHT) / 2;
@@ -82,7 +83,7 @@ public class EncoderScreen extends AbstractContainerScreen<EncoderContainer> {
         } else {
             CompoundTag nbt = te.inventory.getStackInSlot(1).getTag();
             if (nbt != null) {
-                ListTag list = nbt.getList("stored_items", Constants.NBT.TAG_STRING);
+                ListTag list = nbt.getList("stored_items", Tag.TAG_STRING);
                 if (list.size() >= 8) {
                     this.blit(matrixStack, 16, 59, 176, 66, 16, 16);
                 }
@@ -114,7 +115,7 @@ public class EncoderScreen extends AbstractContainerScreen<EncoderContainer> {
             arrow2 = 100;
         }
 
-        this.minecraft.getTextureManager().bind(GUI);
+        RenderSystem._setShaderTexture(0, GUI);
         this.blit(matrixStack, 22, 41, 176, 41, Math.round((arrow1 / 100.0f) * 18), 12);
         this.blit(matrixStack, 47, 40, 176, 53, 7, Math.round((lock / 100.0f) * 13));
         this.blit(matrixStack, 61, 41, 176, 41, Math.round((arrow2 / 100.0f) * 18), 12);
@@ -122,7 +123,7 @@ public class EncoderScreen extends AbstractContainerScreen<EncoderContainer> {
     }
 
     private void drawEnergyBolt(PoseStack matrixStack, int energy) {
-        this.minecraft.getTextureManager().bind(GUI);
+        RenderSystem._setShaderTexture(0, GUI);
 
         if(energy == 0) {
             this.blit(matrixStack, 141, 36, 176, 21, 15, 20);

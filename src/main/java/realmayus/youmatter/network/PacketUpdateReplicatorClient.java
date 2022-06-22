@@ -1,14 +1,10 @@
 package realmayus.youmatter.network;
 
-import io.netty.buffer.ByteBuf;
+import java.util.function.Supplier;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fml.network.NetworkEvent;
-
-import java.util.function.Supplier;
+import net.minecraftforge.network.NetworkEvent;
 
 
 public class PacketUpdateReplicatorClient {

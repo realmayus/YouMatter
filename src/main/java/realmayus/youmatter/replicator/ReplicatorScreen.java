@@ -1,21 +1,25 @@
 package realmayus.youmatter.replicator;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import java.util.Arrays;
+import java.util.List;
+
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
 import realmayus.youmatter.ObjectHolders;
@@ -26,9 +30,6 @@ import realmayus.youmatter.network.PacketShowNext;
 import realmayus.youmatter.network.PacketShowPrevious;
 import realmayus.youmatter.util.DisplaySlot;
 import realmayus.youmatter.util.GeneralUtils;
-
-import java.util.Arrays;
-import java.util.List;
 
 
 public class ReplicatorScreen extends AbstractContainerScreen<ReplicatorContainer> {
@@ -48,8 +49,8 @@ public class ReplicatorScreen extends AbstractContainerScreen<ReplicatorContaine
     @Override
     protected void renderBg(PoseStack matrixStack, float partialTicks, int mouseX, int mouseY) {
         //Setting color to white because JEI is bae (gui would be yellow)
-        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        this.minecraft.getTextureManager().bind(GUI);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem._setShaderTexture(0, GUI);
 
         int relX = (this.width - WIDTH) / 2;
         int relY = (this.height - HEIGHT) / 2;
@@ -61,7 +62,7 @@ public class ReplicatorScreen extends AbstractContainerScreen<ReplicatorContaine
 
     @Override
     protected void renderLabels(PoseStack matrixStack, int mouseX, int mouseY) {
-        this.minecraft.getTextureManager().bind(GUI);
+        RenderSystem._setShaderTexture(0, GUI);
         drawEnergyBolt(matrixStack, te.getClientEnergy());
         drawActiveIcon(matrixStack, te.isActiveClient());
         drawModeIcon(matrixStack, te.isCurrentClientMode());
@@ -71,7 +72,7 @@ public class ReplicatorScreen extends AbstractContainerScreen<ReplicatorContaine
     }
 
     private void drawEnergyBolt(PoseStack matrixStack, int energy) {
-        this.minecraft.getTextureManager().bind(GUI);
+        RenderSystem._setShaderTexture(0, GUI);
 
         if(te.getClientEnergy() == 0) {
             this.blit(matrixStack, 127, 58, 176, 114, 15, 20);
@@ -85,12 +86,12 @@ public class ReplicatorScreen extends AbstractContainerScreen<ReplicatorContaine
 
 
     private void drawProgressArrow(PoseStack matrixStack, int progress) {
-        this.minecraft.getTextureManager().bind(GUI);
+        RenderSystem._setShaderTexture(0, GUI);
         this.blit(matrixStack, 91, 38, 176, 134, 11, Math.round((progress / 100.0f) * 19));
     }
 
     private void drawActiveIcon(PoseStack matrixStack, boolean isActive) {
-        this.minecraft.getTextureManager().bind(GUI);
+        RenderSystem._setShaderTexture(0, GUI);
 
         if(isActive) {
             this.blit(matrixStack, 154, 12, 176, 24, 8, 9);
@@ -100,7 +101,7 @@ public class ReplicatorScreen extends AbstractContainerScreen<ReplicatorContaine
     }
 
     private void drawModeIcon(PoseStack matrixStack, boolean mode) {
-        this.minecraft.getTextureManager().bind(GUI);
+        RenderSystem._setShaderTexture(0, GUI);
 
         if (mode){
             //loop
@@ -183,7 +184,7 @@ public class ReplicatorScreen extends AbstractContainerScreen<ReplicatorContaine
             }
 
             //Bind fluid texture
-            this.getMinecraft().getTextureManager().bind(TextureAtlas.LOCATION_BLOCKS);
+            RenderSystem._setShaderTexture(0, TextureAtlas.LOCATION_BLOCKS);
 
             final int textureSize = 16;
             int start = 0;
@@ -210,7 +211,7 @@ public class ReplicatorScreen extends AbstractContainerScreen<ReplicatorContaine
         final FluidStack fluidStack = tank.getFluid();
 
         //Reset color
-        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
 
         //Draw fluid
@@ -221,12 +222,12 @@ public class ReplicatorScreen extends AbstractContainerScreen<ReplicatorContaine
         }
 
         //Draw lines
-        this.minecraft.getTextureManager().bind(GUI);
+        RenderSystem._setShaderTexture(0, GUI);
         int meterWidth = 14;
         this.blit(matrixStack, this.leftPos + x, this.topPos + y, 176, 35, meterWidth, meterHeight);
 
         //Reset color
-        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
     }
 

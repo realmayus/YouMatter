@@ -1,19 +1,26 @@
 package realmayus.youmatter.scanner;
 
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.Containers;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.MenuProvider;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.block.entity.TickableBlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.core.Direction;
+import java.util.Objects;
+import java.util.stream.IntStream;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.Containers;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -25,17 +32,12 @@ import realmayus.youmatter.encoder.EncoderBlock;
 import realmayus.youmatter.encoder.EncoderTile;
 import realmayus.youmatter.util.MyEnergyStorage;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.Objects;
-import java.util.stream.IntStream;
-
-public class ScannerTile extends BlockEntity implements MenuProvider, TickableBlockEntity {
+public class ScannerTile extends BlockEntity implements MenuProvider {
 
     public boolean hasEncoder = false;
 
-    public ScannerTile() {
-        super(ObjectHolders.SCANNER_TILE);
+    public ScannerTile(BlockPos pos, BlockState state) {
+        super(ObjectHolders.SCANNER_TILE, pos, state);
     }
 
     public boolean getHasEncoder() {
@@ -109,8 +111,8 @@ public class ScannerTile extends BlockEntity implements MenuProvider, TickableBl
     private MyEnergyStorage myEnergyStorage = new MyEnergyStorage(1000000, Integer.MAX_VALUE);
 
     @Override
-    public void load(BlockState state, CompoundTag compound) {
-        super.load(state, compound);
+    public void load(CompoundTag compound) {
+        super.load(compound);
         if (compound.contains("progress")) {
             setProgress(compound.getInt("progress"));
         }
@@ -123,20 +125,31 @@ public class ScannerTile extends BlockEntity implements MenuProvider, TickableBl
     }
 
     @Override
-    public CompoundTag save(CompoundTag compound) {
-        super.save(compound);
+    public void saveAdditional(CompoundTag compound) {
+        super.saveAdditional(compound);
         compound.putInt("progress", getProgress());
         compound.putInt("energy", getEnergy());
         if (inventory != null) {
             compound.put("inventory", inventory.serializeNBT());
         }
+    }
 
-        return compound;
+    @Override
+    public CompoundTag getUpdateTag() {
+        return saveWithoutMetadata();
+    }
+
+    @Override
+    public ClientboundBlockEntityDataPacket getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
     }
 
     private int currentPartTick = 0;
-    @Override
-    public void tick() {
+    public static void serverTick(Level level, BlockPos pos, BlockState state, ScannerTile be) {
+        be.tick(level, pos, state);
+    }
+
+    public void tick(Level level, BlockPos pos, BlockState state) {
         if(currentPartTick >= 2) {
             if (getNeighborEncoder(this.worldPosition) != null) {
                 hasEncoder = true;
@@ -146,7 +159,7 @@ public class ScannerTile extends BlockEntity implements MenuProvider, TickableBl
                         if (getProgress() < 100) {
                             setProgress(getProgress() + 1);
                             myEnergyStorage.consumePower(YMConfig.CONFIG.energyScanner.get());
-                       } else if (encoderPos != null) {
+                        } else if (encoderPos != null) {
                             // Notifying the neighboring encoder of this scanner having finished its operation
                             ((EncoderTile)level.getBlockEntity(encoderPos)).ignite(this.inventory.getStackInSlot(1)); //don't worry, this is already checked by getNeighborEncoder() c:
                             inventory.setStackInSlot(1, ItemStack.EMPTY);
@@ -168,7 +181,7 @@ public class ScannerTile extends BlockEntity implements MenuProvider, TickableBl
     private boolean isItemAllowed(ItemStack itemStack) {
 
         boolean matches = YMConfig.CONFIG.filterItems.get().stream().anyMatch(s -> s.equalsIgnoreCase(Objects.requireNonNull(itemStack.getItem().getRegistryName()).toString()));
-            //If list should act as a blacklist AND it contains the item, disallow scanning
+        //If list should act as a blacklist AND it contains the item, disallow scanning
         if (YMConfig.CONFIG.filterMode.get() && matches) {
             return false;
             //If list should act as a whitelist AND it DOESN'T contain the item, disallow scanning

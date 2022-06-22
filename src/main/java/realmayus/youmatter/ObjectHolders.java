@@ -15,19 +15,20 @@ import realmayus.youmatter.items.BlackHoleItem;
 import realmayus.youmatter.items.ThumbdriveItem;
 import realmayus.youmatter.replicator.ReplicatorBlock;
 import realmayus.youmatter.replicator.ReplicatorContainer;
+import realmayus.youmatter.replicator.ReplicatorTile;
 import realmayus.youmatter.scanner.ScannerBlock;
 import realmayus.youmatter.scanner.ScannerContainer;
 import realmayus.youmatter.scanner.ScannerTile;
 
 public class ObjectHolders {
 
-//    public static final ThumbdriveItem THUMB_DRIVE = null;
-//    public static final ItemBlock UMATTER_BLOCK = new ItemBlock(ObjectHolders.UMATTER_BLOCK);
-//    public static final ItemBlock STABILIZER_BLOCK = new ItemBlock(ObjectHolders.STABILIZER_BLOCK);
-//    public static final MachineCasingItem MACHINE_CASING = null;
-//    public static final TransistorRawItem TRANSISTOR_RAW = null;
-//    public static final TransistorItem TRANSISTOR = null;
-//    public static final ComputeModuleItem COMPUTE_MODULE = null;
+    //    public static final ThumbdriveItem THUMB_DRIVE = null;
+    //    public static final ItemBlock UMATTER_BLOCK = new ItemBlock(ObjectHolders.UMATTER_BLOCK);
+    //    public static final ItemBlock STABILIZER_BLOCK = new ItemBlock(ObjectHolders.STABILIZER_BLOCK);
+    //    public static final MachineCasingItem MACHINE_CASING = null;
+    //    public static final TransistorRawItem TRANSISTOR_RAW = null;
+    //    public static final TransistorItem TRANSISTOR = null;
+    //    public static final ComputeModuleItem COMPUTE_MODULE = null;
 
     @ObjectHolder(YouMatter.MODID + ":black_hole")
     public static BlackHoleItem BLACK_HOLE_ITEM;
@@ -61,7 +62,7 @@ public class ObjectHolders {
     @ObjectHolder(YouMatter.MODID + ":replicator")
     public static MenuType<ReplicatorContainer> REPLICATOR_CONTAINER;
     @ObjectHolder(YouMatter.MODID + ":replicator")
-    public static BlockEntityType<CreatorTile> REPLICATOR_TILE;
+    public static BlockEntityType<ReplicatorTile> REPLICATOR_TILE;
 
     @ObjectHolder(YouMatter.MODID + ":stabilizer_bucket")
     public static BucketItem STABILIZER_BUCKET;

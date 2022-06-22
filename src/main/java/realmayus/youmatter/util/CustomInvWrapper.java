@@ -1,10 +1,10 @@
 package realmayus.youmatter.util;
 
+import javax.annotation.Nonnull;
+
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
-
-import javax.annotation.Nonnull;
 
 public class CustomInvWrapper extends CombinedInvWrapper {
 

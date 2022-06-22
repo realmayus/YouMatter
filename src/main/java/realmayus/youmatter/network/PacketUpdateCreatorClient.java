@@ -1,10 +1,10 @@
 package realmayus.youmatter.network;
 
+import java.util.function.Supplier;
+
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fml.network.NetworkEvent;
-
-import java.util.function.Supplier;
+import net.minecraftforge.network.NetworkEvent;
 
 public class PacketUpdateCreatorClient {
 

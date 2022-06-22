@@ -1,24 +1,24 @@
 package realmayus.youmatter.creator;
 
 
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerListener;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
+import net.minecraftforge.network.PacketDistributor;
 import realmayus.youmatter.ModFluids;
 import realmayus.youmatter.ObjectHolders;
 import realmayus.youmatter.YMConfig;
@@ -30,14 +30,12 @@ import realmayus.youmatter.network.PacketUpdateCreatorClient;
 public class CreatorContainer extends AbstractContainerMenu implements ICreatorStateContainer {
 
     public CreatorTile te;
-    private Player playerEntity;
     private IItemHandler playerInventory;
 
 
     public CreatorContainer(int windowId, Level world, BlockPos pos, Inventory playerInventory, Player player) {
         super(ObjectHolders.CREATOR_CONTAINER, windowId);
         te = world.getBlockEntity(pos) instanceof CreatorTile ? (CreatorTile) world.getBlockEntity(pos) : null;
-        this.playerEntity = player;
         this.playerInventory = new InvWrapper(playerInventory);
 
         addPlayerSlots(this.playerInventory);
@@ -80,11 +78,11 @@ public class CreatorContainer extends AbstractContainerMenu implements ICreatorS
 
     private void addCustomSlots() {
         te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(h -> {
-                    addSlot(new SlotItemHandler(h, 1, 52, 20));
-                    addSlot(new SlotItemHandler(h, 2, 52, 62));
-                    addSlot(new SlotItemHandler(h, 3, 110, 20));
-                    addSlot(new SlotItemHandler(h, 4, 110, 62));
-                });
+            addSlot(new SlotItemHandler(h, 1, 52, 20));
+            addSlot(new SlotItemHandler(h, 2, 52, 62));
+            addSlot(new SlotItemHandler(h, 3, 110, 20));
+            addSlot(new SlotItemHandler(h, 4, 110, 62));
+        });
     }
 
     /**
@@ -106,7 +104,7 @@ public class CreatorContainer extends AbstractContainerMenu implements ICreatorS
             } else {
                 if(itemstack1.getItem() instanceof BucketItem) {
                     BucketItem bucket = (BucketItem) itemstack1.getItem();
-                    if (bucket.getFluid().getFluid().equals(ModFluids.STABILIZER.get()) || YMConfig.CONFIG.alternativeStabilizer.get().equalsIgnoreCase(bucket.getFluid().getFluid().getRegistryName().getPath())) {
+                    if (bucket.getFluid().equals(ModFluids.STABILIZER.get()) || YMConfig.CONFIG.alternativeStabilizer.get().equalsIgnoreCase(bucket.getFluid().getRegistryName().getPath())) {
                         if(!this.moveItemStackTo(itemstack1, 36, 37, false)) {
                             return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                         }
@@ -122,17 +120,17 @@ public class CreatorContainer extends AbstractContainerMenu implements ICreatorS
 
                 } else if(itemstack1.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).isPresent()) {
                     return itemstack1.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).map(h -> {
-                       if (h.getFluidInTank(0).isEmpty() || h.getFluidInTank(0).getFluid().isSame(ModFluids.UMATTER.get())) {
-                           if(!this.moveItemStackTo(itemstack1, 38, 39, false)) {
-                               return ItemStack.EMPTY; // custom slot is full, can't transfer item!
-                           }
-                       } else if (h.getFluidInTank(0).getFluid().isSame(ModFluids.STABILIZER.get()) || YMConfig.CONFIG.alternativeStabilizer.get().equalsIgnoreCase(h.getFluidInTank(0).getFluid().getFluid().getRegistryName().getPath())) {
-                           if(!this.moveItemStackTo(itemstack1, 36, 37, false)) {
-                               return ItemStack.EMPTY; // custom slot is full, can't transfer item!
-                           }
-                       } else {
-                           return ItemStack.EMPTY;
-                       }
+                        if (h.getFluidInTank(0).isEmpty() || h.getFluidInTank(0).getFluid().isSame(ModFluids.UMATTER.get())) {
+                            if(!this.moveItemStackTo(itemstack1, 38, 39, false)) {
+                                return ItemStack.EMPTY; // custom slot is full, can't transfer item!
+                            }
+                        } else if (h.getFluidInTank(0).getFluid().isSame(ModFluids.STABILIZER.get()) || YMConfig.CONFIG.alternativeStabilizer.get().equalsIgnoreCase(h.getFluidInTank(0).getFluid().getRegistryName().getPath())) {
+                            if(!this.moveItemStackTo(itemstack1, 36, 37, false)) {
+                                return ItemStack.EMPTY; // custom slot is full, can't transfer item!
+                            }
+                        } else {
+                            return ItemStack.EMPTY;
+                        }
                         return ItemStack.EMPTY;
                     }).orElse(ItemStack.EMPTY);
                 }

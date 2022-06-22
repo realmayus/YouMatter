@@ -1,10 +1,12 @@
 package realmayus.youmatter;
 
-import com.google.common.collect.Lists;
-import net.minecraftforge.common.ForgeConfigSpec;
+import java.util.List;
+
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.List;
+import com.google.common.collect.Lists;
+
+import net.minecraftforge.common.ForgeConfigSpec;
 
 public class YMConfig {
 
@@ -23,7 +25,7 @@ public class YMConfig {
     public final ForgeConfigSpec.ConfigValue<Integer> productionPerTick;
 
     public final ForgeConfigSpec.ConfigValue<String> alternativeStabilizer;
-    
+
     static {
         Pair<YMConfig, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder().configure(YMConfig::new);
         CONFIG_SPEC = specPair.getRight();

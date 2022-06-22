@@ -1,30 +1,30 @@
 package realmayus.youmatter.creator;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.platform.GlStateManager;
+import java.util.Arrays;
+import java.util.List;
+
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
 import realmayus.youmatter.ObjectHolders;
 import realmayus.youmatter.YouMatter;
 import realmayus.youmatter.network.PacketChangeSettingsCreatorServer;
 import realmayus.youmatter.network.PacketHandler;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class CreatorScreen extends AbstractContainerScreen<CreatorContainer> {
 
@@ -43,8 +43,8 @@ public class CreatorScreen extends AbstractContainerScreen<CreatorContainer> {
     @Override
     protected void renderBg(PoseStack matrixStack, float partialTicks, int mouseX, int mouseY) {
         //Setting color to white because JEI is bae (gui would be yellow)
-        GlStateManager._color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        this.minecraft.getTextureManager().bind(GUI);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem._setShaderTexture(0, GUI);
 
         int relX = (this.width - WIDTH) / 2;
         int relY = (this.height - HEIGHT) / 2;
@@ -55,7 +55,7 @@ public class CreatorScreen extends AbstractContainerScreen<CreatorContainer> {
     }
 
     private void drawActiveIcon(PoseStack matrixStack, boolean isActive) {
-        this.minecraft.getTextureManager().bind(GUI);
+        RenderSystem._setShaderTexture(0, GUI);
 
         if(isActive) {
             this.blit(matrixStack, 154, 13, 176, 24, 8, 9);
@@ -71,13 +71,13 @@ public class CreatorScreen extends AbstractContainerScreen<CreatorContainer> {
         drawEnergyBolt(matrixStack, te.getClientEnergy());
         drawActiveIcon(matrixStack, te.isActivatedClient());
 
-        this.minecraft.getTextureManager().bind(GUI);
+        RenderSystem._setShaderTexture(0, GUI);
 
         font.draw(matrixStack, I18n.get(ObjectHolders.CREATOR_BLOCK.getDescriptionId()), 8, 6, 0x404040);
     }
 
     private void drawEnergyBolt(PoseStack matrixStack, int energy) {
-        this.minecraft.getTextureManager().bind(GUI);
+        RenderSystem._setShaderTexture(0, GUI);
 
         if(energy == 0) {
             this.blit(matrixStack, 150, 58, 176, 114, 15, 20);
@@ -145,7 +145,7 @@ public class CreatorScreen extends AbstractContainerScreen<CreatorContainer> {
 
             //Bind fluid texture
 
-            this.getMinecraft().getTextureManager().bind(TextureAtlas.LOCATION_BLOCKS);
+            RenderSystem._setShaderTexture(0, TextureAtlas.LOCATION_BLOCKS);
 
             final int textureSize = 16;
             int start = 0;
@@ -175,7 +175,7 @@ public class CreatorScreen extends AbstractContainerScreen<CreatorContainer> {
         final FluidStack fluidStack = tank.getFluid();
 
         //Reset color
-        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
 
         //Draw fluid
@@ -186,12 +186,12 @@ public class CreatorScreen extends AbstractContainerScreen<CreatorContainer> {
         }
 
         //Draw lines
-        this.minecraft.getTextureManager().bind(GUI);
+        RenderSystem._setShaderTexture(0, GUI);
         int meterWidth = 14;
         this.blit(matrixStack, this.leftPos + x, this.topPos + y, 176, 35, meterWidth, meterHeight);
 
         //Reset color
-        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
     }
 
