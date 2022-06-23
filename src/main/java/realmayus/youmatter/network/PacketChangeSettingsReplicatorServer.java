@@ -6,7 +6,7 @@ import net.minecraft.network.FriendlyByteBuf;
 //import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
-import realmayus.youmatter.replicator.ReplicatorContainer;
+import realmayus.youmatter.replicator.ReplicatorMenu;
 //import realmayus.youmatter.replicator.ContainerReplicator;
 
 public class PacketChangeSettingsReplicatorServer {
@@ -33,9 +33,9 @@ public class PacketChangeSettingsReplicatorServer {
     void handle(Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
             ServerPlayer player = ctx.get().getSender();
-            if (player.containerMenu instanceof ReplicatorContainer openContainer) {
-                openContainer.te.setActive(isActivated);
-                openContainer.te.setCurrentMode(mode);
+            if (player.containerMenu instanceof ReplicatorMenu openContainer) {
+                openContainer.replicator.setActive(isActivated);
+                openContainer.replicator.setCurrentMode(mode);
             }
         });
         ctx.get().setPacketHandled(true);

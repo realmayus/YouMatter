@@ -6,19 +6,19 @@ import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.registries.ObjectHolder;
 import realmayus.youmatter.creator.CreatorBlock;
-import realmayus.youmatter.creator.CreatorContainer;
-import realmayus.youmatter.creator.CreatorTile;
+import realmayus.youmatter.creator.CreatorMenu;
+import realmayus.youmatter.creator.CreatorBlockEntity;
 import realmayus.youmatter.encoder.EncoderBlock;
-import realmayus.youmatter.encoder.EncoderContainer;
-import realmayus.youmatter.encoder.EncoderTile;
+import realmayus.youmatter.encoder.EncoderMenu;
+import realmayus.youmatter.encoder.EncoderBlockEntity;
 import realmayus.youmatter.items.BlackHoleItem;
 import realmayus.youmatter.items.ThumbdriveItem;
 import realmayus.youmatter.replicator.ReplicatorBlock;
-import realmayus.youmatter.replicator.ReplicatorContainer;
-import realmayus.youmatter.replicator.ReplicatorTile;
+import realmayus.youmatter.replicator.ReplicatorMenu;
+import realmayus.youmatter.replicator.ReplicatorBlockEntity;
 import realmayus.youmatter.scanner.ScannerBlock;
-import realmayus.youmatter.scanner.ScannerContainer;
-import realmayus.youmatter.scanner.ScannerTile;
+import realmayus.youmatter.scanner.ScannerMenu;
+import realmayus.youmatter.scanner.ScannerBlockEntity;
 
 public class ObjectHolders {
 
@@ -39,30 +39,30 @@ public class ObjectHolders {
     @ObjectHolder(YouMatter.MODID + ":scanner")
     public static ScannerBlock SCANNER_BLOCK;
     @ObjectHolder(YouMatter.MODID + ":scanner")
-    public static MenuType<ScannerContainer> SCANNER_CONTAINER;
+    public static MenuType<ScannerMenu> SCANNER_CONTAINER;
     @ObjectHolder(YouMatter.MODID + ":scanner")
-    public static BlockEntityType<ScannerTile> SCANNER_TILE;
+    public static BlockEntityType<ScannerBlockEntity> SCANNER_TILE;
 
     @ObjectHolder(YouMatter.MODID + ":encoder")
     public static EncoderBlock ENCODER_BLOCK;
     @ObjectHolder(YouMatter.MODID + ":encoder")
-    public static MenuType<EncoderContainer> ENCODER_CONTAINER;
+    public static MenuType<EncoderMenu> ENCODER_CONTAINER;
     @ObjectHolder(YouMatter.MODID + ":encoder")
-    public static BlockEntityType<EncoderTile> ENCODER_TILE;
+    public static BlockEntityType<EncoderBlockEntity> ENCODER_TILE;
 
     @ObjectHolder(YouMatter.MODID + ":creator")
     public static CreatorBlock CREATOR_BLOCK;
     @ObjectHolder(YouMatter.MODID + ":creator")
-    public static MenuType<CreatorContainer> CREATOR_CONTAINER;
+    public static MenuType<CreatorMenu> CREATOR_CONTAINER;
     @ObjectHolder(YouMatter.MODID + ":creator")
-    public static BlockEntityType<CreatorTile> CREATOR_TILE;
+    public static BlockEntityType<CreatorBlockEntity> CREATOR_TILE;
 
     @ObjectHolder(YouMatter.MODID + ":replicator")
     public static ReplicatorBlock REPLICATOR_BLOCK;
     @ObjectHolder(YouMatter.MODID + ":replicator")
-    public static MenuType<ReplicatorContainer> REPLICATOR_CONTAINER;
+    public static MenuType<ReplicatorMenu> REPLICATOR_CONTAINER;
     @ObjectHolder(YouMatter.MODID + ":replicator")
-    public static BlockEntityType<ReplicatorTile> REPLICATOR_TILE;
+    public static BlockEntityType<ReplicatorBlockEntity> REPLICATOR_TILE;
 
     @ObjectHolder(YouMatter.MODID + ":stabilizer_bucket")
     public static BucketItem STABILIZER_BUCKET;

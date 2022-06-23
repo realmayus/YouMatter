@@ -27,14 +27,14 @@ import net.minecraftforge.items.ItemStackHandler;
 import realmayus.youmatter.ObjectHolders;
 import realmayus.youmatter.YMConfig;
 import realmayus.youmatter.encoder.EncoderBlock;
-import realmayus.youmatter.encoder.EncoderTile;
+import realmayus.youmatter.encoder.EncoderBlockEntity;
 import realmayus.youmatter.util.MyEnergyStorage;
 
-public class ScannerTile extends BlockEntity implements MenuProvider {
+public class ScannerBlockEntity extends BlockEntity implements MenuProvider {
 
     public boolean hasEncoder = false;
 
-    public ScannerTile(BlockPos pos, BlockState state) {
+    public ScannerBlockEntity(BlockPos pos, BlockState state) {
         super(ObjectHolders.SCANNER_TILE, pos, state);
     }
 
@@ -61,7 +61,7 @@ public class ScannerTile extends BlockEntity implements MenuProvider {
     public LazyOptional<ItemStackHandler> inventory = LazyOptional.of(() -> new ItemStackHandler(5) {
         @Override
         protected void onContentsChanged(int slot) {
-            ScannerTile.this.setChanged();
+            ScannerBlockEntity.this.setChanged();
         }
     });
 
@@ -124,7 +124,7 @@ public class ScannerTile extends BlockEntity implements MenuProvider {
     }
 
     private int currentPartTick = 0;
-    public static void serverTick(Level level, BlockPos pos, BlockState state, ScannerTile be) {
+    public static void serverTick(Level level, BlockPos pos, BlockState state, ScannerBlockEntity be) {
         be.tick(level, pos, state);
     }
 
@@ -147,7 +147,7 @@ public class ScannerTile extends BlockEntity implements MenuProvider {
                                 myEnergyStorage.ifPresent(myEnergyStorage -> myEnergyStorage.extractEnergy(YMConfig.CONFIG.energyScanner.get(), false));
                             } else {
                                 // Notifying the neighboring encoder of this scanner having finished its operation
-                                ((EncoderTile)level.getBlockEntity(encoderPos)).ignite(inventory.getStackInSlot(1)); //don't worry, this is already checked by getNeighborEncoder() c:
+                                ((EncoderBlockEntity)level.getBlockEntity(encoderPos)).ignite(inventory.getStackInSlot(1)); //don't worry, this is already checked by getNeighborEncoder() c:
                                 inventory.setStackInSlot(1, ItemStack.EMPTY);
                                 setProgress(0);
                             }
@@ -194,7 +194,7 @@ public class ScannerTile extends BlockEntity implements MenuProvider {
             BlockPos offsetPos = scannerPos.relative(facing);
 
             if(level.getBlockState(offsetPos).getBlock() instanceof EncoderBlock) {
-                if(level.getBlockEntity(offsetPos) instanceof EncoderTile) {
+                if(level.getBlockEntity(offsetPos) instanceof EncoderBlockEntity) {
                     return offsetPos;
                 }
             }
@@ -209,7 +209,7 @@ public class ScannerTile extends BlockEntity implements MenuProvider {
 
     @Nullable
     @Override
-    public AbstractContainerMenu createMenu(int windowID, Inventory playerInventory, Player playerEntity) {
-        return new ScannerContainer(windowID, level, worldPosition, playerInventory, playerEntity);
+    public AbstractContainerMenu createMenu(int windowID, Inventory playerInventory, Player player) {
+        return new ScannerMenu(windowID, level, worldPosition, playerInventory, player);
     }
 }

@@ -36,13 +36,13 @@ import net.minecraftforge.items.ItemStackHandler;
 import realmayus.youmatter.ModFluids;
 import realmayus.youmatter.ObjectHolders;
 import realmayus.youmatter.YMConfig;
-import realmayus.youmatter.replicator.ReplicatorTile;
+import realmayus.youmatter.replicator.ReplicatorBlockEntity;
 import realmayus.youmatter.util.GeneralUtils;
 import realmayus.youmatter.util.MyEnergyStorage;
 
-public class CreatorTile extends BlockEntity implements MenuProvider {
+public class CreatorBlockEntity extends BlockEntity implements MenuProvider {
 
-    public CreatorTile(BlockPos pos, BlockState state) {
+    public CreatorBlockEntity(BlockPos pos, BlockState state) {
         super(ObjectHolders.CREATOR_TILE, pos, state);
     }
 
@@ -81,7 +81,7 @@ public class CreatorTile extends BlockEntity implements MenuProvider {
     public LazyOptional<ItemStackHandler> inventory = LazyOptional.of(() -> new ItemStackHandler(5) {
         @Override
         protected void onContentsChanged(int slot) {
-            CreatorTile.this.setChanged();
+            CreatorBlockEntity.this.setChanged();
         }
     });
 
@@ -255,7 +255,7 @@ public class CreatorTile extends BlockEntity implements MenuProvider {
     }
 
     private int currentPartTick = 0;
-    public static void serverTick(Level level, BlockPos pos, BlockState state, CreatorTile be) {
+    public static void serverTick(Level level, BlockPos pos, BlockState state, CreatorBlockEntity be) {
         be.tick(level, pos, state);
     }
 
@@ -350,7 +350,7 @@ public class CreatorTile extends BlockEntity implements MenuProvider {
 
         // Prioritize Replicator
         for (Map.Entry<BlockPos, Direction> entry : foundPos.entrySet()) {
-            if (level.getBlockEntity(entry.getKey()) instanceof ReplicatorTile replicator) {
+            if (level.getBlockEntity(entry.getKey()) instanceof ReplicatorBlockEntity replicator) {
                 if(replicator.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, entry.getValue()).map(h -> h.fill(new FluidStack(ModFluids.UMATTER.get(), 500), IFluidHandler.FluidAction.SIMULATE)).orElse(0) > 0) {
                     //Replicator can take fluid
                     return new Object[] {entry.getKey(), entry.getValue()}; // position, facing
@@ -378,7 +378,7 @@ public class CreatorTile extends BlockEntity implements MenuProvider {
     @Nullable
     @Override
     public AbstractContainerMenu createMenu(int windowID, Inventory playerInventory, Player playerEntity) {
-        return new CreatorContainer(windowID, level, worldPosition, playerInventory, playerEntity);
+        return new CreatorMenu(windowID, level, worldPosition, playerInventory, playerEntity);
 
     }
 }

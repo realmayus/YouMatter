@@ -32,119 +32,119 @@ import realmayus.youmatter.util.DisplaySlot;
 import realmayus.youmatter.util.GeneralUtils;
 
 
-public class ReplicatorScreen extends AbstractContainerScreen<ReplicatorContainer> {
+public class ReplicatorScreen extends AbstractContainerScreen<ReplicatorMenu> {
 
     private static final int WIDTH = 176;
     private static final int HEIGHT = 168;
 
-    private ReplicatorTile te;
+    private ReplicatorBlockEntity replicator;
 
     private static final ResourceLocation GUI = new ResourceLocation(YouMatter.MODID, "textures/gui/replicator.png");
 
-    public ReplicatorScreen(ReplicatorContainer container, Inventory inv, Component name) {
+    public ReplicatorScreen(ReplicatorMenu container, Inventory inv, Component name) {
         super(container, inv, name);
-        this.te = container.te;
+        this.replicator = container.replicator;
     }
 
     @Override
-    protected void renderBg(PoseStack matrixStack, float partialTicks, int mouseX, int mouseY) {
+    protected void renderBg(PoseStack poseStack, float partialTicks, int mouseX, int mouseY) {
         //Setting color to white because JEI is bae (gui would be yellow)
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem._setShaderTexture(0, GUI);
 
         int relX = (this.width - WIDTH) / 2;
         int relY = (this.height - HEIGHT) / 2;
-        this.blit(matrixStack, relX, relY, 0, 0, WIDTH, HEIGHT);
+        this.blit(poseStack, relX, relY, 0, 0, WIDTH, HEIGHT);
 
-        drawFluidTank(matrixStack, 26, 20, te.getTank());
+        drawFluidTank(poseStack, 26, 20, replicator.getTank());
 
     }
 
     @Override
-    protected void renderLabels(PoseStack matrixStack, int mouseX, int mouseY) {
+    protected void renderLabels(PoseStack poseStack, int mouseX, int mouseY) {
         RenderSystem._setShaderTexture(0, GUI);
-        drawEnergyBolt(matrixStack, te.getEnergy());
-        drawActiveIcon(matrixStack, te.isActive());
-        drawModeIcon(matrixStack, te.isCurrentMode());
-        drawProgressArrow(matrixStack, te.getProgress());
+        drawEnergyBolt(poseStack, replicator.getEnergy());
+        drawActiveIcon(poseStack, replicator.isActive());
+        drawModeIcon(poseStack, replicator.isCurrentMode());
+        drawProgressArrow(poseStack, replicator.getProgress());
 
-        font.draw(matrixStack, I18n.get(ObjectHolders.REPLICATOR_BLOCK.getDescriptionId()), 8, 6, 0x404040);
+        font.draw(poseStack, I18n.get(ObjectHolders.REPLICATOR_BLOCK.getDescriptionId()), 8, 6, 0x404040);
     }
 
-    private void drawEnergyBolt(PoseStack matrixStack, int energy) {
+    private void drawEnergyBolt(PoseStack poseStack, int energy) {
         RenderSystem._setShaderTexture(0, GUI);
 
-        if(te.getEnergy() == 0) {
-            this.blit(matrixStack, 127, 58, 176, 114, 15, 20);
+        if(replicator.getEnergy() == 0) {
+            this.blit(poseStack, 127, 58, 176, 114, 15, 20);
         } else {
             double percentage = energy * 100.0F / 1000000;  // i know this is dumb
             float percentagef = (float)percentage / 100; // but it works.
-            this.blit(matrixStack, 127, 58, 176, 93, 15, Math.round(20 * percentagef)); // it's not really intended that the bolt fills from the top but it looks cool tbh.
+            this.blit(poseStack, 127, 58, 176, 93, 15, Math.round(20 * percentagef)); // it's not really intended that the bolt fills from the top but it looks cool tbh.
 
         }
     }
 
 
-    private void drawProgressArrow(PoseStack matrixStack, int progress) {
+    private void drawProgressArrow(PoseStack poseStack, int progress) {
         RenderSystem._setShaderTexture(0, GUI);
-        this.blit(matrixStack, 91, 38, 176, 134, 11, Math.round((progress / 100.0f) * 19));
+        this.blit(poseStack, 91, 38, 176, 134, 11, Math.round((progress / 100.0f) * 19));
     }
 
-    private void drawActiveIcon(PoseStack matrixStack, boolean isActive) {
+    private void drawActiveIcon(PoseStack poseStack, boolean isActive) {
         RenderSystem._setShaderTexture(0, GUI);
 
         if(isActive) {
-            this.blit(matrixStack, 154, 12, 176, 24, 8, 9);
+            this.blit(poseStack, 154, 12, 176, 24, 8, 9);
         } else {
-            this.blit(matrixStack, 154, 12, 184, 24, 8, 9);
+            this.blit(poseStack, 154, 12, 184, 24, 8, 9);
         }
     }
 
-    private void drawModeIcon(PoseStack matrixStack, boolean mode) {
+    private void drawModeIcon(PoseStack poseStack, boolean mode) {
         RenderSystem._setShaderTexture(0, GUI);
 
         if (mode){
             //loop
-            this.blit(matrixStack, 152, 34, 176, 11, 13,13);
+            this.blit(poseStack, 152, 34, 176, 11, 13,13);
         } else {
-            this.blit(matrixStack, 151, 35, 176, 0, 13, 11);
+            this.blit(poseStack, 151, 35, 176, 0, 13, 11);
         }
     }
 
     @Override
-    public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
         //Render the dark background
 
-        this.renderBackground(matrixStack);
-        super.render(matrixStack, mouseX, mouseY, partialTicks);
+        this.renderBackground(poseStack);
+        super.render(poseStack, mouseX, mouseY, partialTicks);
 
 
 
         //Render any tooltips
-        renderTooltip(matrixStack, mouseX, mouseY);
+        renderTooltip(poseStack, mouseX, mouseY);
 
         int xAxis = (mouseX - (width - imageWidth) / 2);
         int yAxis = (mouseY - (height - imageHeight) / 2);
 
         if(xAxis >= 26 && xAxis <= 39 && yAxis >= 20 && yAxis <= 75) {
-            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new TextComponent(I18n.get("youmatter.gui.umatter.title")), new TextComponent(I18n.get("youmatter.gui.umatter.description", te.getTank().getFluid().getAmount()))));
+            drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(new TextComponent(I18n.get("youmatter.gui.umatter.title")), new TextComponent(I18n.get("youmatter.gui.umatter.description", replicator.getTank().getFluid().getAmount()))));
         }
 
         if(xAxis >= 127 && xAxis <= 142 && yAxis >= 59 && yAxis <= 79) {
-            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new TextComponent(I18n.get("youmatter.gui.energy.title")), new TextComponent(I18n.get("youmatter.gui.energy.description", te.getEnergy()))));
+            drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(new TextComponent(I18n.get("youmatter.gui.energy.title")), new TextComponent(I18n.get("youmatter.gui.energy.description", replicator.getEnergy()))));
         }
 
         if(xAxis >= 148 && xAxis <= 167 && yAxis >= 7 && yAxis <= 27) {
-            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new TextComponent(te.isActive() ? I18n.get("youmatter.gui.active") : I18n.get("youmatter.gui.paused")), new TextComponent(I18n.get("youmatter.gui.clicktochange"))));
+            drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(new TextComponent(replicator.isActive() ? I18n.get("youmatter.gui.active") : I18n.get("youmatter.gui.paused")), new TextComponent(I18n.get("youmatter.gui.clicktochange"))));
         }
 
         if(xAxis >= 148 && xAxis <= 167 && yAxis >= 31 && yAxis <= 51) {
-            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new TextComponent(te.isCurrentMode() ? I18n.get("youmatter.gui.performInfiniteRuns") : I18n.get("youmatter.gui.performSingleRun")), new TextComponent(I18n.get("youmatter.gui.clicktochange"))));
+            drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(new TextComponent(replicator.isCurrentMode() ? I18n.get("youmatter.gui.performInfiniteRuns") : I18n.get("youmatter.gui.performSingleRun")), new TextComponent(I18n.get("youmatter.gui.clicktochange"))));
         }
     }
 
-    private void drawTooltip(PoseStack matrixStack, int x, int y, List<Component> tooltips) {
-        renderComponentTooltip(matrixStack, tooltips, x, y);
+    private void drawTooltip(PoseStack poseStack, int x, int y, List<Component> tooltips) {
+        renderComponentTooltip(poseStack, tooltips, x, y);
     }
 
     @Override
@@ -161,7 +161,7 @@ public class ReplicatorScreen extends AbstractContainerScreen<ReplicatorContaine
     }
 
     //both drawFluid and drawFluidTank is courtesy of DarkGuardsMan and was modified to suit my needs. Go check him out: https://github.com/BuiltBrokenModding/Atomic-Science | MIT License |  Copyright (c) 2018 Built Broken Modding License: https://opensource.org/licenses/MIT
-    private void drawFluid(PoseStack matrixStack, int x, int y, int line, int col, int width, int drawSize, FluidStack fluidStack)
+    private void drawFluid(PoseStack poseStack, int x, int y, int line, int col, int width, int drawSize, FluidStack fluidStack)
     {
         if (fluidStack != null && fluidStack.getFluid() != null && !fluidStack.isEmpty())
         {
@@ -198,13 +198,13 @@ public class ReplicatorScreen extends AbstractContainerScreen<ReplicatorContaine
                     drawSize = 0;
                 }
 
-                blit(matrixStack, x + col, y + line + 58 - renderY - start, 1000, width, textureSize - (textureSize - renderY), this.minecraft.getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(fluidIcon));
+                blit(poseStack, x + col, y + line + 58 - renderY - start, 1000, width, textureSize - (textureSize - renderY), this.minecraft.getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(fluidIcon));
                 start = start + textureSize;
             }
         }
     }
 
-    private void drawFluidTank(PoseStack matrixStack, int x, int y, IFluidTank tank) {
+    private void drawFluidTank(PoseStack poseStack, int x, int y, IFluidTank tank) {
 
         //Get data
         final float scale = tank.getFluidAmount() / (float) tank.getCapacity();
@@ -218,13 +218,13 @@ public class ReplicatorScreen extends AbstractContainerScreen<ReplicatorContaine
         int meterHeight = 55;
         if (fluidStack != null)
         {
-            this.drawFluid(matrixStack, this.leftPos + x -1, this.topPos + y, -3, 1, 14, (int) ((meterHeight - 1) * scale), fluidStack);
+            this.drawFluid(poseStack, this.leftPos + x -1, this.topPos + y, -3, 1, 14, (int) ((meterHeight - 1) * scale), fluidStack);
         }
 
         //Draw lines
         RenderSystem._setShaderTexture(0, GUI);
         int meterWidth = 14;
-        this.blit(matrixStack, this.leftPos + x, this.topPos + y, 176, 35, meterWidth, meterHeight);
+        this.blit(poseStack, this.leftPos + x, this.topPos + y, 176, 35, meterWidth, meterHeight);
 
         //Reset color
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
@@ -251,12 +251,12 @@ public class ReplicatorScreen extends AbstractContainerScreen<ReplicatorContaine
                 //Playing Click sound
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 //Sending packet to server
-                PacketHandler.INSTANCE.sendToServer(new PacketChangeSettingsReplicatorServer(!te.isActive(), te.isCurrentMode()) );
+                PacketHandler.INSTANCE.sendToServer(new PacketChangeSettingsReplicatorServer(!replicator.isActive(), replicator.isCurrentMode()) );
             } else if(xAxis >= 148 && xAxis <= 167 && yAxis >= 31 && yAxis <= 51) {
                 //Playing Click sound
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 //Sending packet to server
-                PacketHandler.INSTANCE.sendToServer(new PacketChangeSettingsReplicatorServer(te.isActive(), !te.isCurrentMode()) );
+                PacketHandler.INSTANCE.sendToServer(new PacketChangeSettingsReplicatorServer(replicator.isActive(), !replicator.isCurrentMode()) );
             }
         }
         return true;

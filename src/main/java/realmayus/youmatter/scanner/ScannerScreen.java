@@ -15,61 +15,61 @@ import net.minecraft.world.entity.player.Inventory;
 import realmayus.youmatter.ObjectHolders;
 import realmayus.youmatter.YouMatter;
 
-public class ScannerScreen extends AbstractContainerScreen<ScannerContainer> {
+public class ScannerScreen extends AbstractContainerScreen<ScannerMenu> {
     private static final int WIDTH = 176;
     private static final int HEIGHT = 168;
 
-    private ScannerTile te;
+    private ScannerBlockEntity scanner;
 
     private static final ResourceLocation GUI = new ResourceLocation(YouMatter.MODID, "textures/gui/scanner.png");
 
-    public ScannerScreen(ScannerContainer container, Inventory inv, Component name) {
+    public ScannerScreen(ScannerMenu container, Inventory inv, Component name) {
         super(container, inv, name);
-        this.te = container.te;
+        this.scanner = container.scanner;
     }
 
     @Override
-    public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground(matrixStack);
-        super.render(matrixStack, mouseX, mouseY, partialTicks);
-        this.renderTooltip(matrixStack, mouseX, mouseY);
+    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
+        this.renderBackground(poseStack);
+        super.render(poseStack, mouseX, mouseY, partialTicks);
+        this.renderTooltip(poseStack, mouseX, mouseY);
 
         int xAxis = (mouseX - (width - WIDTH) / 2);
         int yAxis = (mouseY - (height - HEIGHT) / 2);
 
         if (xAxis >= 141 && xAxis <= 156 && yAxis >= 37 && yAxis <= 57) {
-            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new TextComponent(I18n.get("youmatter.gui.energy.title")), new TextComponent(I18n.get("youmatter.gui.energy.description", te.getEnergy()))));
+            drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(new TextComponent(I18n.get("youmatter.gui.energy.title")), new TextComponent(I18n.get("youmatter.gui.energy.description", scanner.getEnergy()))));
         }
 
-        if (!te.getHasEncoder()) {
+        if (!scanner.getHasEncoder()) {
             if (xAxis >= 16 && xAxis <= 32 && yAxis >= 59 && yAxis <= 75) {
-                drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new TextComponent(I18n.get("youmatter.warning.scanner1")), new TextComponent(I18n.get("youmatter.warning.scanner2")), new TextComponent(I18n.get("youmatter.warning.scanner3"))));
+                drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(new TextComponent(I18n.get("youmatter.warning.scanner1")), new TextComponent(I18n.get("youmatter.warning.scanner2")), new TextComponent(I18n.get("youmatter.warning.scanner3"))));
             }
         }
 
     }
 
     @Override
-    protected void renderLabels(PoseStack matrixStack, int mouseX, int mouseY) {
-        drawEnergyBolt(matrixStack, te.getEnergy());
-        drawProgressDisplayChain(matrixStack, te.getProgress());
+    protected void renderLabels(PoseStack poseStack, int mouseX, int mouseY) {
+        drawEnergyBolt(poseStack, scanner.getEnergy());
+        drawProgressDisplayChain(poseStack, scanner.getProgress());
 
-        if(!te.getHasEncoder()) {
-            this.blit(matrixStack, 16, 59, 176, 101, 16, 16);
+        if(!scanner.getHasEncoder()) {
+            this.blit(poseStack, 16, 59, 176, 101, 16, 16);
         }
-        font.draw(matrixStack, I18n.get(ObjectHolders.SCANNER_BLOCK.getDescriptionId()), 8, 6, 0x404040);
+        font.draw(poseStack, I18n.get(ObjectHolders.SCANNER_BLOCK.getDescriptionId()), 8, 6, 0x404040);
     }
 
     @Override
-    protected void renderBg(PoseStack matrixStack, float partialTicks, int mouseX, int mouseY) {
+    protected void renderBg(PoseStack poseStack, float partialTicks, int mouseX, int mouseY) {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem._setShaderTexture(0, GUI);
         int relX = (this.width - WIDTH) / 2;
         int relY = (this.height - HEIGHT) / 2;
-        this.blit(matrixStack, relX, relY, 0, 0, WIDTH, HEIGHT);
+        this.blit(poseStack, relX, relY, 0, 0, WIDTH, HEIGHT);
     }
 
-    private void drawProgressDisplayChain(PoseStack matrixStack, int progress) {
+    private void drawProgressDisplayChain(PoseStack poseStack, int progress) {
         int circuits;
         int arrow;
 
@@ -85,25 +85,25 @@ public class ScannerScreen extends AbstractContainerScreen<ScannerContainer> {
         }
 
         RenderSystem._setShaderTexture(0, GUI);
-        this.blit(matrixStack, 79, 62, 176, 41, Math.round((arrow / 100.0f) * 18), 12);
-        this.blit(matrixStack, 104, 34, 176, 53, 17, Math.round((circuits / 100.0f) * 24));
-        this.blit(matrixStack, 54, 34, 176, 77, 17, Math.round((circuits / 100.0f) * 24));
+        this.blit(poseStack, 79, 62, 176, 41, Math.round((arrow / 100.0f) * 18), 12);
+        this.blit(poseStack, 104, 34, 176, 53, 17, Math.round((circuits / 100.0f) * 24));
+        this.blit(poseStack, 54, 34, 176, 77, 17, Math.round((circuits / 100.0f) * 24));
     }
 
-    private void drawEnergyBolt(PoseStack matrixStack, int energy) {
+    private void drawEnergyBolt(PoseStack poseStack, int energy) {
         RenderSystem._setShaderTexture(0, GUI);
 
         if(energy == 0) {
-            this.blit(matrixStack, 141, 35, 176, 21, 15, 20);
+            this.blit(poseStack, 141, 35, 176, 21, 15, 20);
         } else {
             double percentage = energy * 100.0F / 1000000;  // i know this is dumb
             float percentagef = (float) percentage / 100; // but it works.
-            this.blit(matrixStack, 141, 35, 176, 0, 15, Math.round(20 * percentagef)); // it's not really intended that the bolt fills from the top but it looks cool tbh.
+            this.blit(poseStack, 141, 35, 176, 0, 15, Math.round(20 * percentagef)); // it's not really intended that the bolt fills from the top but it looks cool tbh.
 
         }
     }
 
-    private void drawTooltip(PoseStack matrixStack, int x, int y, List<Component> tooltips) {
-        renderComponentTooltip(matrixStack, tooltips, x, y);
+    private void drawTooltip(PoseStack poseStack, int x, int y, List<Component> tooltips) {
+        renderComponentTooltip(poseStack, tooltips, x, y);
     }
 }

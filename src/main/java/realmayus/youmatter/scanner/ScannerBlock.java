@@ -41,18 +41,18 @@ public class ScannerBlock extends BaseEntityBlock {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new ScannerTile(pos, state);
+        return new ScannerBlockEntity(pos, state);
     }
 
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        return level.isClientSide ? null : createTickerHelper(type, ObjectHolders.SCANNER_TILE, ScannerTile::serverTick);
+        return level.isClientSide ? null : createTickerHelper(type, ObjectHolders.SCANNER_TILE, ScannerBlockEntity::serverTick);
     }
 
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
         if (!state.is(newState.getBlock())) {
-            if (level.getBlockEntity(pos) instanceof ScannerTile scanner) {
+            if (level.getBlockEntity(pos) instanceof ScannerBlockEntity scanner) {
                 scanner.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent(h -> IntStream.range(0, h.getSlots()).forEach(i -> Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), h.getStackInSlot(i))));
             }
         }
@@ -64,12 +64,12 @@ public class ScannerBlock extends BaseEntityBlock {
      * EVENT that is called when you right-click the block,
      */
     @Override
-    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
-        if (!worldIn.isClientSide) {
-            MenuProvider containerProvider = getMenuProvider(state, worldIn, pos);
-            if (containerProvider != null) {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        if (!level.isClientSide) {
+            MenuProvider menuProvider = getMenuProvider(state, level, pos);
+            if (menuProvider != null) {
                 if (player instanceof ServerPlayer serverPlayer) {
-                    NetworkHooks.openGui(serverPlayer, containerProvider, pos);
+                    NetworkHooks.openGui(serverPlayer, menuProvider, pos);
                 }
             }
         }
@@ -78,18 +78,16 @@ public class ScannerBlock extends BaseEntityBlock {
 
     @Nullable
     @Override
-    public MenuProvider getMenuProvider(BlockState state, Level worldIn, BlockPos pos) {
-        BlockEntity te = worldIn.getBlockEntity(pos);
-
-        return te instanceof ScannerTile scanner ? scanner : null;
+    public MenuProvider getMenuProvider(BlockState state, Level level, BlockPos pos) {
+        return level.getBlockEntity(pos) instanceof ScannerBlockEntity scanner ? scanner : null;
     }
 
     @Override
-    public void playerWillDestroy(Level worldIn, BlockPos pos, BlockState state, Player player) {
-        BlockEntity te = worldIn.getBlockEntity(pos);
-        if(te instanceof ScannerTile){
-            te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent(h -> IntStream.range(0, h.getSlots()).forEach(i -> worldIn.addFreshEntity(new ItemEntity(worldIn, pos.getX(), pos.getY(), pos.getZ(), h.getStackInSlot(i)))));
+    public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+        BlockEntity be = level.getBlockEntity(pos);
+        if(be instanceof ScannerBlockEntity){
+            be.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent(h -> IntStream.range(0, h.getSlots()).forEach(i -> level.addFreshEntity(new ItemEntity(level, pos.getX(), pos.getY(), pos.getZ(), h.getStackInSlot(i)))));
         }
-        super.playerWillDestroy(worldIn, pos, state, player);
+        super.playerWillDestroy(level, pos, state, player);
     }
 }

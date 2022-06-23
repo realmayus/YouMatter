@@ -24,14 +24,14 @@ import realmayus.youmatter.network.PacketHandler;
 import realmayus.youmatter.network.PacketUpdateReplicatorClient;
 import realmayus.youmatter.util.DisplaySlot;
 
-public class ReplicatorContainer extends AbstractContainerMenu implements IReplicatorStateContainer {
+public class ReplicatorMenu extends AbstractContainerMenu implements IReplicatorStateContainer {
 
-    public ReplicatorTile te;
+    public ReplicatorBlockEntity replicator;
     private IItemHandler playerInventory;
 
-    public ReplicatorContainer(int windowId, Level world, BlockPos pos, Inventory playerInventory, Player player) {
+    public ReplicatorMenu(int windowId, Level level, BlockPos pos, Inventory playerInventory, Player player) {
         super(ObjectHolders.REPLICATOR_CONTAINER, windowId);
-        te = world.getBlockEntity(pos) instanceof ReplicatorTile replicator ? replicator : null;
+        replicator = level.getBlockEntity(pos) instanceof ReplicatorBlockEntity replicator ? replicator : null;
         this.playerInventory = new InvWrapper(playerInventory);
 
         addPlayerSlots(this.playerInventory);
@@ -44,37 +44,37 @@ public class ReplicatorContainer extends AbstractContainerMenu implements IRepli
         for(ContainerListener p : this.containerListeners) {
             if(p != null) {
                 if (p instanceof ServerPlayer serverPlayer) {
-                    PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new PacketUpdateReplicatorClient(te.getEnergy(), te.getProgress(), te.isActive(), te.isCurrentMode(), te.getTank().getFluid()));
+                    PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new PacketUpdateReplicatorClient(replicator.getEnergy(), replicator.getProgress(), replicator.isActive(), replicator.isCurrentMode(), replicator.getTank().getFluid()));
                 }
             }
         }
     }
 
     @Override
-    public boolean stillValid(Player playerIn) {
+    public boolean stillValid(Player player) {
         return true;
     }
 
 
-    private void addPlayerSlots(IItemHandler iItemHandler) {
+    private void addPlayerSlots(IItemHandler itemHandler) {
         // Slots for the main inventory
         for (int row = 0; row < 3; ++row) {
             for (int col = 0; col < 9; ++col) {
                 int x = col * 18 + 8;
                 int y = row * 18 + 85;
-                addSlot(new SlotItemHandler(iItemHandler, col + row * 9 + 9, x, y));
+                addSlot(new SlotItemHandler(itemHandler, col + row * 9 + 9, x, y));
             }
         }
         // Slots for the hotbar
         for (int row = 0; row < 9; ++row) {
             int x = 8 + row * 18;
             int y = 143;
-            addSlot(new SlotItemHandler(iItemHandler, row, x, y));
+            addSlot(new SlotItemHandler(itemHandler, row, x, y));
         }
     }
 
     private void addCustomSlots() {
-        te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(h -> {
+        replicator.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(h -> {
             // Flash drive
             addSlot(new SlotItemHandler(h, 0, 150, 60));
             // Output slot
@@ -89,33 +89,33 @@ public class ReplicatorContainer extends AbstractContainerMenu implements IRepli
     }
 
     @Override
-    public ItemStack quickMoveStack(Player playerIn, int index) {
-        ItemStack itemstack = ItemStack.EMPTY;
+    public ItemStack quickMoveStack(Player player, int index) {
+        ItemStack itemStack = ItemStack.EMPTY;
         Slot slot = this.slots.get(index);
 
         if (slot != null && slot.hasItem()) {
-            ItemStack itemstack1 = slot.getItem();
-            itemstack = itemstack1.copy();
+            ItemStack slotStack = slot.getItem();
+            itemStack = slotStack.copy();
 
             if (index >= 36 && index <= 40) { //originating slot is custom slot
-                if (!this.moveItemStackTo(itemstack1, 0, 36, true)) {
+                if (!this.moveItemStackTo(slotStack, 0, 36, true)) {
                     return ItemStack.EMPTY; // Inventory is full, can't transfer item!
                 }
             } else {
-                if (itemstack1.getItem() instanceof ThumbdriveItem) {
-                    if(!this.moveItemStackTo(itemstack1, 36, 37, false)) {
+                if (slotStack.getItem() instanceof ThumbdriveItem) {
+                    if(!this.moveItemStackTo(slotStack, 36, 37, false)) {
                         return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                     }
-                } else if(itemstack1.getItem() instanceof BucketItem bucket) {
+                } else if(slotStack.getItem() instanceof BucketItem bucket) {
                     if(bucket.getFluid().equals(ModFluids.UMATTER.get())) {
-                        if(!this.moveItemStackTo(itemstack1, 39, 40, false)) {
+                        if(!this.moveItemStackTo(slotStack, 39, 40, false)) {
                             return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                         }
                     }
-                } else if(itemstack1.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).isPresent()) {
-                    return itemstack1.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).map(h -> {
+                } else if(slotStack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).isPresent()) {
+                    return slotStack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).map(h -> {
                         if (h.getFluidInTank(0).getFluid().isSame(ModFluids.UMATTER.get())) {
-                            if(!this.moveItemStackTo(itemstack1, 39, 40, false)) {
+                            if(!this.moveItemStackTo(slotStack, 39, 40, false)) {
                                 return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                             }
                         } else {
@@ -127,21 +127,21 @@ public class ReplicatorContainer extends AbstractContainerMenu implements IRepli
                 return ItemStack.EMPTY;
             }
 
-            if (itemstack1.isEmpty()) {
+            if (slotStack.isEmpty()) {
                 slot.set(ItemStack.EMPTY);
             } else {
                 slot.setChanged();
             }
         }
-        return itemstack;
+        return itemStack;
     }
 
     @Override
     public void sync(int energy, int progress, FluidStack tank, boolean isActivated, boolean mode) {
-        te.setEnergy(energy);
-        te.setProgress(progress);
-        te.getTank().setFluid(tank);
-        te.setCurrentMode(mode);
-        te.setActive(isActivated);
+        replicator.setEnergy(energy);
+        replicator.setProgress(progress);
+        replicator.getTank().setFluid(tank);
+        replicator.setCurrentMode(mode);
+        replicator.setActive(isActivated);
     }
 }

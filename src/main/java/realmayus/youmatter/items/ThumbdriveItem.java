@@ -22,7 +22,7 @@ public class ThumbdriveItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
+    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         if(stack.hasTag()) {
             if (stack.getTag().contains("stored_items", Tag.TAG_LIST)) {
                 tooltip.add(new TextComponent(I18n.get("youmatter.tooltip.dataStored")));

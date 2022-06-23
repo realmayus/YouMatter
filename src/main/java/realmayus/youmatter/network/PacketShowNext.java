@@ -5,7 +5,7 @@ import java.util.function.Supplier;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
-import realmayus.youmatter.replicator.ReplicatorContainer;
+import realmayus.youmatter.replicator.ReplicatorMenu;
 //import realmayus.youmatter.replicator.ContainerReplicator;
 
 public class PacketShowNext {
@@ -22,8 +22,8 @@ public class PacketShowNext {
     void handle(Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
             ServerPlayer player = ctx.get().getSender();
-            if (player.containerMenu instanceof ReplicatorContainer openContainer) {
-                openContainer.te.renderNext();
+            if (player.containerMenu instanceof ReplicatorMenu openContainer) {
+                openContainer.replicator.renderNext();
             }
         });
         ctx.get().setPacketHandled(true);

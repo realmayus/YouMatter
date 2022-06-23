@@ -33,11 +33,11 @@ import realmayus.youmatter.YMConfig;
 import realmayus.youmatter.items.ThumbdriveItem;
 import realmayus.youmatter.util.MyEnergyStorage;
 
-public class EncoderTile extends BlockEntity implements MenuProvider {
+public class EncoderBlockEntity extends BlockEntity implements MenuProvider {
 
     private List<ItemStack> queue = new ArrayList<>();
 
-    public EncoderTile(BlockPos pos, BlockState state) {
+    public EncoderBlockEntity(BlockPos pos, BlockState state) {
         super(ObjectHolders.ENCODER_TILE, pos, state);
     }
 
@@ -58,7 +58,7 @@ public class EncoderTile extends BlockEntity implements MenuProvider {
     public LazyOptional<ItemStackHandler> inventory = LazyOptional.of(() -> new ItemStackHandler(5) {
         @Override
         protected void onContentsChanged(int slot) {
-            EncoderTile.this.setChanged();
+            EncoderBlockEntity.this.setChanged();
         }
     });
 
@@ -91,7 +91,7 @@ public class EncoderTile extends BlockEntity implements MenuProvider {
         myEnergyStorage.resolve().get().setEnergy(energy);
     }
 
-    private LazyOptional<MyEnergyStorage> myEnergyStorage = LazyOptional.of(() ->new MyEnergyStorage(this, 1000000, Integer.MAX_VALUE));
+    private LazyOptional<MyEnergyStorage> myEnergyStorage = LazyOptional.of(() -> new MyEnergyStorage(this, 1000000, Integer.MAX_VALUE));
 
     @Override
     public void load(CompoundTag compound) {
@@ -151,7 +151,7 @@ public class EncoderTile extends BlockEntity implements MenuProvider {
         myEnergyStorage.invalidate();
     }
 
-    public static void serverTick(Level level, BlockPos pos, BlockState state, EncoderTile be) {
+    public static void serverTick(Level level, BlockPos pos, BlockState state, EncoderBlockEntity be) {
         be.tick(level, pos, state);
     }
 
@@ -215,8 +215,8 @@ public class EncoderTile extends BlockEntity implements MenuProvider {
 
     @Nullable
     @Override
-    public AbstractContainerMenu createMenu(int windowID, Inventory playerInventory, Player playerEntity) {
-        return new EncoderContainer(windowID, level, worldPosition, playerInventory, playerEntity);
+    public AbstractContainerMenu createMenu(int windowID, Inventory playerInventory, Player player) {
+        return new EncoderMenu(windowID, level, worldPosition, playerInventory, player);
     }
 }
 

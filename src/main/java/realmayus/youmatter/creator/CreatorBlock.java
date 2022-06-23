@@ -41,18 +41,18 @@ public class CreatorBlock extends BaseEntityBlock {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new CreatorTile(pos, state);
+        return new CreatorBlockEntity(pos, state);
     }
 
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        return level.isClientSide ? null : createTickerHelper(type, ObjectHolders.CREATOR_TILE, CreatorTile::serverTick);
+        return level.isClientSide ? null : createTickerHelper(type, ObjectHolders.CREATOR_TILE, CreatorBlockEntity::serverTick);
     }
 
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
         if (!state.is(newState.getBlock())) {
-            if (level.getBlockEntity(pos) instanceof CreatorTile creator) {
+            if (level.getBlockEntity(pos) instanceof CreatorBlockEntity creator) {
                 creator.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent(h -> IntStream.range(0, h.getSlots()).forEach(i -> Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), h.getStackInSlot(i))));
             }
         }
@@ -64,12 +64,12 @@ public class CreatorBlock extends BaseEntityBlock {
      * EVENT that is called when you right-click the block,
      */
     @Override
-    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
-        if (!worldIn.isClientSide) {
-            MenuProvider containerProvider = getMenuProvider(state, worldIn, pos);
-            if (containerProvider != null) {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        if (!level.isClientSide) {
+            MenuProvider menuProvider = getMenuProvider(state, level, pos);
+            if (menuProvider != null) {
                 if (player instanceof ServerPlayer serverPlayer) {
-                    NetworkHooks.openGui(serverPlayer, containerProvider, pos);
+                    NetworkHooks.openGui(serverPlayer, menuProvider, pos);
                 }
             }
         }
@@ -77,10 +77,8 @@ public class CreatorBlock extends BaseEntityBlock {
     }
     @Nullable
     @Override
-    public MenuProvider getMenuProvider(BlockState state, Level worldIn, BlockPos pos) {
-        BlockEntity te = worldIn.getBlockEntity(pos);
-
-        return te instanceof CreatorTile creator ? creator : null;
+    public MenuProvider getMenuProvider(BlockState state, Level level, BlockPos pos) {
+        return level.getBlockEntity(pos) instanceof CreatorBlockEntity creator ? creator : null;
     }
 
 }

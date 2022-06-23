@@ -23,7 +23,7 @@ public class PacketUpdateReplicatorClient {
         fluidStack = buf.readFluidStack();
     }
 
-    public PacketUpdateReplicatorClient(Integer energy, Integer progress, Boolean isActivated, Boolean mode, FluidStack fluidStack) {
+    public PacketUpdateReplicatorClient(int energy, int progress, boolean isActivated, boolean mode, FluidStack fluidStack) {
         this.energy = energy;
         this.progress = progress;
         this.isActivated = isActivated;

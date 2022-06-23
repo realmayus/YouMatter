@@ -27,15 +27,15 @@ import realmayus.youmatter.network.PacketUpdateCreatorClient;
 
 
 
-public class CreatorContainer extends AbstractContainerMenu implements ICreatorStateContainer {
+public class CreatorMenu extends AbstractContainerMenu implements ICreatorStateContainer {
 
-    public CreatorTile te;
+    public CreatorBlockEntity creator;
     private IItemHandler playerInventory;
 
 
-    public CreatorContainer(int windowId, Level world, BlockPos pos, Inventory playerInventory, Player player) {
+    public CreatorMenu(int windowId, Level level, BlockPos pos, Inventory playerInventory, Player player) {
         super(ObjectHolders.CREATOR_CONTAINER, windowId);
-        te = world.getBlockEntity(pos) instanceof CreatorTile creator ? creator : null;
+        creator = level.getBlockEntity(pos) instanceof CreatorBlockEntity creator ? creator : null;
         this.playerInventory = new InvWrapper(playerInventory);
 
         addPlayerSlots(this.playerInventory);
@@ -47,35 +47,35 @@ public class CreatorContainer extends AbstractContainerMenu implements ICreatorS
         super.broadcastChanges();
         for(ContainerListener p : this.containerListeners) {
             if (p instanceof ServerPlayer serverPlayer) {
-                PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new PacketUpdateCreatorClient(te.getEnergy(), 0, te.getUTank().getFluid(), te.getSTank().getFluid(), te.isActivated()));
+                PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new PacketUpdateCreatorClient(creator.getEnergy(), 0, creator.getUTank().getFluid(), creator.getSTank().getFluid(), creator.isActivated()));
             }
         }
     }
 
     @Override
-    public boolean stillValid(Player playerIn) {
+    public boolean stillValid(Player player) {
         return true;
     }
 
-    private void addPlayerSlots(IItemHandler iItemHandler) {
+    private void addPlayerSlots(IItemHandler itemHandler) {
         // Slots for the main inventory
         for (int row = 0; row < 3; ++row) {
             for (int col = 0; col < 9; ++col) {
                 int x = col * 18 + 8;
                 int y = row * 18 + 85;
-                addSlot(new SlotItemHandler(iItemHandler, col + row * 9 + 9, x, y));
+                addSlot(new SlotItemHandler(itemHandler, col + row * 9 + 9, x, y));
             }
         }
         // Slots for the hotbar
         for (int row = 0; row < 9; ++row) {
             int x = 8 + row * 18;
             int y = 143;
-            addSlot(new SlotItemHandler(iItemHandler, row, x, y));
+            addSlot(new SlotItemHandler(itemHandler, row, x, y));
         }
     }
 
     private void addCustomSlots() {
-        te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(h -> {
+        creator.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(h -> {
             addSlot(new SlotItemHandler(h, 1, 52, 20));
             addSlot(new SlotItemHandler(h, 2, 52, 62));
             addSlot(new SlotItemHandler(h, 3, 110, 20));
@@ -87,42 +87,42 @@ public class CreatorContainer extends AbstractContainerMenu implements ICreatorS
      * This is actually needed in order to achieve shift click functionality in the Controller GUI. If this method isn't overridden, the game crashes.
      */
     @Override
-    public ItemStack quickMoveStack(Player playerIn, int index) {
-        ItemStack itemstack = ItemStack.EMPTY;
+    public ItemStack quickMoveStack(Player player, int index) {
+        ItemStack itemStack = ItemStack.EMPTY;
         Slot slot = this.slots.get(index);
 
         if (slot != null && slot.hasItem()) {
-            ItemStack itemstack1 = slot.getItem();
-            itemstack = itemstack1.copy();
+            ItemStack slotStack = slot.getItem();
+            itemStack = slotStack.copy();
 
             if (index >= 36 && index <= 39) { //originating slot is custom slot
-                if (!this.moveItemStackTo(itemstack1, 0, 36, true)) {
+                if (!this.moveItemStackTo(slotStack, 0, 36, true)) {
                     return ItemStack.EMPTY; // Inventory is full, can't transfer item!
                 }
             } else {
-                if(itemstack1.getItem() instanceof BucketItem bucket) {
+                if(slotStack.getItem() instanceof BucketItem bucket) {
                     if (bucket.getFluid().equals(ModFluids.STABILIZER.get()) || YMConfig.CONFIG.alternativeStabilizer.get().equalsIgnoreCase(bucket.getFluid().getRegistryName().getPath())) {
-                        if(!this.moveItemStackTo(itemstack1, 36, 37, false)) {
+                        if(!this.moveItemStackTo(slotStack, 36, 37, false)) {
                             return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                         }
                     } else if(bucket == Items.BUCKET) {
-                        if(!this.moveItemStackTo(itemstack1, 38, 39, false)) {
+                        if(!this.moveItemStackTo(slotStack, 38, 39, false)) {
                             return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                         }
                     }
-                } else if(itemstack1.getItem().equals(Items.BUCKET)) {
-                    if(!this.moveItemStackTo(itemstack1, 38, 39, false)) {
+                } else if(slotStack.getItem().equals(Items.BUCKET)) {
+                    if(!this.moveItemStackTo(slotStack, 38, 39, false)) {
                         return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                     }
 
-                } else if(itemstack1.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).isPresent()) {
-                    return itemstack1.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).map(h -> {
+                } else if(slotStack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).isPresent()) {
+                    return slotStack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).map(h -> {
                         if (h.getFluidInTank(0).isEmpty() || h.getFluidInTank(0).getFluid().isSame(ModFluids.UMATTER.get())) {
-                            if(!this.moveItemStackTo(itemstack1, 38, 39, false)) {
+                            if(!this.moveItemStackTo(slotStack, 38, 39, false)) {
                                 return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                             }
                         } else if (h.getFluidInTank(0).getFluid().isSame(ModFluids.STABILIZER.get()) || YMConfig.CONFIG.alternativeStabilizer.get().equalsIgnoreCase(h.getFluidInTank(0).getFluid().getRegistryName().getPath())) {
-                            if(!this.moveItemStackTo(itemstack1, 36, 37, false)) {
+                            if(!this.moveItemStackTo(slotStack, 36, 37, false)) {
                                 return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                             }
                         } else {
@@ -134,20 +134,20 @@ public class CreatorContainer extends AbstractContainerMenu implements ICreatorS
                 return ItemStack.EMPTY;
             }
 
-            if (itemstack1.isEmpty()) {
+            if (slotStack.isEmpty()) {
                 slot.set(ItemStack.EMPTY);
             } else {
                 slot.setChanged();
             }
         }
-        return itemstack;
+        return itemStack;
     }
 
     @Override
     public void sync(int energy, int progress, FluidStack uTank, FluidStack sTank, boolean isActivated) {
-        te.setEnergy(energy);
-        te.getUTank().setFluid(uTank);
-        te.getSTank().setFluid(sTank);
-        te.setActivated(isActivated);
+        creator.setEnergy(energy);
+        creator.getUTank().setFluid(uTank);
+        creator.getSTank().setFluid(sTank);
+        creator.setActivated(isActivated);
     }
 }

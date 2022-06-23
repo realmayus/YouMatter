@@ -46,9 +46,9 @@ import realmayus.youmatter.YMConfig;
 import realmayus.youmatter.util.GeneralUtils;
 import realmayus.youmatter.util.MyEnergyStorage;
 
-public class ReplicatorTile extends BlockEntity implements MenuProvider {
+public class ReplicatorBlockEntity extends BlockEntity implements MenuProvider {
 
-    public ReplicatorTile(BlockPos pos, BlockState state) {
+    public ReplicatorBlockEntity(BlockPos pos, BlockState state) {
         super(ObjectHolders.REPLICATOR_TILE, pos, state);
     }
 
@@ -180,7 +180,7 @@ public class ReplicatorTile extends BlockEntity implements MenuProvider {
 
         @Override
         protected void onContentsChanged(int slot) {
-            ReplicatorTile.this.setChanged();
+            ReplicatorBlockEntity.this.setChanged();
         }
     });
 
@@ -198,7 +198,7 @@ public class ReplicatorTile extends BlockEntity implements MenuProvider {
     private int currentIndex = 0;
     private int currentPartTick = 0; // only execute the following code every 5 ticks
     private ItemStack currentItem;
-    public static void serverTick(Level level, BlockPos pos, BlockState state, ReplicatorTile be) {
+    public static void serverTick(Level level, BlockPos pos, BlockState state, ReplicatorBlockEntity be) {
         be.tick(level, pos, state);
     }
 
@@ -405,8 +405,8 @@ public class ReplicatorTile extends BlockEntity implements MenuProvider {
 
     @Nullable
     @Override
-    public AbstractContainerMenu createMenu(int windowID, Inventory playerInventory, Player playerEntity) {
-        return new ReplicatorContainer(windowID, level, worldPosition, playerInventory, playerEntity);
+    public AbstractContainerMenu createMenu(int windowID, Inventory playerInventory, Player player) {
+        return new ReplicatorMenu(windowID, level, worldPosition, playerInventory, player);
 
     }
 }

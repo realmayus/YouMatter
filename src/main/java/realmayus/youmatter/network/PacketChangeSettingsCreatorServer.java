@@ -6,7 +6,7 @@ import java.util.function.Supplier;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
-import realmayus.youmatter.creator.CreatorContainer;
+import realmayus.youmatter.creator.CreatorMenu;
 
 public class PacketChangeSettingsCreatorServer{
 
@@ -29,8 +29,8 @@ public class PacketChangeSettingsCreatorServer{
         // This is the player the packet was sent to the server from
         ctx.get().enqueueWork(() -> {
             ServerPlayer player = ctx.get().getSender();
-            if (player.containerMenu instanceof CreatorContainer openContainer) {
-                openContainer.te.setActivated(isActivated);
+            if (player.containerMenu instanceof CreatorMenu openContainer) {
+                openContainer.creator.setActivated(isActivated);
             }
         });
         ctx.get().setPacketHandled(true);
