@@ -2,11 +2,9 @@ package realmayus.youmatter.encoder;
 
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ContainerListener;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -14,13 +12,10 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
-import net.minecraftforge.network.PacketDistributor;
 import realmayus.youmatter.ObjectHolders;
 import realmayus.youmatter.items.ThumbdriveItem;
-import realmayus.youmatter.network.PacketHandler;
-import realmayus.youmatter.network.PacketUpdateEncoderClient;
 
-public class EncoderMenu extends AbstractContainerMenu implements IEncoderStateContainer {
+public class EncoderMenu extends AbstractContainerMenu {
 
 
     public EncoderBlockEntity encoder;
@@ -33,18 +28,6 @@ public class EncoderMenu extends AbstractContainerMenu implements IEncoderStateC
 
         addPlayerSlots(this.playerInventory);
         addCustomSlots();
-    }
-
-    @Override
-    public void broadcastChanges() {
-        super.broadcastChanges();
-        for(ContainerListener p : this.containerListeners) {
-            if(p != null) {
-                if (p instanceof ServerPlayer serverPlayer) {
-                    PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new PacketUpdateEncoderClient(encoder.getEnergy(), encoder.getProgress()));
-                }
-            }
-        }
     }
 
     @Override
@@ -104,11 +87,5 @@ public class EncoderMenu extends AbstractContainerMenu implements IEncoderStateC
         }
 
         return itemStack;
-    }
-
-    @Override
-    public void sync(int energy, int progress) {
-        encoder.setEnergy(energy);
-        encoder.setProgress(progress);
     }
 }

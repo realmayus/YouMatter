@@ -1,11 +1,9 @@
 package realmayus.youmatter.scanner;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ContainerListener;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -13,12 +11,9 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
-import net.minecraftforge.network.PacketDistributor;
 import realmayus.youmatter.ObjectHolders;
-import realmayus.youmatter.network.PacketHandler;
-import realmayus.youmatter.network.PacketUpdateScannerClient;
 
-public class ScannerMenu extends AbstractContainerMenu implements IScannerStateContainer {
+public class ScannerMenu extends AbstractContainerMenu {
 
     public ScannerBlockEntity scanner;
     private IItemHandler playerInventory;
@@ -31,18 +26,6 @@ public class ScannerMenu extends AbstractContainerMenu implements IScannerStateC
 
         addPlayerSlots(this.playerInventory);
         addCustomSlots();
-    }
-
-    @Override
-    public void broadcastChanges() {
-        super.broadcastChanges();
-        for(ContainerListener p : this.containerListeners) {
-            if(p != null) {
-                if (p instanceof ServerPlayer serverPlayer) {
-                    PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new PacketUpdateScannerClient(scanner.getEnergy(), scanner.getProgress(), scanner.getHasEncoder()));
-                }
-            }
-        }
     }
 
     @Override
@@ -104,12 +87,5 @@ public class ScannerMenu extends AbstractContainerMenu implements IScannerStateC
         }
 
         return itemStack;
-    }
-
-    @Override
-    public void sync(int energy, int progress, boolean hasEncoder) {
-        scanner.setEnergy(energy);
-        scanner.setProgress(progress);
-        scanner.setHasEncoder(hasEncoder);
     }
 }

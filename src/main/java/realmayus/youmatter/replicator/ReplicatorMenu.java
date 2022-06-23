@@ -1,30 +1,24 @@
 package realmayus.youmatter.replicator;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ContainerListener;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
-import net.minecraftforge.network.PacketDistributor;
 import realmayus.youmatter.ModFluids;
 import realmayus.youmatter.ObjectHolders;
 import realmayus.youmatter.items.ThumbdriveItem;
-import realmayus.youmatter.network.PacketHandler;
-import realmayus.youmatter.network.PacketUpdateReplicatorClient;
 import realmayus.youmatter.util.DisplaySlot;
 
-public class ReplicatorMenu extends AbstractContainerMenu implements IReplicatorStateContainer {
+public class ReplicatorMenu extends AbstractContainerMenu {
 
     public ReplicatorBlockEntity replicator;
     private IItemHandler playerInventory;
@@ -36,18 +30,6 @@ public class ReplicatorMenu extends AbstractContainerMenu implements IReplicator
 
         addPlayerSlots(this.playerInventory);
         addCustomSlots();
-    }
-
-    @Override
-    public void broadcastChanges() {
-        super.broadcastChanges();
-        for(ContainerListener p : this.containerListeners) {
-            if(p != null) {
-                if (p instanceof ServerPlayer serverPlayer) {
-                    PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new PacketUpdateReplicatorClient(replicator.getEnergy(), replicator.getProgress(), replicator.isActive(), replicator.isCurrentMode(), replicator.getTank().getFluid()));
-                }
-            }
-        }
     }
 
     @Override
@@ -137,14 +119,5 @@ public class ReplicatorMenu extends AbstractContainerMenu implements IReplicator
             }
         }
         return itemStack;
-    }
-
-    @Override
-    public void sync(int energy, int progress, FluidStack tank, boolean isActivated, boolean mode) {
-        replicator.setEnergy(energy);
-        replicator.setProgress(progress);
-        replicator.getTank().setFluid(tank);
-        replicator.setCurrentMode(mode);
-        replicator.setActive(isActivated);
     }
 }

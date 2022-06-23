@@ -2,32 +2,26 @@ package realmayus.youmatter.creator;
 
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ContainerListener;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
-import net.minecraftforge.network.PacketDistributor;
 import realmayus.youmatter.ModFluids;
 import realmayus.youmatter.ObjectHolders;
 import realmayus.youmatter.YMConfig;
-import realmayus.youmatter.network.PacketHandler;
-import realmayus.youmatter.network.PacketUpdateCreatorClient;
 
 
 
-public class CreatorMenu extends AbstractContainerMenu implements ICreatorStateContainer {
+public class CreatorMenu extends AbstractContainerMenu {
 
     public CreatorBlockEntity creator;
     private IItemHandler playerInventory;
@@ -40,16 +34,6 @@ public class CreatorMenu extends AbstractContainerMenu implements ICreatorStateC
 
         addPlayerSlots(this.playerInventory);
         addCustomSlots();
-    }
-
-    @Override
-    public void broadcastChanges() {
-        super.broadcastChanges();
-        for(ContainerListener p : this.containerListeners) {
-            if (p instanceof ServerPlayer serverPlayer) {
-                PacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new PacketUpdateCreatorClient(creator.getEnergy(), 0, creator.getUTank().getFluid(), creator.getSTank().getFluid(), creator.isActivated()));
-            }
-        }
     }
 
     @Override
@@ -144,13 +128,5 @@ public class CreatorMenu extends AbstractContainerMenu implements ICreatorStateC
             }
         }
         return itemStack;
-    }
-
-    @Override
-    public void sync(int energy, int progress, FluidStack uTank, FluidStack sTank, boolean isActivated) {
-        creator.setEnergy(energy);
-        creator.getUTank().setFluid(uTank);
-        creator.getSTank().setFluid(sTank);
-        creator.setActivated(isActivated);
     }
 }
