@@ -149,7 +149,7 @@ public class ScannerTile extends BlockEntity implements MenuProvider {
                             setProgress(0);
                         }
                     }
-                } else {
+                } else if (getProgress() != 0) {
                     setProgress(0); // if item was suddenly removed, reset progress to 0
                 }
             } else {
