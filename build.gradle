@@ -12,6 +12,7 @@ repositories {
     maven {
         url = "https://dvs1.progwml6.com/files/maven/"
     }
+    maven { url 'https://modmaven.dev/' }
 }
 
 
@@ -118,7 +119,7 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
-//    implementation fg.deobf("ignored:Mekanism-1.16.1:10.0.9.432")
+    runtimeOnly fg.deobf("mekanism:Mekanism:1.18.2-10.2.0.459")
 //    implementation fg.deobf("curse.maven:refinedstorage:2871849")
 	implementation fg.deobf("mezz.jei:jei-1.18.2:9.7.0.196")
 }
