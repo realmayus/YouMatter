@@ -82,7 +82,7 @@ public class ScannerTile extends BlockEntity implements MenuProvider {
         myEnergyStorage.setEnergy(energy);
     }
 
-    private MyEnergyStorage myEnergyStorage = new MyEnergyStorage(1000000, Integer.MAX_VALUE);
+    private MyEnergyStorage myEnergyStorage = new MyEnergyStorage(this, 1000000, Integer.MAX_VALUE);
 
     @Override
     public void load(CompoundTag compound) {
@@ -141,7 +141,7 @@ public class ScannerTile extends BlockEntity implements MenuProvider {
                     if(getEnergy() > YMConfig.CONFIG.energyScanner.get()) {
                         if (getProgress() < 100) {
                             setProgress(getProgress() + 1);
-                            myEnergyStorage.consumePower(YMConfig.CONFIG.energyScanner.get());
+                            myEnergyStorage.extractEnergy(YMConfig.CONFIG.energyScanner.get(), false);
                         } else {
                             // Notifying the neighboring encoder of this scanner having finished its operation
                             ((EncoderTile)level.getBlockEntity(encoderPos)).ignite(this.inventory.getStackInSlot(1)); //don't worry, this is already checked by getNeighborEncoder() c:

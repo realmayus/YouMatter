@@ -1,29 +1,45 @@
 package realmayus.youmatter.util;
 
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.energy.EnergyStorage;
 
 public class MyEnergyStorage extends EnergyStorage {
 
-    public MyEnergyStorage(int capacity, int maxReceive) {
+    private final BlockEntity be;
+
+    public MyEnergyStorage(BlockEntity be, int capacity, int maxReceive) {
         super(capacity, maxReceive, 0);
+        this.be = be;
     }
 
     public void setEnergy(int energy) {
         this.energy = energy;
-    }
 
-    public void consumePower(int energy) {
-        this.energy -= energy;
-        if (this.energy < 0) {
-            this.energy = 0;
+        if (be.getLevel() != null) {
+            be.getLevel().sendBlockUpdated(be.getBlockPos(), be.getBlockState(), be.getBlockState(), Block.UPDATE_CLIENTS);
         }
+
+        be.setChanged();
     }
 
-    public void generatePower(int energy) {
-        this.energy += energy;
-        if (this.energy > capacity) {
-            this.energy = capacity;
+    @Override
+    public int extractEnergy(int maxExtract, boolean simulate) {
+        int energyExtracted = super.extractEnergy(maxExtract, simulate);
+        if (energyExtracted > 0 && be.getLevel() != null) {
+            be.getLevel().sendBlockUpdated(be.getBlockPos(), be.getBlockState(), be.getBlockState(), Block.UPDATE_CLIENTS);
         }
+        be.setChanged();
+        return energyExtracted;
     }
 
+    @Override
+    public int receiveEnergy(int maxReceive, boolean simulate) {
+        int energyReceived = super.receiveEnergy(maxReceive, simulate);
+        if (energyReceived > 0 && be.getLevel() != null) {
+            be.getLevel().sendBlockUpdated(be.getBlockPos(), be.getBlockState(), be.getBlockState(), Block.UPDATE_CLIENTS);
+        }
+        be.setChanged();
+        return energyReceived;
+    }
 }

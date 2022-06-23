@@ -236,7 +236,7 @@ public class ReplicatorTile extends BlockEntity implements MenuProvider {
                                             if(tank.getFluidAmount() >= getUMatterAmountForItem(currentItem.getItem())) {
                                                 tank.drain(getUMatterAmountForItem(currentItem.getItem()), IFluidHandler.FluidAction.EXECUTE);
                                                 progress++;
-                                                myEnergyStorage.consumePower(YMConfig.CONFIG.energyReplicator.get());
+                                                myEnergyStorage.extractEnergy(YMConfig.CONFIG.energyReplicator.get(), false);
                                             }
                                         }
 
@@ -259,7 +259,7 @@ public class ReplicatorTile extends BlockEntity implements MenuProvider {
                                                     if(inventory.getStackInSlot(1).isEmpty() || GeneralUtils.canAddItemToSlot(inventory.getStackInSlot(1), currentItem, false)) { //check if output slot is still empty
                                                         if (myEnergyStorage.getEnergyStored() >= YMConfig.CONFIG.energyReplicator.get()) {
                                                             progress++;
-                                                            myEnergyStorage.consumePower(YMConfig.CONFIG.energyReplicator.get());
+                                                            myEnergyStorage.extractEnergy(YMConfig.CONFIG.energyReplicator.get(), false);
                                                         }
                                                     }
                                                 } else {
@@ -308,7 +308,7 @@ public class ReplicatorTile extends BlockEntity implements MenuProvider {
         }
     }
 
-    private MyEnergyStorage myEnergyStorage = new MyEnergyStorage(1000000, 2000);
+    private MyEnergyStorage myEnergyStorage = new MyEnergyStorage(this, 1000000, 2000);
 
     private int progress = 0;
 

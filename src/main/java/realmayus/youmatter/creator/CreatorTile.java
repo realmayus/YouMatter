@@ -193,7 +193,7 @@ public class CreatorTile extends BlockEntity implements MenuProvider {
         myEnergyStorage.setEnergy(energy);
     }
 
-    private MyEnergyStorage myEnergyStorage = new MyEnergyStorage(1000000, Integer.MAX_VALUE);
+    private MyEnergyStorage myEnergyStorage = new MyEnergyStorage(this, 1000000, Integer.MAX_VALUE);
 
     @Override
     public void load(CompoundTag compound) {
@@ -257,7 +257,7 @@ public class CreatorTile extends BlockEntity implements MenuProvider {
                     if (uTank.getFluidAmount() + YMConfig.CONFIG.productionPerTick.get() <= MAX_UMATTER) {
                         sTank.drain(125, IFluidHandler.FluidAction.EXECUTE);
                         uTank.fill(new FluidStack(ModFluids.UMATTER.get(), YMConfig.CONFIG.productionPerTick.get()), IFluidHandler.FluidAction.EXECUTE);
-                        myEnergyStorage.consumePower(Math.round(getEnergy()/3f));
+                        myEnergyStorage.extractEnergy(Math.round(getEnergy()/3f), false);
                     }
                 }
             }

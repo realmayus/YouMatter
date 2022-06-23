@@ -89,7 +89,7 @@ public class EncoderTile extends BlockEntity implements MenuProvider {
         myEnergyStorage.setEnergy(energy);
     }
 
-    private MyEnergyStorage myEnergyStorage = new MyEnergyStorage(1000000, Integer.MAX_VALUE);
+    private MyEnergyStorage myEnergyStorage = new MyEnergyStorage(this, 1000000, Integer.MAX_VALUE);
 
     @Override
     public void load(CompoundTag compound) {
@@ -159,12 +159,12 @@ public class EncoderTile extends BlockEntity implements MenuProvider {
                                     ListTag list = nbt.getList("stored_items", Tag.TAG_STRING);
                                     if (list.size() < 8) {
                                         progress = progress + 1;
-                                        myEnergyStorage.consumePower(YMConfig.CONFIG.energyEncoder.get());
+                                        myEnergyStorage.extractEnergy(YMConfig.CONFIG.energyEncoder.get(), false);
                                     }
                                 }
                             } else {
                                 progress = progress + 1; //doesn't have data stored yet
-                                myEnergyStorage.consumePower(YMConfig.CONFIG.energyEncoder.get());
+                                myEnergyStorage.extractEnergy(YMConfig.CONFIG.energyEncoder.get(), false);
                             }
                         }
                     } else {
