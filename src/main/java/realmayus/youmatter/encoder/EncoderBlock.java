@@ -56,6 +56,8 @@ public class EncoderBlock extends BaseEntityBlock {
                 encoder.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent(h -> IntStream.range(0, h.getSlots()).forEach(i -> Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), h.getStackInSlot(i))));
             }
         }
+
+        super.onRemove(state, level, pos, newState, isMoving);
     }
 
     /**
