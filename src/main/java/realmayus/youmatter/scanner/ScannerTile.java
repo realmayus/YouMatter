@@ -44,25 +44,26 @@ public class ScannerTile extends BlockEntity implements MenuProvider {
 
     public void setHasEncoder(boolean hasEncoder) {
         this.hasEncoder = hasEncoder;
+        setChanged();
     }
 
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
         if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            return LazyOptional.of(() -> inventory).cast();
+            return inventory.cast();
         }
         if(cap == CapabilityEnergy.ENERGY) {
-            return LazyOptional.of(() -> myEnergyStorage).cast();
+            return myEnergyStorage.cast();
         }
         return super.getCapability(cap, side);
     }
-    public ItemStackHandler inventory = new ItemStackHandler(5) {
+    public LazyOptional<ItemStackHandler> inventory = LazyOptional.of(() -> new ItemStackHandler(5) {
         @Override
         protected void onContentsChanged(int slot) {
             ScannerTile.this.setChanged();
         }
-    };
+    });
 
     private int progress = 0;
 
@@ -72,17 +73,18 @@ public class ScannerTile extends BlockEntity implements MenuProvider {
 
     public void setProgress(int progress) {
         this.progress = progress;
+        setChanged();
     }
 
     public int getEnergy() {
-        return myEnergyStorage.getEnergyStored();
+        return myEnergyStorage.resolve().get().getEnergyStored();
     }
 
     public void setEnergy(int energy) {
-        myEnergyStorage.setEnergy(energy);
+        myEnergyStorage.resolve().get().setEnergy(energy);
     }
 
-    private MyEnergyStorage myEnergyStorage = new MyEnergyStorage(this, 1000000, Integer.MAX_VALUE);
+    private LazyOptional<MyEnergyStorage> myEnergyStorage = LazyOptional.of(() -> new MyEnergyStorage(this, 1000000, Integer.MAX_VALUE));
 
     @Override
     public void load(CompoundTag compound) {
@@ -91,10 +93,10 @@ public class ScannerTile extends BlockEntity implements MenuProvider {
             setProgress(compound.getInt("progress"));
         }
         if (compound.contains("energy")) {
-            myEnergyStorage.setEnergy(compound.getInt("energy"));
+            setEnergy(compound.getInt("energy"));
         }
         if(compound.contains("inventory")) {
-            inventory.deserializeNBT((CompoundTag) compound.get("inventory"));
+            inventory.resolve().get().deserializeNBT((CompoundTag) compound.get("inventory"));
         }
 
         setHasEncoder(compound.getBoolean("encoder"));
@@ -107,7 +109,7 @@ public class ScannerTile extends BlockEntity implements MenuProvider {
         compound.putInt("energy", getEnergy());
         compound.putBoolean("encoder", getHasEncoder());
         if (inventory != null) {
-            compound.put("inventory", inventory.serializeNBT());
+            compound.put("inventory", inventory.resolve().get().serializeNBT());
         }
     }
 
@@ -137,21 +139,23 @@ public class ScannerTile extends BlockEntity implements MenuProvider {
                 }
 
                 hasEncoder = true;
-                if(!inventory.getStackInSlot(1).isEmpty() && isItemAllowed(inventory.getStackInSlot(1))) {
-                    if(getEnergy() > YMConfig.CONFIG.energyScanner.get()) {
-                        if (getProgress() < 100) {
-                            setProgress(getProgress() + 1);
-                            myEnergyStorage.extractEnergy(YMConfig.CONFIG.energyScanner.get(), false);
-                        } else {
-                            // Notifying the neighboring encoder of this scanner having finished its operation
-                            ((EncoderTile)level.getBlockEntity(encoderPos)).ignite(this.inventory.getStackInSlot(1)); //don't worry, this is already checked by getNeighborEncoder() c:
-                            inventory.setStackInSlot(1, ItemStack.EMPTY);
-                            setProgress(0);
+                inventory.ifPresent(inventory -> {
+                    if(!inventory.getStackInSlot(1).isEmpty() && isItemAllowed(inventory.getStackInSlot(1))) {
+                        if(getEnergy() > YMConfig.CONFIG.energyScanner.get()) {
+                            if (getProgress() < 100) {
+                                setProgress(getProgress() + 1);
+                                myEnergyStorage.ifPresent(myEnergyStorage -> myEnergyStorage.extractEnergy(YMConfig.CONFIG.energyScanner.get(), false));
+                            } else {
+                                // Notifying the neighboring encoder of this scanner having finished its operation
+                                ((EncoderTile)level.getBlockEntity(encoderPos)).ignite(inventory.getStackInSlot(1)); //don't worry, this is already checked by getNeighborEncoder() c:
+                                inventory.setStackInSlot(1, ItemStack.EMPTY);
+                                setProgress(0);
+                            }
                         }
+                    } else if (getProgress() != 0) {
+                        setProgress(0); // if item was suddenly removed, reset progress to 0
                     }
-                } else if (getProgress() != 0) {
-                    setProgress(0); // if item was suddenly removed, reset progress to 0
-                }
+                });
             } else {
                 if(hasEncoder) {
                     setChanged();
@@ -175,6 +179,13 @@ public class ScannerTile extends BlockEntity implements MenuProvider {
             //If list should act as a whitelist AND it DOESN'T contain the item, disallow scanning
         } else if (YMConfig.CONFIG.filterMode.get() || matches) return true;
         else return false;
+    }
+
+    @Override
+    public void setRemoved() {
+        super.setRemoved();
+        inventory.invalidate();
+        myEnergyStorage.invalidate();
     }
 
     @Nullable

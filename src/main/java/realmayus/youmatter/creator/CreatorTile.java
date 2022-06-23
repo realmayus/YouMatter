@@ -57,32 +57,33 @@ public class CreatorTile extends BlockEntity implements MenuProvider {
 
     public void setActivated(boolean activated) {
         isActivated = activated;
+        setChanged();
     }
 
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
         if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            return LazyOptional.of(() -> inventory).cast();
+            return inventory.cast();
         }
 
         if(cap == CapabilityEnergy.ENERGY) {
-            return LazyOptional.of(() -> myEnergyStorage).cast();
+            return myEnergyStorage.cast();
 
         }
         if(cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
-            return LazyOptional.of(() -> fluidHandler).cast();
+            return fluidHandler.cast();
 
         }
         return super.getCapability(cap, side);
     }
 
-    public ItemStackHandler inventory = new ItemStackHandler(5) {
+    public LazyOptional<ItemStackHandler> inventory = LazyOptional.of(() -> new ItemStackHandler(5) {
         @Override
         protected void onContentsChanged(int slot) {
             CreatorTile.this.setChanged();
         }
-    };
+    });
 
     private FluidTank uTank = new FluidTank(MAX_UMATTER) {
         @Override
@@ -110,7 +111,7 @@ public class CreatorTile extends BlockEntity implements MenuProvider {
         return sTank;
     }
 
-    private IFluidHandler fluidHandler = new IFluidHandler() {
+    private LazyOptional<IFluidHandler> fluidHandler = LazyOptional.of(() -> new IFluidHandler() {
         @Override
         public int getTanks() {
             return 2;
@@ -183,17 +184,25 @@ public class CreatorTile extends BlockEntity implements MenuProvider {
                 return null;
             }
         }
-    };
+    });
 
     public int getEnergy() {
-        return myEnergyStorage.getEnergyStored();
+        return myEnergyStorage.resolve().get().getEnergyStored();
     }
 
     public void setEnergy(int energy) {
-        myEnergyStorage.setEnergy(energy);
+        myEnergyStorage.resolve().get().setEnergy(energy);
     }
 
-    private MyEnergyStorage myEnergyStorage = new MyEnergyStorage(this, 1000000, Integer.MAX_VALUE);
+    private LazyOptional<MyEnergyStorage> myEnergyStorage = LazyOptional.of(() -> new MyEnergyStorage(this, 1000000, Integer.MAX_VALUE));
+
+    @Override
+    public void setRemoved() {
+        super.setRemoved();
+        inventory.invalidate();
+        myEnergyStorage.invalidate();
+        fluidHandler.invalidate();
+    }
 
     @Override
     public void load(CompoundTag compound) {
@@ -208,13 +217,13 @@ public class CreatorTile extends BlockEntity implements MenuProvider {
             sTank.readFromNBT(tagSTank);
         }
         if (compound.contains("energy")) {
-            myEnergyStorage.setEnergy(compound.getInt("energy"));
+            setEnergy(compound.getInt("energy"));
         }
         if (compound.contains("isActivated")) {
             isActivated = compound.getBoolean("isActivated");
         }
         if(compound.contains("inventory")) {
-            inventory.deserializeNBT((CompoundTag) compound.get("inventory"));
+            inventory.resolve().get().deserializeNBT((CompoundTag) compound.get("inventory"));
         }
     }
 
@@ -231,7 +240,7 @@ public class CreatorTile extends BlockEntity implements MenuProvider {
         compound.putInt("energy", getEnergy());
         compound.putBoolean("isActivated", isActivated);
         if(compound.contains("inventory")) {
-            inventory.deserializeNBT((CompoundTag) compound.get("inventory"));
+            inventory.resolve().get().deserializeNBT((CompoundTag) compound.get("inventory"));
         }
     }
 
@@ -257,7 +266,7 @@ public class CreatorTile extends BlockEntity implements MenuProvider {
                     if (uTank.getFluidAmount() + YMConfig.CONFIG.productionPerTick.get() <= MAX_UMATTER) {
                         sTank.drain(125, IFluidHandler.FluidAction.EXECUTE);
                         uTank.fill(new FluidStack(ModFluids.UMATTER.get(), YMConfig.CONFIG.productionPerTick.get()), IFluidHandler.FluidAction.EXECUTE);
-                        myEnergyStorage.extractEnergy(Math.round(getEnergy()/3f), false);
+                        myEnergyStorage.ifPresent(myEnergyStorage -> myEnergyStorage.extractEnergy(Math.round(getEnergy()/3f), false));
                     }
                 }
             }
@@ -272,54 +281,56 @@ public class CreatorTile extends BlockEntity implements MenuProvider {
             }
             currentPartTick = 0;
         } else if ((currentPartTick % 5) == 0) { // every five ticks
-            if (!(this.inventory.getStackInSlot(3).isEmpty()) && GeneralUtils.canAddItemToSlot(this.inventory.getStackInSlot(4), this.inventory.getStackInSlot(3), false)) {
-                ItemStack item = this.inventory.getStackInSlot(3);
-                if (item.getItem() instanceof BucketItem) {
-                    if (getUTank().getFluidAmount() >= 1000) {
-                        getUTank().drain(1000, IFluidHandler.FluidAction.EXECUTE);
-                        this.inventory.setStackInSlot(3, ItemStack.EMPTY);
-                        this.inventory.insertItem(4, new ItemStack(ObjectHolders.UMATTER_BUCKET, 1), false);
+            inventory.ifPresent(inventory -> {
+                if (!(inventory.getStackInSlot(3).isEmpty()) && GeneralUtils.canAddItemToSlot(inventory.getStackInSlot(4), inventory.getStackInSlot(3), false)) {
+                    ItemStack item = inventory.getStackInSlot(3);
+                    if (item.getItem() instanceof BucketItem) {
+                        if (getUTank().getFluidAmount() >= 1000) {
+                            getUTank().drain(1000, IFluidHandler.FluidAction.EXECUTE);
+                            inventory.setStackInSlot(3, ItemStack.EMPTY);
+                            inventory.insertItem(4, new ItemStack(ObjectHolders.UMATTER_BUCKET, 1), false);
+                        }
+                    } else {
+                        item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).ifPresent(h -> {
+                            if (h.getFluidInTank(0).getFluid().isSame(ModFluids.UMATTER.get()) || h.getFluidInTank(0).isEmpty()) {
+                                if (h.getTankCapacity(0) - h.getFluidInTank(0).getAmount() < getUTank().getFluidAmount()) { //fluid in S-Tank is more than what fits in the item's tank
+                                    getUTank().drain(h.fill(new FluidStack(ModFluids.UMATTER.get(), h.getTankCapacity(0) - h.getFluidInTank(0).getAmount()), IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
+                                } else { //S-Tank's fluid fits perfectly in item's tank
+                                    getUTank().drain(h.fill(getUTank().getFluid(), IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
+                                }
+                            }
+                        });
+                        inventory.setStackInSlot(3, ItemStack.EMPTY);
+                        inventory.insertItem(4, item, false);
                     }
-                } else {
-                    item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).ifPresent(h -> {
-                        if (h.getFluidInTank(0).getFluid().isSame(ModFluids.UMATTER.get()) || h.getFluidInTank(0).isEmpty()) {
-                            if (h.getTankCapacity(0) - h.getFluidInTank(0).getAmount() < getUTank().getFluidAmount()) { //fluid in S-Tank is more than what fits in the item's tank
-                                getUTank().drain(h.fill(new FluidStack(ModFluids.UMATTER.get(), h.getTankCapacity(0) - h.getFluidInTank(0).getAmount()), IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
-                            } else { //S-Tank's fluid fits perfectly in item's tank
-                                getUTank().drain(h.fill(getUTank().getFluid(), IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
-                            }
-                        }
-                    });
-                    this.inventory.setStackInSlot(3, ItemStack.EMPTY);
-                    this.inventory.insertItem(4, item, false);
                 }
-            }
-            if (!this.inventory.getStackInSlot(1).isEmpty()) {
-                ItemStack item = this.inventory.getStackInSlot(1);
-                if (item.getItem() instanceof BucketItem && GeneralUtils.canAddItemToSlot(this.inventory.getStackInSlot(2), new ItemStack(Items.BUCKET, 1), false)) {
-                    item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).ifPresent(h -> {
-                        if (!h.getFluidInTank(0).isEmpty() && (h.getFluidInTank(0).getFluid().isSame(ModFluids.STABILIZER.get()) || YMConfig.CONFIG.alternativeStabilizer.get().equalsIgnoreCase(h.getFluidInTank(0).getFluid().getRegistryName().getPath()))) {
-                            if (MAX_STABILIZER - getSTank().getFluidAmount() >= 1000) {
-                                getSTank().fill(new FluidStack(ModFluids.STABILIZER.get(), 1000), IFluidHandler.FluidAction.EXECUTE);
-                                this.inventory.setStackInSlot(1, ItemStack.EMPTY);
-                                this.inventory.insertItem(2, new ItemStack(Items.BUCKET, 1), false);
+                if (!inventory.getStackInSlot(1).isEmpty()) {
+                    ItemStack item = inventory.getStackInSlot(1);
+                    if (item.getItem() instanceof BucketItem && GeneralUtils.canAddItemToSlot(inventory.getStackInSlot(2), new ItemStack(Items.BUCKET, 1), false)) {
+                        item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).ifPresent(h -> {
+                            if (!h.getFluidInTank(0).isEmpty() && (h.getFluidInTank(0).getFluid().isSame(ModFluids.STABILIZER.get()) || YMConfig.CONFIG.alternativeStabilizer.get().equalsIgnoreCase(h.getFluidInTank(0).getFluid().getRegistryName().getPath()))) {
+                                if (MAX_STABILIZER - getSTank().getFluidAmount() >= 1000) {
+                                    getSTank().fill(new FluidStack(ModFluids.STABILIZER.get(), 1000), IFluidHandler.FluidAction.EXECUTE);
+                                    inventory.setStackInSlot(1, ItemStack.EMPTY);
+                                    inventory.insertItem(2, new ItemStack(Items.BUCKET, 1), false);
+                                }
                             }
-                        }
-                    });
-                } else if(GeneralUtils.canAddItemToSlot(this.inventory.getStackInSlot(2), this.inventory.getStackInSlot(1), false)) {
-                    item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).ifPresent(h -> {
-                        if (h.getFluidInTank(0).getFluid().isSame(ModFluids.STABILIZER.get()) || YMConfig.CONFIG.alternativeStabilizer.get().equalsIgnoreCase(h.getFluidInTank(0).getFluid().getRegistryName().getPath())) {
-                            if (h.getFluidInTank(0).getAmount() > MAX_STABILIZER - getSTank().getFluidAmount()) { //given fluid is more than what fits in the S-Tank
-                                getSTank().fill(h.drain(MAX_STABILIZER - getSTank().getFluidAmount(), IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
-                            } else { //given fluid fits perfectly in S-Tank
-                                getSTank().fill(h.drain(h.getFluidInTank(0).getAmount(), IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
+                        });
+                    } else if(GeneralUtils.canAddItemToSlot(inventory.getStackInSlot(2), inventory.getStackInSlot(1), false)) {
+                        item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).ifPresent(h -> {
+                            if (h.getFluidInTank(0).getFluid().isSame(ModFluids.STABILIZER.get()) || YMConfig.CONFIG.alternativeStabilizer.get().equalsIgnoreCase(h.getFluidInTank(0).getFluid().getRegistryName().getPath())) {
+                                if (h.getFluidInTank(0).getAmount() > MAX_STABILIZER - getSTank().getFluidAmount()) { //given fluid is more than what fits in the S-Tank
+                                    getSTank().fill(h.drain(MAX_STABILIZER - getSTank().getFluidAmount(), IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
+                                } else { //given fluid fits perfectly in S-Tank
+                                    getSTank().fill(h.drain(h.getFluidInTank(0).getAmount(), IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
+                                }
                             }
-                        }
-                    });
-                    this.inventory.setStackInSlot(1, ItemStack.EMPTY);
-                    this.inventory.insertItem(2, item, false);
+                        });
+                        inventory.setStackInSlot(1, ItemStack.EMPTY);
+                        inventory.insertItem(2, item, false);
+                    }
                 }
-            }
+            });
             currentPartTick++;
         } else {
             currentPartTick++;

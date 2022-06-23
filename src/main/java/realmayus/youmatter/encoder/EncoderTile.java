@@ -45,28 +45,29 @@ public class EncoderTile extends BlockEntity implements MenuProvider {
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
         if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            return LazyOptional.of(() -> inventory).cast();
+            return inventory.cast();
         }
 
         if(cap == CapabilityEnergy.ENERGY) {
-            return LazyOptional.of(() -> myEnergyStorage).cast();
+            return myEnergyStorage.cast();
 
         }
         return super.getCapability(cap, side);
     }
 
-    public ItemStackHandler inventory = new ItemStackHandler(5) {
+    public LazyOptional<ItemStackHandler> inventory = LazyOptional.of(() -> new ItemStackHandler(5) {
         @Override
         protected void onContentsChanged(int slot) {
             EncoderTile.this.setChanged();
         }
-    };
+    });
 
 
     // Calling this method signals incoming data from a neighboring scanner
     public void ignite(ItemStack itemStack) {
         if(itemStack != ItemStack.EMPTY && itemStack != null) {
             queue.add(itemStack);
+            setChanged();
         }
     }
 
@@ -79,25 +80,26 @@ public class EncoderTile extends BlockEntity implements MenuProvider {
 
     public void setProgress(int progress) {
         this.progress = progress;
+        setChanged();
     }
 
     public int getEnergy() {
-        return myEnergyStorage.getEnergyStored();
+        return myEnergyStorage.resolve().get().getEnergyStored();
     }
 
     public void setEnergy(int energy) {
-        myEnergyStorage.setEnergy(energy);
+        myEnergyStorage.resolve().get().setEnergy(energy);
     }
 
-    private MyEnergyStorage myEnergyStorage = new MyEnergyStorage(this, 1000000, Integer.MAX_VALUE);
+    private LazyOptional<MyEnergyStorage> myEnergyStorage = LazyOptional.of(() ->new MyEnergyStorage(this, 1000000, Integer.MAX_VALUE));
 
     @Override
     public void load(CompoundTag compound) {
         super.load(compound);
         setProgress(compound.getInt("progress"));
-        myEnergyStorage.setEnergy(compound.getInt("energy"));
+        setEnergy(compound.getInt("energy"));
         if(compound.contains("inventory")) {
-            inventory.deserializeNBT((CompoundTag) compound.get("inventory"));
+            inventory.resolve().get().deserializeNBT((CompoundTag) compound.get("inventory"));
         }
         if(compound.contains("queue")) {
             if (compound.get("queue") instanceof ListTag) {
@@ -121,7 +123,7 @@ public class EncoderTile extends BlockEntity implements MenuProvider {
         compound.putInt("progress", getProgress());
         compound.putInt("energy", getEnergy());
         if (inventory != null) {
-            compound.put("inventory", inventory.serializeNBT());
+            compound.put("inventory", inventory.resolve().get().serializeNBT());
         }
         ListTag tempCompoundList = new ListTag();
         for (ItemStack is : queue) {
@@ -142,6 +144,13 @@ public class EncoderTile extends BlockEntity implements MenuProvider {
         return ClientboundBlockEntityDataPacket.create(this);
     }
 
+    @Override
+    public void setRemoved() {
+        super.setRemoved();
+        inventory.invalidate();
+        myEnergyStorage.invalidate();
+    }
+
     public static void serverTick(Level level, BlockPos pos, BlockState state, EncoderTile be) {
         be.tick(level, pos, state);
     }
@@ -150,49 +159,51 @@ public class EncoderTile extends BlockEntity implements MenuProvider {
         if(queue.size() > 0){
             ItemStack processIS = queue.get(queue.size() - 1);
             if(processIS != ItemStack.EMPTY) {
-                if(this.inventory.getStackInSlot(1).getItem() instanceof ThumbdriveItem) {
-                    if (progress < 100) {
-                        if(getEnergy() >= YMConfig.CONFIG.energyEncoder.get()) {
-                            CompoundTag nbt = this.inventory.getStackInSlot(1).getTag();
-                            if (nbt != null) {
-                                if (nbt.contains("stored_items")) {
-                                    ListTag list = nbt.getList("stored_items", Tag.TAG_STRING);
-                                    if (list.size() < 8) {
-                                        progress = progress + 1;
-                                        myEnergyStorage.extractEnergy(YMConfig.CONFIG.energyEncoder.get(), false);
+                inventory.ifPresent(inventory -> {
+                    if(inventory.getStackInSlot(1).getItem() instanceof ThumbdriveItem) {
+                        if (progress < 100) {
+                            if(getEnergy() >= YMConfig.CONFIG.energyEncoder.get()) {
+                                CompoundTag nbt = inventory.getStackInSlot(1).getTag();
+                                if (nbt != null) {
+                                    if (nbt.contains("stored_items")) {
+                                        ListTag list = nbt.getList("stored_items", Tag.TAG_STRING);
+                                        if (list.size() < 8) {
+                                            progress = progress + 1;
+                                            myEnergyStorage.ifPresent(myEnergyStorage -> myEnergyStorage.extractEnergy(YMConfig.CONFIG.energyEncoder.get(), false));
+                                        }
                                     }
+                                } else {
+                                    progress = progress + 1; //doesn't have data stored yet
+                                    myEnergyStorage.ifPresent(myEnergyStorage -> myEnergyStorage.extractEnergy(YMConfig.CONFIG.energyEncoder.get(), false));
                                 }
-                            } else {
-                                progress = progress + 1; //doesn't have data stored yet
-                                myEnergyStorage.extractEnergy(YMConfig.CONFIG.energyEncoder.get(), false);
                             }
-                        }
-                    } else {
-                        CompoundTag nbt = this.inventory.getStackInSlot(1).getTag();
-                        if (nbt != null) {
-                            if(nbt.contains("stored_items")) {
-                                ListTag list = nbt.getList("stored_items", Tag.TAG_STRING);
-                                if(list.size() < 8) {
+                        } else {
+                            CompoundTag nbt = inventory.getStackInSlot(1).getTag();
+                            if (nbt != null) {
+                                if(nbt.contains("stored_items")) {
+                                    ListTag list = nbt.getList("stored_items", Tag.TAG_STRING);
+                                    if(list.size() < 8) {
+                                        list.add(StringTag.valueOf(processIS.getItem().getRegistryName() + ""));
+                                        nbt.put("stored_items", list);
+                                    }
+                                } else {
+                                    ListTag list = new ListTag();
                                     list.add(StringTag.valueOf(processIS.getItem().getRegistryName() + ""));
                                     nbt.put("stored_items", list);
                                 }
                             } else {
+                                nbt = new CompoundTag();
                                 ListTag list = new ListTag();
                                 list.add(StringTag.valueOf(processIS.getItem().getRegistryName() + ""));
                                 nbt.put("stored_items", list);
+                                inventory.getStackInSlot(1).setTag(nbt);
                             }
-                        } else {
-                            nbt = new CompoundTag();
-                            ListTag list = new ListTag();
-                            list.add(StringTag.valueOf(processIS.getItem().getRegistryName() + ""));
-                            nbt.put("stored_items", list);
-                            this.inventory.getStackInSlot(1).setTag(nbt);
-                        }
 
-                        queue.remove(processIS);
-                        progress = 0;
+                            queue.remove(processIS);
+                            progress = 0;
+                        }
                     }
-                }
+                });
             }
         }
     }

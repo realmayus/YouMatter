@@ -43,7 +43,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 import realmayus.youmatter.ModFluids;
 import realmayus.youmatter.ObjectHolders;
 import realmayus.youmatter.YMConfig;
-import realmayus.youmatter.util.CustomInvWrapper;
 import realmayus.youmatter.util.GeneralUtils;
 import realmayus.youmatter.util.MyEnergyStorage;
 
@@ -64,6 +63,7 @@ public class ReplicatorTile extends BlockEntity implements MenuProvider {
 
     public void setCurrentMode(boolean currentMode) {
         this.currentMode = currentMode;
+        setChanged();
     }
 
     boolean isActive() {
@@ -72,6 +72,7 @@ public class ReplicatorTile extends BlockEntity implements MenuProvider {
 
     public void setActive(boolean active) {
         isActive = active;
+        setChanged();
     }
 
     private static final int MAX_UMATTER = 10500;
@@ -89,7 +90,7 @@ public class ReplicatorTile extends BlockEntity implements MenuProvider {
         return tank;
     }
 
-    private IFluidHandler fluidHandler = new IFluidHandler() {
+    private LazyOptional<IFluidHandler> fluidHandler = LazyOptional.of(() -> new IFluidHandler() {
         @Override
         public int getTanks() {
             return 1;
@@ -139,35 +140,59 @@ public class ReplicatorTile extends BlockEntity implements MenuProvider {
             assert ModFluids.UMATTER.get() != null;
             return new FluidStack(ModFluids.UMATTER.get(), 0);
         }
-    };
+    });
 
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
         if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            return LazyOptional.of(() -> invWrapper).cast();
+            return inventory.cast();
         }
         if(cap == CapabilityEnergy.ENERGY) {
-            return LazyOptional.of(() -> myEnergyStorage).cast();
+            return myEnergyStorage.cast();
 
         }
         if(cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
-            return LazyOptional.of(() -> fluidHandler).cast();
+            return fluidHandler.cast();
         }
 
         return super.getCapability(cap, side);
     }
 
 
-    public ItemStackHandler inventory = new ItemStackHandler(5) {
+    public LazyOptional<ItemStackHandler> inventory = LazyOptional.of(() -> new ItemStackHandler(5) {
+        @Override
+        public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+            if (slot == 2) {
+                return stack;
+            } else {
+                return super.insertItem(slot, stack, simulate);
+            }
+        }
+
+        @Override
+        public ItemStack extractItem(int slot, int amount, boolean simulate) {
+            if (slot == 2) {
+                return ItemStack.EMPTY;
+            } else {
+                return super.extractItem(slot, amount, simulate);
+            }
+        }
+
         @Override
         protected void onContentsChanged(int slot) {
             ReplicatorTile.this.setChanged();
         }
-    };
-
-    CustomInvWrapper invWrapper = new CustomInvWrapper(inventory);
+    });
 
     private List<ItemStack> cachedItems;
+
+    @Override
+    public void setRemoved() {
+        super.setRemoved();
+        inventory.invalidate();
+        myEnergyStorage.invalidate();
+        fluidHandler.invalidate();
+    }
 
     // Current displayed item index -> cachedItems
     private int currentIndex = 0;
@@ -180,95 +205,101 @@ public class ReplicatorTile extends BlockEntity implements MenuProvider {
     public void tick(Level level, BlockPos pos, BlockState state) {
         if(currentPartTick == 5) {
             currentPartTick = 0;
-            if (!this.inventory.getStackInSlot(3).isEmpty()) {
-                ItemStack item = this.inventory.getStackInSlot(3);
-                if (item.getItem() instanceof BucketItem && GeneralUtils.canAddItemToSlot(this.inventory.getStackInSlot(4), new ItemStack(Items.BUCKET, 1), false)) {
-                    item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).ifPresent(h -> {
-                        if (!h.getFluidInTank(0).isEmpty() && h.getFluidInTank(0).getFluid().isSame(ModFluids.UMATTER.get())) {
-                            if (MAX_UMATTER - getTank().getFluidAmount() >= 1000) {
-                                getTank().fill(new FluidStack(ModFluids.UMATTER.get(), 1000), IFluidHandler.FluidAction.EXECUTE);
-                                this.inventory.setStackInSlot(3, ItemStack.EMPTY);
-                                this.inventory.insertItem(4, new ItemStack(Items.BUCKET, 1), false);
+            inventory.ifPresent(inventory -> {
+                if (!inventory.getStackInSlot(3).isEmpty()) {
+                    ItemStack item = inventory.getStackInSlot(3);
+                    if (item.getItem() instanceof BucketItem && GeneralUtils.canAddItemToSlot(inventory.getStackInSlot(4), new ItemStack(Items.BUCKET, 1), false)) {
+                        item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).ifPresent(h -> {
+                            if (!h.getFluidInTank(0).isEmpty() && h.getFluidInTank(0).getFluid().isSame(ModFluids.UMATTER.get())) {
+                                if (MAX_UMATTER - getTank().getFluidAmount() >= 1000) {
+                                    getTank().fill(new FluidStack(ModFluids.UMATTER.get(), 1000), IFluidHandler.FluidAction.EXECUTE);
+                                    inventory.setStackInSlot(3, ItemStack.EMPTY);
+                                    inventory.insertItem(4, new ItemStack(Items.BUCKET, 1), false);
+                                }
                             }
-                        }
-                    });
-                } else if(GeneralUtils.canAddItemToSlot(this.inventory.getStackInSlot(4), this.inventory.getStackInSlot(3), false)) {
-                    item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).ifPresent(h -> {
-                        if (h.getFluidInTank(0).getFluid().isSame(ModFluids.UMATTER.get())) {
-                            if (h.getFluidInTank(0).getAmount() > MAX_UMATTER - getTank().getFluidAmount()) { //given fluid is more than what fits in the U-Tank
-                                getTank().fill(h.drain(MAX_UMATTER - getTank().getFluidAmount(), IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
-                            } else { //given fluid fits perfectly in U-Tank
-                                getTank().fill(h.drain(h.getFluidInTank(0).getAmount(), IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
+                        });
+                    } else if(GeneralUtils.canAddItemToSlot(inventory.getStackInSlot(4), inventory.getStackInSlot(3), false)) {
+                        item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).ifPresent(h -> {
+                            if (h.getFluidInTank(0).getFluid().isSame(ModFluids.UMATTER.get())) {
+                                if (h.getFluidInTank(0).getAmount() > MAX_UMATTER - getTank().getFluidAmount()) { //given fluid is more than what fits in the U-Tank
+                                    getTank().fill(h.drain(MAX_UMATTER - getTank().getFluidAmount(), IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
+                                } else { //given fluid fits perfectly in U-Tank
+                                    getTank().fill(h.drain(h.getFluidInTank(0).getAmount(), IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
+                                }
                             }
-                        }
-                    });
-                    this.inventory.setStackInSlot(3, ItemStack.EMPTY);
-                    this.inventory.insertItem(4, item, false);
+                        });
+                        inventory.setStackInSlot(3, ItemStack.EMPTY);
+                        inventory.insertItem(4, item, false);
+                    }
                 }
-            }
 
-            ItemStack thumbdrive = inventory.getStackInSlot(0);
-            if (thumbdrive.isEmpty()){ //in case user removes thumb drive while replicator is in operation
-                inventory.setStackInSlot(2, ItemStack.EMPTY);
-                cachedItems = null;
-                currentIndex = 0;
-                progress = 0;
-            } else {
-                if (thumbdrive.hasTag()) {
-                    if(thumbdrive.getTag() != null) {
-                        ListTag taglist = (ListTag) thumbdrive.getTag().get("stored_items");
-                        cachedItems = new ArrayList<>();
-                        if (taglist != null) {
-                            for(Tag nbt : taglist) {
-                                if (nbt != null) {
-                                    if(nbt instanceof StringTag item) {
-                                        ItemStack newitem = new ItemStack(Objects.requireNonNull(ForgeRegistries.ITEMS.getValue(new ResourceLocation(item.getAsString()))), 1);
-                                        cachedItems.add(newitem);
+                ItemStack thumbdrive = inventory.getStackInSlot(0);
+                if (thumbdrive.isEmpty()){ //in case user removes thumb drive while replicator is in operation
+                    inventory.setStackInSlot(2, ItemStack.EMPTY);
+                    cachedItems = null;
+                    currentIndex = 0;
+                    progress = 0;
+                } else {
+                    if (thumbdrive.hasTag()) {
+                        if(thumbdrive.getTag() != null) {
+                            ListTag taglist = (ListTag) thumbdrive.getTag().get("stored_items");
+                            cachedItems = new ArrayList<>();
+                            if (taglist != null) {
+                                for(Tag nbt : taglist) {
+                                    if (nbt != null) {
+                                        if(nbt instanceof StringTag item) {
+                                            ItemStack newitem = new ItemStack(Objects.requireNonNull(ForgeRegistries.ITEMS.getValue(new ResourceLocation(item.getAsString()))), 1);
+                                            cachedItems.add(newitem);
+                                        }
                                     }
                                 }
-                            }
-                            renderItem(cachedItems, currentIndex);
-                            if(progress == 0) {
-                                if (!inventory.getStackInSlot(2).isEmpty()) {
-                                    if (isActive) {
-                                        currentItem = cachedItems.get(currentIndex);
-                                        if (myEnergyStorage.getEnergyStored() >= YMConfig.CONFIG.energyReplicator.get()) {
-                                            if(tank.getFluidAmount() >= getUMatterAmountForItem(currentItem.getItem())) {
-                                                tank.drain(getUMatterAmountForItem(currentItem.getItem()), IFluidHandler.FluidAction.EXECUTE);
-                                                progress++;
-                                                myEnergyStorage.extractEnergy(YMConfig.CONFIG.energyReplicator.get(), false);
-                                            }
-                                        }
-
-                                    }
-                                }
-                            } else {
-                                if(isActive) {
-                                    if(progress >= 100) {
-                                        if(!inventory.getStackInSlot(2).isEmpty()) {
-                                            if(!currentMode) { //if mode is single run, then pause machine
-                                                isActive = false;
-                                            }
-                                            inventory.insertItem(1, currentItem, false);
-                                        }
-                                        progress = 0;
-                                    } else {
-                                        if (currentItem != null) {
-                                            if (!currentItem.isEmpty()) {
-                                                if (currentItem.sameItem(inventory.getStackInSlot(2))) { // Check if selected item hasn't changed
-                                                    if(inventory.getStackInSlot(1).isEmpty() || GeneralUtils.canAddItemToSlot(inventory.getStackInSlot(1), currentItem, false)) { //check if output slot is still empty
-                                                        if (myEnergyStorage.getEnergyStored() >= YMConfig.CONFIG.energyReplicator.get()) {
-                                                            progress++;
-                                                            myEnergyStorage.extractEnergy(YMConfig.CONFIG.energyReplicator.get(), false);
-                                                        }
+                                renderItem(cachedItems, currentIndex);
+                                if(progress == 0) {
+                                    if (!inventory.getStackInSlot(2).isEmpty()) {
+                                        if (isActive) {
+                                            currentItem = cachedItems.get(currentIndex);
+                                            myEnergyStorage.ifPresent(myEnergyStorage -> {
+                                                if (myEnergyStorage.getEnergyStored() >= YMConfig.CONFIG.energyReplicator.get()) {
+                                                    if(tank.getFluidAmount() >= getUMatterAmountForItem(currentItem.getItem())) {
+                                                        tank.drain(getUMatterAmountForItem(currentItem.getItem()), IFluidHandler.FluidAction.EXECUTE);
+                                                        progress++;
+                                                        myEnergyStorage.extractEnergy(YMConfig.CONFIG.energyReplicator.get(), false);
                                                     }
-                                                } else {
-                                                    progress = 0; // abort if not
                                                 }
+                                            });
+
+                                        }
+                                    }
+                                } else {
+                                    if(isActive) {
+                                        if(progress >= 100) {
+                                            if(!inventory.getStackInSlot(2).isEmpty()) {
+                                                if(!currentMode) { //if mode is single run, then pause machine
+                                                    isActive = false;
+                                                }
+                                                inventory.insertItem(1, currentItem, false);
                                             }
+                                            progress = 0;
                                         } else {
-                                            if(cachedItems.get(currentIndex) != null) { //in case the current item isn't loaded yet -> this happens when reloading the world, see issue #31 on GitHub
-                                                currentItem = cachedItems.get(currentIndex);
+                                            if (currentItem != null) {
+                                                if (!currentItem.isEmpty()) {
+                                                    if (currentItem.sameItem(inventory.getStackInSlot(2))) { // Check if selected item hasn't changed
+                                                        if(inventory.getStackInSlot(1).isEmpty() || GeneralUtils.canAddItemToSlot(inventory.getStackInSlot(1), currentItem, false)) { //check if output slot is still empty
+                                                            myEnergyStorage.ifPresent(myEnergyStorage -> {
+                                                                if (myEnergyStorage.getEnergyStored() >= YMConfig.CONFIG.energyReplicator.get()) {
+                                                                    progress++;
+                                                                    myEnergyStorage.extractEnergy(YMConfig.CONFIG.energyReplicator.get(), false);
+                                                                }
+                                                            });
+                                                        }
+                                                    } else {
+                                                        progress = 0; // abort if not
+                                                    }
+                                                }
+                                            } else {
+                                                if(cachedItems.get(currentIndex) != null) { //in case the current item isn't loaded yet -> this happens when reloading the world, see issue #31 on GitHub
+                                                    currentItem = cachedItems.get(currentIndex);
+                                                }
                                             }
                                         }
                                     }
@@ -277,7 +308,7 @@ public class ReplicatorTile extends BlockEntity implements MenuProvider {
                         }
                     }
                 }
-            }
+            });
         }
         currentPartTick++;
     }
@@ -303,12 +334,12 @@ public class ReplicatorTile extends BlockEntity implements MenuProvider {
     private void renderItem(List<ItemStack> cache, int index) {
         if(index <= cache.size() - 1 && index >= 0) {
             if(cache.get(index) != null) {
-                inventory.setStackInSlot(2, cache.get(index));
+                inventory.ifPresent(inventory -> inventory.setStackInSlot(2, cache.get(index)));
             }
         }
     }
 
-    private MyEnergyStorage myEnergyStorage = new MyEnergyStorage(this, 1000000, 2000);
+    private LazyOptional<MyEnergyStorage> myEnergyStorage = LazyOptional.of(() -> new MyEnergyStorage(this, 1000000, 2000));
 
     private int progress = 0;
 
@@ -318,26 +349,27 @@ public class ReplicatorTile extends BlockEntity implements MenuProvider {
 
     public void setProgress(int progress) {
         this.progress = progress;
+        setChanged();
     }
 
     public int getEnergy() {
-        return myEnergyStorage.getEnergyStored();
+        return myEnergyStorage.resolve().get().getEnergyStored();
     }
 
     public void setEnergy(int energy) {
-        myEnergyStorage.setEnergy(energy);
+        myEnergyStorage.resolve().get().setEnergy(energy);
     }
 
     @Override
     public void load(CompoundTag compound) {
         super.load(compound);
         tank.readFromNBT(compound.getCompound("tank"));
-        myEnergyStorage.setEnergy(compound.getInt("energy"));
+        setEnergy(compound.getInt("energy"));
         setActive(compound.getBoolean("isActive"));
         setProgress(compound.getInt("progress"));
         setCurrentMode(compound.getBoolean("mode"));
         if (compound.contains("inventory")) {
-            inventory.deserializeNBT((CompoundTag) compound.get("inventory"));
+            inventory.resolve().get().deserializeNBT((CompoundTag) compound.get("inventory"));
         }
     }
 
@@ -352,7 +384,7 @@ public class ReplicatorTile extends BlockEntity implements MenuProvider {
         compound.putBoolean("mode", isCurrentMode());
         compound.putInt("progress", getProgress());
         if (inventory != null) {
-            compound.put("inventory", inventory.serializeNBT());
+            compound.put("inventory", inventory.resolve().get().serializeNBT());
         }
     }
 

@@ -15,6 +15,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraftforge.items.ItemStackHandler;
 import realmayus.youmatter.ObjectHolders;
 import realmayus.youmatter.YouMatter;
 import realmayus.youmatter.items.ThumbdriveItem;
@@ -48,17 +49,22 @@ public class EncoderScreen extends AbstractContainerScreen<EncoderContainer> {
             drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new TextComponent(I18n.get("youmatter.gui.energy.title")), new TextComponent(I18n.get("youmatter.gui.energy.description", te.getEnergy()))));
         }
         if (xAxis >= 16 && xAxis <= 32 && yAxis >= 59 && yAxis <= 75) {
-            if (te.inventory.getStackInSlot(1).getItem() instanceof ThumbdriveItem) {
-                CompoundTag nbt = te.inventory.getStackInSlot(1).getTag();
-                if (nbt != null) {
-                    ListTag list = nbt.getList("stored_items", Tag.TAG_STRING);
-                    if (list.size() >= 8) {
-                        drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new TextComponent(I18n.get("youmatter.warning.encoder2"))));
+            if (te.inventory.isPresent()) {
+                ItemStackHandler inventory = te.inventory.resolve().get();
+                if (inventory.getStackInSlot(1).getItem() instanceof ThumbdriveItem) {
+                    CompoundTag nbt = inventory.getStackInSlot(1).getTag();
+                    if (nbt != null) {
+                        ListTag list = nbt.getList("stored_items", Tag.TAG_STRING);
+                        if (list.size() >= 8) {
+                            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new TextComponent(I18n.get("youmatter.warning.encoder2"))));
+                        }
                     }
+
+                    return; //only dfraw the warning tooltip if the inventory is not present, or there is no thumbdrive inserted
                 }
-            } else {
-                drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new TextComponent(I18n.get("youmatter.warning.encoder1"))));
             }
+
+            drawTooltip(matrixStack, mouseX, mouseY, Arrays.asList(new TextComponent(I18n.get("youmatter.warning.encoder1"))));
         }
     }
 
@@ -78,17 +84,19 @@ public class EncoderScreen extends AbstractContainerScreen<EncoderContainer> {
         drawEnergyBolt(matrixStack, te.getEnergy());
         drawProgressDisplayChain(matrixStack, te.getProgress());
 
-        if (!(te.inventory.getStackInSlot(1).getItem() instanceof ThumbdriveItem)) {
-            this.blit(matrixStack, 16, 59, 176, 66, 16, 16);
-        } else {
-            CompoundTag nbt = te.inventory.getStackInSlot(1).getTag();
-            if (nbt != null) {
-                ListTag list = nbt.getList("stored_items", Tag.TAG_STRING);
-                if (list.size() >= 8) {
-                    this.blit(matrixStack, 16, 59, 176, 66, 16, 16);
+        te.inventory.ifPresent(inventory -> {
+            if (!(inventory.getStackInSlot(1).getItem() instanceof ThumbdriveItem)) {
+                this.blit(matrixStack, 16, 59, 176, 66, 16, 16);
+            } else {
+                CompoundTag nbt = inventory.getStackInSlot(1).getTag();
+                if (nbt != null) {
+                    ListTag list = nbt.getList("stored_items", Tag.TAG_STRING);
+                    if (list.size() >= 8) {
+                        this.blit(matrixStack, 16, 59, 176, 66, 16, 16);
+                    }
                 }
             }
-        }
+        });
         font.draw(matrixStack, I18n.get(ObjectHolders.ENCODER_BLOCK.getDescriptionId()), 8, 6, 0x404040);
     }
 
