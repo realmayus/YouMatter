@@ -49,7 +49,10 @@ public class EncoderMenu extends AbstractContainerMenu implements IEncoderStateC
 
     @Override
     public boolean stillValid(Player player) {
-        return true;
+        Level level = encoder.getLevel();
+        BlockPos pos = encoder.getBlockPos();
+
+        return !level.getBlockState(pos).is(ObjectHolders.ENCODER_BLOCK) ? false : player.distanceToSqr(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D) <= 64.0D;
     }
 
     private void addPlayerSlots(IItemHandler itemHandler) {
@@ -77,7 +80,7 @@ public class EncoderMenu extends AbstractContainerMenu implements IEncoderStateC
      * This is actually needed in order to achieve shift click functionality in the GUI. If this method isn't overridden, the game crashes.
      */
     @Override
-    public ItemStack quickMoveStack(Player playerIn, int index) {
+    public ItemStack quickMoveStack(Player player, int index) {
         ItemStack itemStack = ItemStack.EMPTY;
         Slot slot = this.slots.get(index);
 

@@ -47,7 +47,10 @@ public class ScannerMenu extends AbstractContainerMenu implements IScannerStateC
 
     @Override
     public boolean stillValid(Player player) {
-        return true;
+        Level level = scanner.getLevel();
+        BlockPos pos = scanner.getBlockPos();
+
+        return !level.getBlockState(pos).is(ObjectHolders.SCANNER_BLOCK) ? false : player.distanceToSqr(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D) <= 64.0D;
     }
 
 

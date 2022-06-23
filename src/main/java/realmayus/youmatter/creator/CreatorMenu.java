@@ -54,7 +54,10 @@ public class CreatorMenu extends AbstractContainerMenu implements ICreatorStateC
 
     @Override
     public boolean stillValid(Player player) {
-        return true;
+        Level level = creator.getLevel();
+        BlockPos pos = creator.getBlockPos();
+
+        return !level.getBlockState(pos).is(ObjectHolders.CREATOR_BLOCK) ? false : player.distanceToSqr(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D) <= 64.0D;
     }
 
     private void addPlayerSlots(IItemHandler itemHandler) {
