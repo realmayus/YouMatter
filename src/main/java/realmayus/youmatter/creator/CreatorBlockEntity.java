@@ -58,6 +58,10 @@ public class CreatorBlockEntity extends BlockEntity implements MenuProvider {
     public void setActivated(boolean activated) {
         isActivated = activated;
         setChanged();
+
+        if(level != null && !level.isClientSide) {
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+        }
     }
 
     @Nonnull

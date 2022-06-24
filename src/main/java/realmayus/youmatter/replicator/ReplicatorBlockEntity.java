@@ -64,6 +64,10 @@ public class ReplicatorBlockEntity extends BlockEntity implements MenuProvider {
     public void setCurrentMode(boolean currentMode) {
         this.currentMode = currentMode;
         setChanged();
+
+        if(level != null && !level.isClientSide) {
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+        }
     }
 
     boolean isActive() {
@@ -73,6 +77,10 @@ public class ReplicatorBlockEntity extends BlockEntity implements MenuProvider {
     public void setActive(boolean active) {
         isActive = active;
         setChanged();
+
+        if(level != null && !level.isClientSide) {
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+        }
     }
 
     private static final int MAX_UMATTER = 10500;
