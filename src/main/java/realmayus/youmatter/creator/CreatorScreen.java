@@ -204,8 +204,9 @@ public class CreatorScreen extends AbstractContainerScreen<CreatorMenu> {
             if(xAxis >= 148 && xAxis <= 167 && yAxis >= 7 && yAxis <= 27) {
                 //Playing Click sound
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                creator.setActivated(!creator.isActivated());
                 //Sending packet to server
-                PacketHandler.INSTANCE.sendToServer(new PacketChangeSettingsCreatorServer(!creator.isActivated()));
+                PacketHandler.INSTANCE.sendToServer(new PacketChangeSettingsCreatorServer(creator.isActivated()));
             }
         }
         return true;

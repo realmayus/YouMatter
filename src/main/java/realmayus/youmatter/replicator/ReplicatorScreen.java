@@ -240,23 +240,27 @@ public class ReplicatorScreen extends AbstractContainerScreen<ReplicatorMenu> {
             if(xAxis >= 80 && xAxis <= 85 && yAxis >= 21 && yAxis <= 31) {
                 //Playing Click sound
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                replicator.renderPrevious();
                 //Sending packet to server
                 PacketHandler.INSTANCE.sendToServer(new PacketShowPrevious());
             } else if(xAxis >= 108 && xAxis <= 113 && yAxis >= 21 && yAxis <= 31) {
                 //Playing Click sound
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                replicator.renderNext();
                 //Sending packet to server
                 PacketHandler.INSTANCE.sendToServer(new PacketShowNext() );
             } else if(xAxis >= 148 && xAxis <= 167 && yAxis >= 7 && yAxis <= 27) {
                 //Playing Click sound
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                replicator.setActive(!replicator.isActive());
                 //Sending packet to server
-                PacketHandler.INSTANCE.sendToServer(new PacketChangeSettingsReplicatorServer(!replicator.isActive(), replicator.isCurrentMode()) );
+                PacketHandler.INSTANCE.sendToServer(new PacketChangeSettingsReplicatorServer(replicator.isActive(), replicator.isCurrentMode()) );
             } else if(xAxis >= 148 && xAxis <= 167 && yAxis >= 31 && yAxis <= 51) {
                 //Playing Click sound
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                replicator.setCurrentMode(!replicator.isCurrentMode());
                 //Sending packet to server
-                PacketHandler.INSTANCE.sendToServer(new PacketChangeSettingsReplicatorServer(replicator.isActive(), !replicator.isCurrentMode()) );
+                PacketHandler.INSTANCE.sendToServer(new PacketChangeSettingsReplicatorServer(replicator.isActive(), replicator.isCurrentMode()) );
             }
         }
         return true;
