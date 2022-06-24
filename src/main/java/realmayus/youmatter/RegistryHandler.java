@@ -10,11 +10,11 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import realmayus.youmatter.creator.CreatorBlock;
-import realmayus.youmatter.creator.CreatorMenu;
 import realmayus.youmatter.creator.CreatorBlockEntity;
+import realmayus.youmatter.creator.CreatorMenu;
 import realmayus.youmatter.encoder.EncoderBlock;
-import realmayus.youmatter.encoder.EncoderMenu;
 import realmayus.youmatter.encoder.EncoderBlockEntity;
+import realmayus.youmatter.encoder.EncoderMenu;
 import realmayus.youmatter.items.BlackHoleItem;
 import realmayus.youmatter.items.ComputeModuleItem;
 import realmayus.youmatter.items.MachineCasingItem;
@@ -22,11 +22,11 @@ import realmayus.youmatter.items.ThumbdriveItem;
 import realmayus.youmatter.items.TransistorItem;
 import realmayus.youmatter.items.TransistorRawItem;
 import realmayus.youmatter.replicator.ReplicatorBlock;
-import realmayus.youmatter.replicator.ReplicatorMenu;
 import realmayus.youmatter.replicator.ReplicatorBlockEntity;
+import realmayus.youmatter.replicator.ReplicatorMenu;
 import realmayus.youmatter.scanner.ScannerBlock;
-import realmayus.youmatter.scanner.ScannerMenu;
 import realmayus.youmatter.scanner.ScannerBlockEntity;
+import realmayus.youmatter.scanner.ScannerMenu;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class RegistryHandler {

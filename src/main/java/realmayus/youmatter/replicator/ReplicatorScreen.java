@@ -12,7 +12,6 @@ import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Inventory;
@@ -127,19 +126,19 @@ public class ReplicatorScreen extends AbstractContainerScreen<ReplicatorMenu> {
         int yAxis = (mouseY - (height - imageHeight) / 2);
 
         if(xAxis >= 26 && xAxis <= 39 && yAxis >= 20 && yAxis <= 75) {
-            drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(new TextComponent(I18n.get("youmatter.gui.umatter.title")), new TextComponent(I18n.get("youmatter.gui.umatter.description", replicator.getTank().getFluid().getAmount()))));
+            drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(Component.literal(I18n.get("youmatter.gui.umatter.title")), Component.literal(I18n.get("youmatter.gui.umatter.description", replicator.getTank().getFluid().getAmount()))));
         }
 
         if(xAxis >= 127 && xAxis <= 142 && yAxis >= 59 && yAxis <= 79) {
-            drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(new TextComponent(I18n.get("youmatter.gui.energy.title")), new TextComponent(I18n.get("youmatter.gui.energy.description", replicator.getEnergy()))));
+            drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(Component.literal(I18n.get("youmatter.gui.energy.title")), Component.literal(I18n.get("youmatter.gui.energy.description", replicator.getEnergy()))));
         }
 
         if(xAxis >= 148 && xAxis <= 167 && yAxis >= 7 && yAxis <= 27) {
-            drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(new TextComponent(replicator.isActive() ? I18n.get("youmatter.gui.active") : I18n.get("youmatter.gui.paused")), new TextComponent(I18n.get("youmatter.gui.clicktochange"))));
+            drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(Component.literal(replicator.isActive() ? I18n.get("youmatter.gui.active") : I18n.get("youmatter.gui.paused")), Component.literal(I18n.get("youmatter.gui.clicktochange"))));
         }
 
         if(xAxis >= 148 && xAxis <= 167 && yAxis >= 31 && yAxis <= 51) {
-            drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(new TextComponent(replicator.isCurrentMode() ? I18n.get("youmatter.gui.performInfiniteRuns") : I18n.get("youmatter.gui.performSingleRun")), new TextComponent(I18n.get("youmatter.gui.clicktochange"))));
+            drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(Component.literal(replicator.isCurrentMode() ? I18n.get("youmatter.gui.performInfiniteRuns") : I18n.get("youmatter.gui.performSingleRun")), Component.literal(I18n.get("youmatter.gui.clicktochange"))));
         }
     }
 
@@ -152,8 +151,8 @@ public class ReplicatorScreen extends AbstractContainerScreen<ReplicatorMenu> {
         if (hoveredSlot instanceof DisplaySlot) {
             if(givenItem.sameItem(hoveredSlot.getItem())) {
                 List<Component> existingTooltips =  super.getTooltipFromItem(givenItem);
-                existingTooltips.add(new TextComponent(""));
-                existingTooltips.add(new TextComponent(I18n.get("gui.youmatter.requiredAmount", GeneralUtils.getUMatterAmountForItem(givenItem.getItem()))));
+                existingTooltips.add(Component.literal(""));
+                existingTooltips.add(Component.literal(I18n.get("gui.youmatter.requiredAmount", GeneralUtils.getUMatterAmountForItem(givenItem.getItem()))));
                 return existingTooltips;
             }
         }

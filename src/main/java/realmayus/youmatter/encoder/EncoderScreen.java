@@ -12,7 +12,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraftforge.items.ItemStackHandler;
@@ -46,7 +45,7 @@ public class EncoderScreen extends AbstractContainerScreen<EncoderMenu> {
         int yAxis = (mouseY - (height - HEIGHT) / 2);
 
         if(xAxis >= 141 && xAxis <= 156 && yAxis >= 37 && yAxis <= 57) {
-            drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(new TextComponent(I18n.get("youmatter.gui.energy.title")), new TextComponent(I18n.get("youmatter.gui.energy.description", encoder.getEnergy()))));
+            drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(Component.literal(I18n.get("youmatter.gui.energy.title")), Component.literal(I18n.get("youmatter.gui.energy.description", encoder.getEnergy()))));
         }
         if (xAxis >= 16 && xAxis <= 32 && yAxis >= 59 && yAxis <= 75) {
             if (encoder.inventory.isPresent()) {
@@ -56,7 +55,7 @@ public class EncoderScreen extends AbstractContainerScreen<EncoderMenu> {
                     if (nbt != null) {
                         ListTag list = nbt.getList("stored_items", Tag.TAG_STRING);
                         if (list.size() >= 8) {
-                            drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(new TextComponent(I18n.get("youmatter.warning.encoder2"))));
+                            drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(Component.literal(I18n.get("youmatter.warning.encoder2"))));
                         }
                     }
 
@@ -64,7 +63,7 @@ public class EncoderScreen extends AbstractContainerScreen<EncoderMenu> {
                 }
             }
 
-            drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(new TextComponent(I18n.get("youmatter.warning.encoder1"))));
+            drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(Component.literal(I18n.get("youmatter.warning.encoder1"))));
         }
     }
 

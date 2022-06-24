@@ -9,7 +9,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import realmayus.youmatter.ObjectHolders;
@@ -38,12 +37,12 @@ public class ScannerScreen extends AbstractContainerScreen<ScannerMenu> {
         int yAxis = (mouseY - (height - HEIGHT) / 2);
 
         if (xAxis >= 141 && xAxis <= 156 && yAxis >= 37 && yAxis <= 57) {
-            drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(new TextComponent(I18n.get("youmatter.gui.energy.title")), new TextComponent(I18n.get("youmatter.gui.energy.description", scanner.getEnergy()))));
+            drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(Component.literal(I18n.get("youmatter.gui.energy.title")), Component.literal(I18n.get("youmatter.gui.energy.description", scanner.getEnergy()))));
         }
 
         if (!scanner.getHasEncoder()) {
             if (xAxis >= 16 && xAxis <= 32 && yAxis >= 59 && yAxis <= 75) {
-                drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(new TextComponent(I18n.get("youmatter.warning.scanner1")), new TextComponent(I18n.get("youmatter.warning.scanner2")), new TextComponent(I18n.get("youmatter.warning.scanner3"))));
+                drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(Component.literal(I18n.get("youmatter.warning.scanner1")), Component.literal(I18n.get("youmatter.warning.scanner2")), Component.literal(I18n.get("youmatter.warning.scanner3"))));
             }
         }
 

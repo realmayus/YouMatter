@@ -12,7 +12,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -39,6 +38,7 @@ import realmayus.youmatter.YMConfig;
 import realmayus.youmatter.replicator.ReplicatorBlockEntity;
 import realmayus.youmatter.util.GeneralUtils;
 import realmayus.youmatter.util.MyEnergyStorage;
+import realmayus.youmatter.util.RegistryUtil;
 
 public class CreatorBlockEntity extends BlockEntity implements MenuProvider {
 
@@ -312,7 +312,7 @@ public class CreatorBlockEntity extends BlockEntity implements MenuProvider {
                     ItemStack item = inventory.getStackInSlot(1);
                     if (item.getItem() instanceof BucketItem && GeneralUtils.canAddItemToSlot(inventory.getStackInSlot(2), new ItemStack(Items.BUCKET, 1), false)) {
                         item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).ifPresent(h -> {
-                            if (!h.getFluidInTank(0).isEmpty() && (h.getFluidInTank(0).getFluid().isSame(ModFluids.STABILIZER.get()) || YMConfig.CONFIG.alternativeStabilizer.get().equalsIgnoreCase(h.getFluidInTank(0).getFluid().getRegistryName().getPath()))) {
+                            if (!h.getFluidInTank(0).isEmpty() && (h.getFluidInTank(0).getFluid().isSame(ModFluids.STABILIZER.get()) || YMConfig.CONFIG.alternativeStabilizer.get().equalsIgnoreCase(RegistryUtil.getRegistryName(h.getFluidInTank(0).getFluid()).getPath()))) {
                                 if (MAX_STABILIZER - getSTank().getFluidAmount() >= 1000) {
                                     getSTank().fill(new FluidStack(ModFluids.STABILIZER.get(), 1000), IFluidHandler.FluidAction.EXECUTE);
                                     inventory.setStackInSlot(1, ItemStack.EMPTY);
@@ -322,7 +322,7 @@ public class CreatorBlockEntity extends BlockEntity implements MenuProvider {
                         });
                     } else if(GeneralUtils.canAddItemToSlot(inventory.getStackInSlot(2), inventory.getStackInSlot(1), false)) {
                         item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).ifPresent(h -> {
-                            if (h.getFluidInTank(0).getFluid().isSame(ModFluids.STABILIZER.get()) || YMConfig.CONFIG.alternativeStabilizer.get().equalsIgnoreCase(h.getFluidInTank(0).getFluid().getRegistryName().getPath())) {
+                            if (h.getFluidInTank(0).getFluid().isSame(ModFluids.STABILIZER.get()) || YMConfig.CONFIG.alternativeStabilizer.get().equalsIgnoreCase(RegistryUtil.getRegistryName(h.getFluidInTank(0).getFluid()).getPath())) {
                                 if (h.getFluidInTank(0).getAmount() > MAX_STABILIZER - getSTank().getFluidAmount()) { //given fluid is more than what fits in the S-Tank
                                     getSTank().fill(h.drain(MAX_STABILIZER - getSTank().getFluidAmount(), IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
                                 } else { //given fluid fits perfectly in S-Tank
@@ -376,7 +376,7 @@ public class CreatorBlockEntity extends BlockEntity implements MenuProvider {
 
     @Override
     public Component getDisplayName() {
-        return new TranslatableComponent(ObjectHolders.CREATOR_BLOCK.getDescriptionId());
+        return Component.translatable(ObjectHolders.CREATOR_BLOCK.getDescriptionId());
     }
 
     @Nullable

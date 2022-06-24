@@ -18,6 +18,7 @@ import net.minecraftforge.items.wrapper.InvWrapper;
 import realmayus.youmatter.ModFluids;
 import realmayus.youmatter.ObjectHolders;
 import realmayus.youmatter.YMConfig;
+import realmayus.youmatter.util.RegistryUtil;
 
 
 
@@ -88,7 +89,7 @@ public class CreatorMenu extends AbstractContainerMenu {
                 }
             } else {
                 if(slotStack.getItem() instanceof BucketItem bucket) {
-                    if (bucket.getFluid().equals(ModFluids.STABILIZER.get()) || YMConfig.CONFIG.alternativeStabilizer.get().equalsIgnoreCase(bucket.getFluid().getRegistryName().getPath())) {
+                    if (bucket.getFluid().equals(ModFluids.STABILIZER.get()) || YMConfig.CONFIG.alternativeStabilizer.get().equalsIgnoreCase(RegistryUtil.getRegistryName(bucket.getFluid()).getPath())) {
                         if(!this.moveItemStackTo(slotStack, 36, 37, false)) {
                             return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                         }
@@ -108,7 +109,7 @@ public class CreatorMenu extends AbstractContainerMenu {
                             if(!this.moveItemStackTo(slotStack, 38, 39, false)) {
                                 return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                             }
-                        } else if (h.getFluidInTank(0).getFluid().isSame(ModFluids.STABILIZER.get()) || YMConfig.CONFIG.alternativeStabilizer.get().equalsIgnoreCase(h.getFluidInTank(0).getFluid().getRegistryName().getPath())) {
+                        } else if (h.getFluidInTank(0).getFluid().isSame(ModFluids.STABILIZER.get()) || YMConfig.CONFIG.alternativeStabilizer.get().equalsIgnoreCase(RegistryUtil.getRegistryName(h.getFluidInTank(0).getFluid()).getPath())) {
                             if(!this.moveItemStackTo(slotStack, 36, 37, false)) {
                                 return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                             }

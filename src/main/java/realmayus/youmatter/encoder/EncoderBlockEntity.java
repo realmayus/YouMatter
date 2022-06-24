@@ -13,7 +13,6 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -32,6 +31,7 @@ import realmayus.youmatter.ObjectHolders;
 import realmayus.youmatter.YMConfig;
 import realmayus.youmatter.items.ThumbdriveItem;
 import realmayus.youmatter.util.MyEnergyStorage;
+import realmayus.youmatter.util.RegistryUtil;
 
 public class EncoderBlockEntity extends BlockEntity implements MenuProvider {
 
@@ -105,8 +105,7 @@ public class EncoderBlockEntity extends BlockEntity implements MenuProvider {
             if (compound.get("queue") instanceof ListTag) {
                 List<ItemStack> queueBuilder = new ArrayList<>();
                 for(Tag base: compound.getList("queue", Tag.TAG_COMPOUND)) {
-                    if (base instanceof CompoundTag) {
-                        CompoundTag nbtTagCompound = (CompoundTag) base;
+                    if (base instanceof CompoundTag nbtTagCompound) {
                         if(!ItemStack.of(nbtTagCompound).isEmpty()) {
                             queueBuilder.add(ItemStack.of(nbtTagCompound));
                         }
@@ -183,18 +182,18 @@ public class EncoderBlockEntity extends BlockEntity implements MenuProvider {
                                 if(nbt.contains("stored_items")) {
                                     ListTag list = nbt.getList("stored_items", Tag.TAG_STRING);
                                     if(list.size() < 8) {
-                                        list.add(StringTag.valueOf(processIS.getItem().getRegistryName() + ""));
+                                        list.add(StringTag.valueOf(RegistryUtil.getRegistryName(processIS.getItem()) + ""));
                                         nbt.put("stored_items", list);
                                     }
                                 } else {
                                     ListTag list = new ListTag();
-                                    list.add(StringTag.valueOf(processIS.getItem().getRegistryName() + ""));
+                                    list.add(StringTag.valueOf(RegistryUtil.getRegistryName(processIS.getItem()) + ""));
                                     nbt.put("stored_items", list);
                                 }
                             } else {
                                 nbt = new CompoundTag();
                                 ListTag list = new ListTag();
-                                list.add(StringTag.valueOf(processIS.getItem().getRegistryName() + ""));
+                                list.add(StringTag.valueOf(RegistryUtil.getRegistryName(processIS.getItem()) + ""));
                                 nbt.put("stored_items", list);
                                 inventory.getStackInSlot(1).setTag(nbt);
                             }
@@ -210,7 +209,7 @@ public class EncoderBlockEntity extends BlockEntity implements MenuProvider {
 
     @Override
     public Component getDisplayName() {
-        return new TranslatableComponent(ObjectHolders.ENCODER_BLOCK.getDescriptionId());
+        return Component.translatable(ObjectHolders.ENCODER_BLOCK.getDescriptionId());
     }
 
     @Nullable

@@ -12,7 +12,6 @@ import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Inventory;
@@ -101,16 +100,16 @@ public class CreatorScreen extends AbstractContainerScreen<CreatorMenu> {
         int yAxis = (mouseY - (height - imageHeight) / 2);
 
         if(xAxis >= 31 && xAxis <= 44 && yAxis >= 20 && yAxis <= 75) {
-            drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(new TextComponent(I18n.get("youmatter.gui.stabilizer.title")), new TextComponent(I18n.get("youmatter.gui.stabilizer.description", creator.getSTank().getFluidAmount()))));
+            drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(Component.literal(I18n.get("youmatter.gui.stabilizer.title")), Component.literal(I18n.get("youmatter.gui.stabilizer.description", creator.getSTank().getFluidAmount()))));
         }
         if(xAxis >= 89 && xAxis <= 102 && yAxis >= 20 && yAxis <= 75) {
-            drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(new TextComponent(I18n.get("youmatter.gui.umatter.title")), new TextComponent(I18n.get("youmatter.gui.umatter.description", creator.getUTank().getFluidAmount()))));
+            drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(Component.literal(I18n.get("youmatter.gui.umatter.title")), Component.literal(I18n.get("youmatter.gui.umatter.description", creator.getUTank().getFluidAmount()))));
         }
         if(xAxis >= 150 && xAxis <= 164 && yAxis >= 57 && yAxis <= 77) {
-            drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(new TextComponent(I18n.get("youmatter.gui.energy.title")), new TextComponent(I18n.get("youmatter.gui.energy.description", creator.getEnergy()))));
+            drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(Component.literal(I18n.get("youmatter.gui.energy.title")), Component.literal(I18n.get("youmatter.gui.energy.description", creator.getEnergy()))));
         }
         if(xAxis >= 148 && xAxis <= 167 && yAxis >= 7 && yAxis <= 27) {
-            drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(new TextComponent(creator.isActivated() ? I18n.get("youmatter.gui.active") : I18n.get("youmatter.gui.paused")), new TextComponent(I18n.get("youmatter.gui.clicktochange"))));
+            drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(Component.literal(creator.isActivated() ? I18n.get("youmatter.gui.active") : I18n.get("youmatter.gui.paused")), Component.literal(I18n.get("youmatter.gui.clicktochange"))));
         }
     }
 

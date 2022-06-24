@@ -17,7 +17,6 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.MenuProvider;
@@ -408,7 +407,7 @@ public class ReplicatorBlockEntity extends BlockEntity implements MenuProvider {
 
     @Override
     public Component getDisplayName() {
-        return new TranslatableComponent(ObjectHolders.REPLICATOR_BLOCK.getDescriptionId());
+        return Component.translatable(ObjectHolders.REPLICATOR_BLOCK.getDescriptionId());
     }
 
     @Nullable

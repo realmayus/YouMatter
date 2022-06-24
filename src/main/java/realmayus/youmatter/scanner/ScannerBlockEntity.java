@@ -9,7 +9,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -29,6 +28,7 @@ import realmayus.youmatter.YMConfig;
 import realmayus.youmatter.encoder.EncoderBlock;
 import realmayus.youmatter.encoder.EncoderBlockEntity;
 import realmayus.youmatter.util.MyEnergyStorage;
+import realmayus.youmatter.util.RegistryUtil;
 
 public class ScannerBlockEntity extends BlockEntity implements MenuProvider {
 
@@ -172,7 +172,7 @@ public class ScannerBlockEntity extends BlockEntity implements MenuProvider {
 
     private boolean isItemAllowed(ItemStack itemStack) {
 
-        boolean matches = YMConfig.CONFIG.filterItems.get().stream().anyMatch(s -> s.equalsIgnoreCase(Objects.requireNonNull(itemStack.getItem().getRegistryName()).toString()));
+        boolean matches = YMConfig.CONFIG.filterItems.get().stream().anyMatch(s -> s.equalsIgnoreCase(Objects.requireNonNull(RegistryUtil.getRegistryName(itemStack.getItem())).toString()));
         //If list should act as a blacklist AND it contains the item, disallow scanning
         if (YMConfig.CONFIG.filterMode.get() && matches) {
             return false;
@@ -204,7 +204,7 @@ public class ScannerBlockEntity extends BlockEntity implements MenuProvider {
 
     @Override
     public Component getDisplayName() {
-        return new TranslatableComponent(ObjectHolders.SCANNER_BLOCK.getDescriptionId());
+        return Component.translatable(ObjectHolders.SCANNER_BLOCK.getDescriptionId());
     }
 
     @Nullable

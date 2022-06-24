@@ -27,8 +27,8 @@ public class GeneralUtils {
     }
 
     public static int getUMatterAmountForItem(Item item) {
-        if(YMConfig.CONFIG.getOverride(item.getRegistryName().toString()) != null) {
-            return Integer.parseInt((String)YMConfig.CONFIG.getOverride(item.getRegistryName().toString())[1]);
+        if(YMConfig.CONFIG.getOverride(RegistryUtil.getRegistryName(item).toString()) != null) {
+            return Integer.parseInt((String)YMConfig.CONFIG.getOverride(RegistryUtil.getRegistryName(item).toString())[1]);
         } else {
             return YMConfig.CONFIG.defaultAmount.get();
         }
@@ -44,12 +44,12 @@ public class GeneralUtils {
     }
 
     public static boolean hasCustomUMatterValue(ItemStack item) {
-        return YMConfig.CONFIG.getOverride(item.getItem().getRegistryName().toString()) != null;
+        return YMConfig.CONFIG.getOverride(RegistryUtil.getRegistryName(item.getItem()).toString()) != null;
     }
 
     public static boolean hasCustomUMatterValue(ItemStack[] items) {
         for(ItemStack is : items) {
-            if(YMConfig.CONFIG.getOverride(is.getItem().getRegistryName().toString()) != null) {
+            if(YMConfig.CONFIG.getOverride(RegistryUtil.getRegistryName(is.getItem()).toString()) != null) {
                 return true;
             }
         }
