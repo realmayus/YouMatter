@@ -15,31 +15,38 @@ public class MyEnergyStorage extends EnergyStorage {
 
     public void setEnergy(int energy) {
         this.energy = energy;
+        be.setChanged();
 
-        if (be.getLevel() != null) {
+        if (be.getLevel() != null && !be.getLevel().isClientSide) {
             be.getLevel().sendBlockUpdated(be.getBlockPos(), be.getBlockState(), be.getBlockState(), Block.UPDATE_CLIENTS);
         }
-
-        be.setChanged();
     }
 
     @Override
     public int extractEnergy(int maxExtract, boolean simulate) {
-        int energyExtracted = super.extractEnergy(maxExtract, simulate);
-        if (energyExtracted > 0 && be.getLevel() != null) {
-            be.getLevel().sendBlockUpdated(be.getBlockPos(), be.getBlockState(), be.getBlockState(), Block.UPDATE_CLIENTS);
+        int energyToExtract = Math.min(energy, maxExtract);
+        if (!simulate && energyToExtract > 0) {
+            energy -= energyToExtract;
+            be.setChanged();
+
+            if(be.getLevel() != null && !be.getLevel().isClientSide) {
+                be.getLevel().sendBlockUpdated(be.getBlockPos(), be.getBlockState(), be.getBlockState(), Block.UPDATE_CLIENTS);
+            }
         }
-        be.setChanged();
-        return energyExtracted;
+        return energyToExtract;
     }
 
     @Override
     public int receiveEnergy(int maxReceive, boolean simulate) {
-        int energyReceived = super.receiveEnergy(maxReceive, simulate);
-        if (energyReceived > 0 && be.getLevel() != null) {
-            be.getLevel().sendBlockUpdated(be.getBlockPos(), be.getBlockState(), be.getBlockState(), Block.UPDATE_CLIENTS);
+        int energyToReceive = Math.min(capacity - energy, maxReceive);
+        if (!simulate && energyToReceive > 0) {
+            energy += energyToReceive;
+            be.setChanged();
+
+            if(be.getLevel() != null && !be.getLevel().isClientSide) {
+                be.getLevel().sendBlockUpdated(be.getBlockPos(), be.getBlockState(), be.getBlockState(), Block.UPDATE_CLIENTS);
+            }
         }
-        be.setChanged();
-        return energyReceived;
+        return energyToReceive;
     }
 }
