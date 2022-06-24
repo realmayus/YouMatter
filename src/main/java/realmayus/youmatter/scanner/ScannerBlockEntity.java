@@ -124,7 +124,7 @@ public class ScannerBlockEntity extends BlockEntity implements MenuProvider {
     }
 
     private int currentPartTick = 0;
-    public static void serverTick(Level level, BlockPos pos, BlockState state, ScannerBlockEntity be) {
+    public static void tick(Level level, BlockPos pos, BlockState state, ScannerBlockEntity be) {
         be.tick(level, pos, state);
     }
 

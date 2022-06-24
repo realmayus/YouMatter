@@ -151,7 +151,7 @@ public class EncoderBlockEntity extends BlockEntity implements MenuProvider {
         myEnergyStorage.invalidate();
     }
 
-    public static void serverTick(Level level, BlockPos pos, BlockState state, EncoderBlockEntity be) {
+    public static void tick(Level level, BlockPos pos, BlockState state, EncoderBlockEntity be) {
         be.tick(level, pos, state);
     }
 

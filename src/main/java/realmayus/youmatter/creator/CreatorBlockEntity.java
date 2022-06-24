@@ -255,7 +255,7 @@ public class CreatorBlockEntity extends BlockEntity implements MenuProvider {
     }
 
     private int currentPartTick = 0;
-    public static void serverTick(Level level, BlockPos pos, BlockState state, CreatorBlockEntity be) {
+    public static void tick(Level level, BlockPos pos, BlockState state, CreatorBlockEntity be) {
         be.tick(level, pos, state);
     }
 

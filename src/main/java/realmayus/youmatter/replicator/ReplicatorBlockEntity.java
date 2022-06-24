@@ -198,7 +198,7 @@ public class ReplicatorBlockEntity extends BlockEntity implements MenuProvider {
     private int currentIndex = 0;
     private int currentPartTick = 0; // only execute the following code every 5 ticks
     private ItemStack currentItem;
-    public static void serverTick(Level level, BlockPos pos, BlockState state, ReplicatorBlockEntity be) {
+    public static void tick(Level level, BlockPos pos, BlockState state, ReplicatorBlockEntity be) {
         be.tick(level, pos, state);
     }
 

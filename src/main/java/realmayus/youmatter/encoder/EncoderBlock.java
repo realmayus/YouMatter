@@ -46,7 +46,7 @@ public class EncoderBlock extends BaseEntityBlock {
 
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        return level.isClientSide ? null : createTickerHelper(type, ObjectHolders.ENCODER_TILE, EncoderBlockEntity::serverTick);
+        return createTickerHelper(type, ObjectHolders.ENCODER_TILE, EncoderBlockEntity::tick);
     }
 
     @Override
