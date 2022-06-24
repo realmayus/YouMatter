@@ -22,7 +22,7 @@ public class EncoderMenu extends AbstractContainerMenu {
     private IItemHandler playerInventory;
 
     public EncoderMenu(int windowId, Level world, BlockPos pos, Inventory playerInventory, Player player) {
-        super(ObjectHolders.ENCODER_CONTAINER, windowId);
+        super(ObjectHolders.ENCODER_MENU_TYPE, windowId);
         encoder = world.getBlockEntity(pos) instanceof EncoderBlockEntity encoder ? encoder : null;
         this.playerInventory = new InvWrapper(playerInventory);
 

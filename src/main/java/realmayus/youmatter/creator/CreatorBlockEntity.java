@@ -43,7 +43,7 @@ import realmayus.youmatter.util.MyEnergyStorage;
 public class CreatorBlockEntity extends BlockEntity implements MenuProvider {
 
     public CreatorBlockEntity(BlockPos pos, BlockState state) {
-        super(ObjectHolders.CREATOR_TILE, pos, state);
+        super(ObjectHolders.CREATOR_BLOCK_ENTITY_TYPE, pos, state);
     }
 
     private static final int MAX_UMATTER = 11000;

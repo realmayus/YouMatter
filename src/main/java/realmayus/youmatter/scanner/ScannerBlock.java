@@ -46,7 +46,7 @@ public class ScannerBlock extends BaseEntityBlock {
 
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        return createTickerHelper(type, ObjectHolders.SCANNER_TILE, ScannerBlockEntity::tick);
+        return createTickerHelper(type, ObjectHolders.SCANNER_BLOCK_ENTITY_TYPE, ScannerBlockEntity::tick);
     }
 
     @Override

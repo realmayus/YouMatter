@@ -28,7 +28,7 @@ public class CreatorMenu extends AbstractContainerMenu {
 
 
     public CreatorMenu(int windowId, Level level, BlockPos pos, Inventory playerInventory, Player player) {
-        super(ObjectHolders.CREATOR_CONTAINER, windowId);
+        super(ObjectHolders.CREATOR_MENU_TYPE, windowId);
         creator = level.getBlockEntity(pos) instanceof CreatorBlockEntity creator ? creator : null;
         this.playerInventory = new InvWrapper(playerInventory);
 

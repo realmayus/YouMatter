@@ -20,7 +20,7 @@ public class ScannerMenu extends AbstractContainerMenu {
 
 
     public ScannerMenu(int windowId, Level level, BlockPos pos, Inventory playerInventory, Player player) {
-        super(ObjectHolders.SCANNER_CONTAINER, windowId);
+        super(ObjectHolders.SCANNER_MENU_TYPE, windowId);
         scanner = level.getBlockEntity(pos) instanceof ScannerBlockEntity scanner ? scanner : null;
         this.playerInventory = new InvWrapper(playerInventory);
 

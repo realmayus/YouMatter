@@ -46,7 +46,7 @@ public class CreatorBlock extends BaseEntityBlock {
 
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        return createTickerHelper(type, ObjectHolders.CREATOR_TILE, CreatorBlockEntity::tick);
+        return createTickerHelper(type, ObjectHolders.CREATOR_BLOCK_ENTITY_TYPE, CreatorBlockEntity::tick);
     }
 
     @Override
