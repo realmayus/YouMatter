@@ -1,14 +1,13 @@
 package realmayus.youmatter;
 
-import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.common.extensions.IForgeMenuType;
-import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.registries.ForgeRegistries.Keys;
+import net.minecraftforge.registries.RegisterEvent;
 import realmayus.youmatter.creator.CreatorBlock;
 import realmayus.youmatter.creator.CreatorBlockEntity;
 import realmayus.youmatter.creator.CreatorMenu;
@@ -32,42 +31,37 @@ import realmayus.youmatter.scanner.ScannerMenu;
 public class RegistryHandler {
 
     @SubscribeEvent
-    public static void registerBlocks(RegistryEvent.Register<Block> event) {
-        event.getRegistry().register(new ScannerBlock().setRegistryName(YouMatter.MODID, "scanner"));
-        event.getRegistry().register(new EncoderBlock().setRegistryName(YouMatter.MODID, "encoder"));
-        event.getRegistry().register(new CreatorBlock().setRegistryName(YouMatter.MODID, "creator"));
-        event.getRegistry().register(new ReplicatorBlock().setRegistryName(YouMatter.MODID, "replicator"));
-    }
-
-    @SubscribeEvent
-    public static void registerTileEntites(RegistryEvent.Register<BlockEntityType<?>> event) {
-        event.getRegistry().register(BlockEntityType.Builder.of(ScannerBlockEntity::new, ObjectHolders.SCANNER_BLOCK).build(null).setRegistryName(YouMatter.MODID, "scanner"));
-        event.getRegistry().register(BlockEntityType.Builder.of(EncoderBlockEntity::new, ObjectHolders.ENCODER_BLOCK).build(null).setRegistryName(YouMatter.MODID, "encoder"));
-        event.getRegistry().register(BlockEntityType.Builder.of(CreatorBlockEntity::new, ObjectHolders.CREATOR_BLOCK).build(null).setRegistryName(YouMatter.MODID, "creator"));
-        event.getRegistry().register(BlockEntityType.Builder.of(ReplicatorBlockEntity::new, ObjectHolders.REPLICATOR_BLOCK).build(null).setRegistryName(YouMatter.MODID, "replicator"));
-    }
-
-    @SubscribeEvent
-    public static void registerItems(RegistryEvent.Register<Item> event) {
-        event.getRegistry().register(new BlockItem(ObjectHolders.SCANNER_BLOCK, new Item.Properties().tab(YouMatter.ITEM_GROUP)).setRegistryName(YouMatter.MODID, "scanner"));
-        event.getRegistry().register(new BlockItem(ObjectHolders.ENCODER_BLOCK, new Item.Properties().tab(YouMatter.ITEM_GROUP)).setRegistryName(YouMatter.MODID, "encoder"));
-        event.getRegistry().register(new BlockItem(ObjectHolders.CREATOR_BLOCK, new Item.Properties().tab(YouMatter.ITEM_GROUP)).setRegistryName(YouMatter.MODID, "creator"));
-        event.getRegistry().register(new BlockItem(ObjectHolders.REPLICATOR_BLOCK, new Item.Properties().tab(YouMatter.ITEM_GROUP)).setRegistryName(YouMatter.MODID, "replicator"));
-        event.getRegistry().register(new ThumbdriveItem().setRegistryName(YouMatter.MODID, "thumb_drive"));
-        event.getRegistry().register(new BlackHoleItem().setRegistryName(YouMatter.MODID, "black_hole"));
-        event.getRegistry().register(new MachineCasingItem().setRegistryName(YouMatter.MODID, "machine_casing"));
-        event.getRegistry().register(new ComputeModuleItem().setRegistryName(YouMatter.MODID, "compute_module"));
-        event.getRegistry().register(new TransistorItem().setRegistryName(YouMatter.MODID, "transistor"));
-        event.getRegistry().register(new TransistorRawItem().setRegistryName(YouMatter.MODID, "transistor_raw"));
-    }
-
-    @SubscribeEvent
-    public static void registerContainerTypes(RegistryEvent.Register<MenuType<?>> event) {
-        event.getRegistry().register(IForgeMenuType.create((windowId, inv, data) -> new ScannerMenu(windowId, inv.player.level, data.readBlockPos(), inv, inv.player)).setRegistryName(YouMatter.MODID + ":scanner"));
-        event.getRegistry().register(IForgeMenuType.create((windowId, inv, data) -> new EncoderMenu(windowId, inv.player.level, data.readBlockPos(), inv, inv.player)).setRegistryName(YouMatter.MODID + ":encoder"));
-        event.getRegistry().register(IForgeMenuType.create((windowId, inv, data) -> new CreatorMenu(windowId, inv.player.level, data.readBlockPos(), inv, inv.player)).setRegistryName(YouMatter.MODID + ":creator"));
-        event.getRegistry().register(IForgeMenuType.create((windowId, inv, data) -> new ReplicatorMenu(windowId, inv.player.level, data.readBlockPos(), inv, inv.player)).setRegistryName(YouMatter.MODID + ":replicator"));
-
+    public static void registerBlocks(RegisterEvent event) {
+        event.register(Keys.BLOCKS, helper -> {
+            helper.register("scanner", new ScannerBlock());
+            helper.register("encoder", new EncoderBlock());
+            helper.register("creator", new CreatorBlock());
+            helper.register("replicator", new ReplicatorBlock());
+        });
+        event.register(Keys.BLOCK_ENTITY_TYPES, helper -> {
+            helper.register("scanner", BlockEntityType.Builder.of(ScannerBlockEntity::new, ObjectHolders.SCANNER_BLOCK).build(null));
+            helper.register("encoder", BlockEntityType.Builder.of(EncoderBlockEntity::new, ObjectHolders.ENCODER_BLOCK).build(null));
+            helper.register("creator", BlockEntityType.Builder.of(CreatorBlockEntity::new, ObjectHolders.CREATOR_BLOCK).build(null));
+            helper.register("replicator", BlockEntityType.Builder.of(ReplicatorBlockEntity::new, ObjectHolders.REPLICATOR_BLOCK).build(null));
+        });
+        event.register(Keys.ITEMS, helper -> {
+            helper.register("scanner", new BlockItem(ObjectHolders.SCANNER_BLOCK, new Item.Properties().tab(YouMatter.ITEM_GROUP)));
+            helper.register("encoder", new BlockItem(ObjectHolders.ENCODER_BLOCK, new Item.Properties().tab(YouMatter.ITEM_GROUP)));
+            helper.register("creator", new BlockItem(ObjectHolders.CREATOR_BLOCK, new Item.Properties().tab(YouMatter.ITEM_GROUP)));
+            helper.register("replicator", new BlockItem(ObjectHolders.REPLICATOR_BLOCK, new Item.Properties().tab(YouMatter.ITEM_GROUP)));
+            helper.register("thumb_drive", new ThumbdriveItem());
+            helper.register("black_hole", new BlackHoleItem());
+            helper.register("machine_casing", new MachineCasingItem());
+            helper.register("compute_module", new ComputeModuleItem());
+            helper.register("transistor", new TransistorItem());
+            helper.register("transistor_raw", new TransistorRawItem());
+        });
+        event.register(Keys.CONTAINER_TYPES, helper -> {
+            helper.register("scanner", IForgeMenuType.create((windowId, inv, data) -> new ScannerMenu(windowId, inv.player.level, data.readBlockPos(), inv, inv.player)));
+            helper.register("encoder", IForgeMenuType.create((windowId, inv, data) -> new EncoderMenu(windowId, inv.player.level, data.readBlockPos(), inv, inv.player)));
+            helper.register("creator", IForgeMenuType.create((windowId, inv, data) -> new CreatorMenu(windowId, inv.player.level, data.readBlockPos(), inv, inv.player)));
+            helper.register("replicator", IForgeMenuType.create((windowId, inv, data) -> new ReplicatorMenu(windowId, inv.player.level, data.readBlockPos(), inv, inv.player)));
+        });
     }
 
 }

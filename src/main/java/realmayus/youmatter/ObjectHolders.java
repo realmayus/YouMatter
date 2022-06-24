@@ -30,42 +30,42 @@ public class ObjectHolders {
     //    public static final TransistorItem TRANSISTOR = null;
     //    public static final ComputeModuleItem COMPUTE_MODULE = null;
 
-    @ObjectHolder(YouMatter.MODID + ":black_hole")
+    @ObjectHolder(value = "minecraft:block", registryName = YouMatter.MODID + ":black_hole")
     public static BlackHoleItem BLACK_HOLE_ITEM;
 
-    @ObjectHolder(YouMatter.MODID + ":thumb_drive")
+    @ObjectHolder(value = "minecraft:item", registryName = YouMatter.MODID + ":thumb_drive")
     public static ThumbdriveItem THUMBDRIVE_ITEM;
 
-    @ObjectHolder(YouMatter.MODID + ":scanner")
+    @ObjectHolder(value = "minecraft:block", registryName = YouMatter.MODID + ":scanner")
     public static ScannerBlock SCANNER_BLOCK;
-    @ObjectHolder(YouMatter.MODID + ":scanner")
+    @ObjectHolder(value = "minecraft:menu_type", registryName = YouMatter.MODID + ":scanner")
     public static MenuType<ScannerMenu> SCANNER_CONTAINER;
-    @ObjectHolder(YouMatter.MODID + ":scanner")
+    @ObjectHolder(value = "minecraft:block_entity", registryName = YouMatter.MODID + ":scanner")
     public static BlockEntityType<ScannerBlockEntity> SCANNER_TILE;
 
-    @ObjectHolder(YouMatter.MODID + ":encoder")
+    @ObjectHolder(value = "minecraft:block", registryName = YouMatter.MODID + ":encoder")
     public static EncoderBlock ENCODER_BLOCK;
-    @ObjectHolder(YouMatter.MODID + ":encoder")
+    @ObjectHolder(value = "minecraft:menu_type", registryName = YouMatter.MODID + ":encoder")
     public static MenuType<EncoderMenu> ENCODER_CONTAINER;
-    @ObjectHolder(YouMatter.MODID + ":encoder")
+    @ObjectHolder(value = "minecraft:block_entity", registryName = YouMatter.MODID + ":encoder")
     public static BlockEntityType<EncoderBlockEntity> ENCODER_TILE;
 
-    @ObjectHolder(YouMatter.MODID + ":creator")
+    @ObjectHolder(value = "minecraft:block", registryName = YouMatter.MODID + ":creator")
     public static CreatorBlock CREATOR_BLOCK;
-    @ObjectHolder(YouMatter.MODID + ":creator")
+    @ObjectHolder(value = "minecraft:menu_type", registryName = YouMatter.MODID + ":creator")
     public static MenuType<CreatorMenu> CREATOR_CONTAINER;
-    @ObjectHolder(YouMatter.MODID + ":creator")
+    @ObjectHolder(value = "minecraft:block_entity", registryName = YouMatter.MODID + ":creator")
     public static BlockEntityType<CreatorBlockEntity> CREATOR_TILE;
 
-    @ObjectHolder(YouMatter.MODID + ":replicator")
+    @ObjectHolder(value = "minecraft:block", registryName = YouMatter.MODID + ":replicator")
     public static ReplicatorBlock REPLICATOR_BLOCK;
-    @ObjectHolder(YouMatter.MODID + ":replicator")
+    @ObjectHolder(value = "minecraft:menu_type", registryName = YouMatter.MODID + ":replicator")
     public static MenuType<ReplicatorMenu> REPLICATOR_CONTAINER;
-    @ObjectHolder(YouMatter.MODID + ":replicator")
+    @ObjectHolder(value = "minecraft:block_entity", registryName = YouMatter.MODID + ":replicator")
     public static BlockEntityType<ReplicatorBlockEntity> REPLICATOR_TILE;
 
-    @ObjectHolder(YouMatter.MODID + ":stabilizer_bucket")
+    @ObjectHolder(value = "minecraft:item", registryName = YouMatter.MODID + ":stabilizer_bucket")
     public static BucketItem STABILIZER_BUCKET;
-    @ObjectHolder(YouMatter.MODID + ":umatter_bucket")
+    @ObjectHolder(value = "minecraft:item", registryName = YouMatter.MODID + ":umatter_bucket")
     public static BucketItem UMATTER_BUCKET;
 }
