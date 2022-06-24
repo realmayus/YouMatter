@@ -19,6 +19,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraftforge.client.RenderProperties;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
 import realmayus.youmatter.ObjectHolders;
@@ -168,13 +169,13 @@ public class ReplicatorScreen extends AbstractContainerScreen<ReplicatorMenu> {
             ResourceLocation fluidIcon;
             Fluid fluid = fluidStack.getFluid();
 
-            ResourceLocation waterSprite = Fluids.WATER.getAttributes().getStillTexture(new FluidStack(Fluids.WATER, 1000));
+            ResourceLocation waterSprite = RenderProperties.get(Fluids.WATER).getStillTexture(new FluidStack(Fluids.WATER, 1000));
 
             if (fluid instanceof FlowingFluid) {
-                if (fluid.getAttributes().getStillTexture(fluidStack) != null) {
-                    fluidIcon = fluid.getAttributes().getStillTexture(fluidStack);
-                } else if (fluid.getAttributes().getFlowingTexture(fluidStack) != null) {
-                    fluidIcon = fluid.getAttributes().getFlowingTexture(fluidStack);
+                if (RenderProperties.get(fluid).getStillTexture(fluidStack) != null) {
+                    fluidIcon = RenderProperties.get(fluid).getStillTexture(fluidStack);
+                } else if (RenderProperties.get(fluid).getFlowingTexture(fluidStack) != null) {
+                    fluidIcon = RenderProperties.get(fluid).getFlowingTexture(fluidStack);
                 } else {
                     fluidIcon = waterSprite;
                 }
