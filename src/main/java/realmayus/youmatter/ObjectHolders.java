@@ -30,42 +30,42 @@ public class ObjectHolders {
     //    public static final TransistorItem TRANSISTOR = null;
     //    public static final ComputeModuleItem COMPUTE_MODULE = null;
 
-    @ObjectHolder(value = "minecraft:block", registryName = YouMatter.MODID + ":black_hole")
+    @ObjectHolder(registryName = "minecraft:block", value = YouMatter.MODID + ":black_hole")
     public static BlackHoleItem BLACK_HOLE_ITEM;
 
-    @ObjectHolder(value = "minecraft:item", registryName = YouMatter.MODID + ":thumb_drive")
+    @ObjectHolder(registryName = "minecraft:item", value = YouMatter.MODID + ":thumb_drive")
     public static ThumbdriveItem THUMBDRIVE_ITEM;
 
-    @ObjectHolder(value = "minecraft:block", registryName = YouMatter.MODID + ":scanner")
+    @ObjectHolder(registryName = "minecraft:block", value = YouMatter.MODID + ":scanner")
     public static ScannerBlock SCANNER_BLOCK;
-    @ObjectHolder(value = "minecraft:menu_type", registryName = YouMatter.MODID + ":scanner")
+    @ObjectHolder(registryName = "minecraft:menu", value = YouMatter.MODID + ":scanner")
     public static MenuType<ScannerMenu> SCANNER_CONTAINER;
-    @ObjectHolder(value = "minecraft:block_entity", registryName = YouMatter.MODID + ":scanner")
+    @ObjectHolder(registryName = "minecraft:block_entity_type", value = YouMatter.MODID + ":scanner")
     public static BlockEntityType<ScannerBlockEntity> SCANNER_TILE;
 
-    @ObjectHolder(value = "minecraft:block", registryName = YouMatter.MODID + ":encoder")
+    @ObjectHolder(registryName = "minecraft:block", value = YouMatter.MODID + ":encoder")
     public static EncoderBlock ENCODER_BLOCK;
-    @ObjectHolder(value = "minecraft:menu_type", registryName = YouMatter.MODID + ":encoder")
+    @ObjectHolder(registryName = "minecraft:menu", value = YouMatter.MODID + ":encoder")
     public static MenuType<EncoderMenu> ENCODER_CONTAINER;
-    @ObjectHolder(value = "minecraft:block_entity", registryName = YouMatter.MODID + ":encoder")
+    @ObjectHolder(registryName = "minecraft:block_entity_type", value = YouMatter.MODID + ":encoder")
     public static BlockEntityType<EncoderBlockEntity> ENCODER_TILE;
 
-    @ObjectHolder(value = "minecraft:block", registryName = YouMatter.MODID + ":creator")
+    @ObjectHolder(registryName = "minecraft:block", value = YouMatter.MODID + ":creator")
     public static CreatorBlock CREATOR_BLOCK;
-    @ObjectHolder(value = "minecraft:menu_type", registryName = YouMatter.MODID + ":creator")
+    @ObjectHolder(registryName = "minecraft:menu", value = YouMatter.MODID + ":creator")
     public static MenuType<CreatorMenu> CREATOR_CONTAINER;
-    @ObjectHolder(value = "minecraft:block_entity", registryName = YouMatter.MODID + ":creator")
+    @ObjectHolder(registryName = "minecraft:block_entity_type", value = YouMatter.MODID + ":creator")
     public static BlockEntityType<CreatorBlockEntity> CREATOR_TILE;
 
-    @ObjectHolder(value = "minecraft:block", registryName = YouMatter.MODID + ":replicator")
+    @ObjectHolder(registryName = "minecraft:block", value = YouMatter.MODID + ":replicator")
     public static ReplicatorBlock REPLICATOR_BLOCK;
-    @ObjectHolder(value = "minecraft:menu_type", registryName = YouMatter.MODID + ":replicator")
+    @ObjectHolder(registryName = "minecraft:menu", value = YouMatter.MODID + ":replicator")
     public static MenuType<ReplicatorMenu> REPLICATOR_CONTAINER;
-    @ObjectHolder(value = "minecraft:block_entity", registryName = YouMatter.MODID + ":replicator")
+    @ObjectHolder(registryName = "minecraft:block_entity_type", value = YouMatter.MODID + ":replicator")
     public static BlockEntityType<ReplicatorBlockEntity> REPLICATOR_TILE;
 
-    @ObjectHolder(value = "minecraft:item", registryName = YouMatter.MODID + ":stabilizer_bucket")
+    @ObjectHolder(registryName = "minecraft:item", value = YouMatter.MODID + ":stabilizer_bucket")
     public static BucketItem STABILIZER_BUCKET;
-    @ObjectHolder(value = "minecraft:item", registryName = YouMatter.MODID + ":umatter_bucket")
+    @ObjectHolder(registryName = "minecraft:item", value = YouMatter.MODID + ":umatter_bucket")
     public static BucketItem UMATTER_BUCKET;
 }
