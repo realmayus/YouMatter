@@ -48,7 +48,7 @@ import realmayus.youmatter.util.MyEnergyStorage;
 public class ReplicatorBlockEntity extends BlockEntity implements MenuProvider {
 
     public ReplicatorBlockEntity(BlockPos pos, BlockState state) {
-        super(ObjectHolders.REPLICATOR_TILE, pos, state);
+        super(ObjectHolders.REPLICATOR_BLOCK_ENTITY, pos, state);
     }
 
 

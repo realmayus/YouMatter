@@ -39,30 +39,30 @@ public class ObjectHolders {
     @ObjectHolder(registryName = "minecraft:block", value = YouMatter.MODID + ":scanner")
     public static ScannerBlock SCANNER_BLOCK;
     @ObjectHolder(registryName = "minecraft:menu", value = YouMatter.MODID + ":scanner")
-    public static MenuType<ScannerMenu> SCANNER_CONTAINER;
+    public static MenuType<ScannerMenu> SCANNER_MENU;
     @ObjectHolder(registryName = "minecraft:block_entity_type", value = YouMatter.MODID + ":scanner")
-    public static BlockEntityType<ScannerBlockEntity> SCANNER_TILE;
+    public static BlockEntityType<ScannerBlockEntity> SCANNER_BLOCK_ENTITY;
 
     @ObjectHolder(registryName = "minecraft:block", value = YouMatter.MODID + ":encoder")
     public static EncoderBlock ENCODER_BLOCK;
     @ObjectHolder(registryName = "minecraft:menu", value = YouMatter.MODID + ":encoder")
-    public static MenuType<EncoderMenu> ENCODER_CONTAINER;
+    public static MenuType<EncoderMenu> ENCODER_MENU;
     @ObjectHolder(registryName = "minecraft:block_entity_type", value = YouMatter.MODID + ":encoder")
-    public static BlockEntityType<EncoderBlockEntity> ENCODER_TILE;
+    public static BlockEntityType<EncoderBlockEntity> ENCODER_BLOCK_ENTITY;
 
     @ObjectHolder(registryName = "minecraft:block", value = YouMatter.MODID + ":creator")
     public static CreatorBlock CREATOR_BLOCK;
     @ObjectHolder(registryName = "minecraft:menu", value = YouMatter.MODID + ":creator")
-    public static MenuType<CreatorMenu> CREATOR_CONTAINER;
+    public static MenuType<CreatorMenu> CREATOR_MENU;
     @ObjectHolder(registryName = "minecraft:block_entity_type", value = YouMatter.MODID + ":creator")
     public static BlockEntityType<CreatorBlockEntity> CREATOR_TILE;
 
     @ObjectHolder(registryName = "minecraft:block", value = YouMatter.MODID + ":replicator")
     public static ReplicatorBlock REPLICATOR_BLOCK;
     @ObjectHolder(registryName = "minecraft:menu", value = YouMatter.MODID + ":replicator")
-    public static MenuType<ReplicatorMenu> REPLICATOR_CONTAINER;
+    public static MenuType<ReplicatorMenu> REPLICATOR_MENU;
     @ObjectHolder(registryName = "minecraft:block_entity_type", value = YouMatter.MODID + ":replicator")
-    public static BlockEntityType<ReplicatorBlockEntity> REPLICATOR_TILE;
+    public static BlockEntityType<ReplicatorBlockEntity> REPLICATOR_BLOCK_ENTITY;
 
     @ObjectHolder(registryName = "minecraft:item", value = YouMatter.MODID + ":stabilizer_bucket")
     public static BucketItem STABILIZER_BUCKET;

@@ -35,7 +35,7 @@ public class ScannerBlockEntity extends BlockEntity implements MenuProvider {
     public boolean hasEncoder = false;
 
     public ScannerBlockEntity(BlockPos pos, BlockState state) {
-        super(ObjectHolders.SCANNER_TILE, pos, state);
+        super(ObjectHolders.SCANNER_BLOCK_ENTITY, pos, state);
     }
 
     public boolean getHasEncoder() {

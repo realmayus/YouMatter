@@ -46,7 +46,7 @@ public class ReplicatorBlock extends BaseEntityBlock {
 
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        return createTickerHelper(type, ObjectHolders.REPLICATOR_TILE, ReplicatorBlockEntity::tick);
+        return createTickerHelper(type, ObjectHolders.REPLICATOR_BLOCK_ENTITY, ReplicatorBlockEntity::tick);
     }
 
     @Override

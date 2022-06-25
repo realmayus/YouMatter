@@ -38,7 +38,7 @@ public class EncoderBlockEntity extends BlockEntity implements MenuProvider {
     private List<ItemStack> queue = new ArrayList<>();
 
     public EncoderBlockEntity(BlockPos pos, BlockState state) {
-        super(ObjectHolders.ENCODER_TILE, pos, state);
+        super(ObjectHolders.ENCODER_BLOCK_ENTITY, pos, state);
     }
 
     @Nonnull

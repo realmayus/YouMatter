@@ -24,7 +24,7 @@ public class ReplicatorMenu extends AbstractContainerMenu {
     private IItemHandler playerInventory;
 
     public ReplicatorMenu(int windowId, Level level, BlockPos pos, Inventory playerInventory, Player player) {
-        super(ObjectHolders.REPLICATOR_CONTAINER, windowId);
+        super(ObjectHolders.REPLICATOR_MENU, windowId);
         replicator = level.getBlockEntity(pos) instanceof ReplicatorBlockEntity replicator ? replicator : null;
         this.playerInventory = new InvWrapper(playerInventory);
 

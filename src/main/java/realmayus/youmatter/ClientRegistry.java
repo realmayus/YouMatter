@@ -15,9 +15,9 @@ public class ClientRegistry {
     @SubscribeEvent
     public static void onFMLClientSetup(FMLClientSetupEvent event)
     {
-        MenuScreens.register(ObjectHolders.SCANNER_CONTAINER, ScannerScreen::new);
-        MenuScreens.register(ObjectHolders.ENCODER_CONTAINER, EncoderScreen::new);
-        MenuScreens.register(ObjectHolders.CREATOR_CONTAINER, CreatorScreen::new);
-        MenuScreens.register(ObjectHolders.REPLICATOR_CONTAINER, ReplicatorScreen::new);
+        MenuScreens.register(ObjectHolders.SCANNER_MENU, ScannerScreen::new);
+        MenuScreens.register(ObjectHolders.ENCODER_MENU, EncoderScreen::new);
+        MenuScreens.register(ObjectHolders.CREATOR_MENU, CreatorScreen::new);
+        MenuScreens.register(ObjectHolders.REPLICATOR_MENU, ReplicatorScreen::new);
     }
 }
