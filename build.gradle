@@ -120,9 +120,10 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
-    runtimeOnly fg.deobf("mekanism:Mekanism:1.18.2-10.2.0.459")
+//    runtimeOnly fg.deobf("mekanism:Mekanism:1.18.2-10.2.0.459")
 //    implementation fg.deobf("curse.maven:refinedstorage:2871849")
-	implementation fg.deobf("mezz.jei:jei-1.18.2:9.7.0.196")
+	implementation fg.deobf("mezz.jei:jei-1.19-common:11.0.0.206")
+	implementation fg.deobf("mezz.jei:jei-1.19-forge:11.0.0.206")
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
