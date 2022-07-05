@@ -17,7 +17,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import realmayus.youmatter.fluid.StabilizerFluidBlock;
 import realmayus.youmatter.fluid.StabilizerFluidType;
-import realmayus.youmatter.fluid.UmatterFluidType;
+import realmayus.youmatter.fluid.UMatterFluidType;
 
 public class ModFluids {
 
@@ -34,7 +34,7 @@ public class ModFluids {
     public static RegistryObject<Item> STABILIZER_BUCKET = ITEMS.register("stabilizer_bucket", () -> new BucketItem(STABILIZER, new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1).tab(YouMatter.ITEM_GROUP)));
     public static final ForgeFlowingFluid.Properties STABILIZER_PROPERIES = new ForgeFlowingFluid.Properties(STABILIZER_TYPE, STABILIZER, STABILIZER_FLOWING).bucket(STABILIZER_BUCKET).block(STABILIZER_FLUID_BLOCK);
 
-    public static RegistryObject<FluidType> UMATTER_TYPE = FLUID_TYPES.register("umatter", () -> new UmatterFluidType());
+    public static RegistryObject<FluidType> UMATTER_TYPE = FLUID_TYPES.register("umatter", () -> new UMatterFluidType());
     public static RegistryObject<FlowingFluid> UMATTER = FLUIDS.register("umatter", () -> new ForgeFlowingFluid.Source(ModFluids.UMATTER_PROPERTIES));
     public static RegistryObject<FlowingFluid> UMATTER_FLOWING = FLUIDS.register("umatter_flowing", () -> new ForgeFlowingFluid.Flowing(ModFluids.UMATTER_PROPERTIES));
     public static RegistryObject<StabilizerFluidBlock> UMATTER_FLUID_BLOCK = BLOCKS.register("umatter_fluid_block", () -> new StabilizerFluidBlock(UMATTER, BlockBehaviour.Properties.of(Material.LAVA).noCollission().strength(1.0F).noLootTable()));

@@ -9,8 +9,8 @@ import net.minecraftforge.common.SoundActions;
 import net.minecraftforge.fluids.FluidType;
 import realmayus.youmatter.YouMatter;
 
-public class UmatterFluidType extends FluidType {
-    public UmatterFluidType() {
+public class UMatterFluidType extends FluidType {
+    public UMatterFluidType() {
         super(FluidType.Properties.create()
                 .descriptionId("block.youmatter.umatter")
                 .fallDistanceModifier(0.0F)

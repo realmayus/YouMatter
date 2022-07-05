@@ -27,7 +27,7 @@ group = 'realmayus.youmatter' // http://maven.apache.org/guides/mini/guide-namin
 
 java {
 	archivesBaseName = 'youmatter-1.19'
-	java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+	toolchain.languageVersion = JavaLanguageVersion.of(17)
 }
 
 minecraft {
