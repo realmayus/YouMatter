@@ -18,7 +18,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraftforge.client.RenderProperties;
+import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
 import realmayus.youmatter.ObjectHolders;
@@ -129,13 +129,13 @@ public class CreatorScreen extends AbstractContainerScreen<CreatorMenu> {
             ResourceLocation fluidIcon;
             Fluid fluid = fluidStack.getFluid();
 
-            ResourceLocation waterSprite = RenderProperties.get(Fluids.WATER).getStillTexture(new FluidStack(Fluids.WATER, 1000));
+            ResourceLocation waterSprite = IClientFluidTypeExtensions.of(Fluids.WATER).getStillTexture(new FluidStack(Fluids.WATER, 1000));
 
             if (fluid instanceof FlowingFluid) {
-                if (RenderProperties.get(fluid).getStillTexture(fluidStack) != null) {
-                    fluidIcon = RenderProperties.get(fluid).getStillTexture(fluidStack);
-                } else if (RenderProperties.get(fluid).getFlowingTexture(fluidStack) != null) {
-                    fluidIcon = RenderProperties.get(fluid).getFlowingTexture(fluidStack);
+                if (IClientFluidTypeExtensions.of(fluid).getStillTexture(fluidStack) != null) {
+                    fluidIcon = IClientFluidTypeExtensions.of(fluid).getStillTexture(fluidStack);
+                } else if (IClientFluidTypeExtensions.of(fluid).getFlowingTexture(fluidStack) != null) {
+                    fluidIcon = IClientFluidTypeExtensions.of(fluid).getFlowingTexture(fluidStack);
                 } else {
                     fluidIcon = waterSprite;
                 }
