@@ -69,7 +69,7 @@ public class CreatorBlock extends BaseEntityBlock {
             MenuProvider menuProvider = getMenuProvider(state, level, pos);
             if (menuProvider != null) {
                 if (player instanceof ServerPlayer serverPlayer) {
-                    NetworkHooks.openGui(serverPlayer, menuProvider, pos);
+                    NetworkHooks.openScreen(serverPlayer, menuProvider, pos);
                 }
             }
         }

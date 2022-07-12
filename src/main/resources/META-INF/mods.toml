@@ -22,7 +22,7 @@ license="MIT License"
   [[dependencies.youmatter]]
     modId="forge"
     mandatory=true
-    versionRange="[410.64,)"
+    versionRange="[41.0.94,)"
     ordering="NONE"
     side="BOTH"
 

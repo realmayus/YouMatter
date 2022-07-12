@@ -56,7 +56,7 @@ public class RegistryHandler {
             helper.register("transistor", new TransistorItem());
             helper.register("transistor_raw", new TransistorRawItem());
         });
-        event.register(Keys.CONTAINER_TYPES, helper -> {
+        event.register(Keys.MENU_TYPES, helper -> {
             helper.register("scanner", IForgeMenuType.create((windowId, inv, data) -> new ScannerMenu(windowId, inv.player.level, data.readBlockPos(), inv, inv.player)));
             helper.register("encoder", IForgeMenuType.create((windowId, inv, data) -> new EncoderMenu(windowId, inv.player.level, data.readBlockPos(), inv, inv.player)));
             helper.register("creator", IForgeMenuType.create((windowId, inv, data) -> new CreatorMenu(windowId, inv.player.level, data.readBlockPos(), inv, inv.player)));
