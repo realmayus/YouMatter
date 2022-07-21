@@ -1,29 +1,25 @@
 package realmayus.youmatter.network;
 
-import io.netty.buffer.ByteBuf;
-//import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.network.PacketBuffer;
-//import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-//import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-//import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import net.minecraftforge.fml.network.NetworkEvent;
-import realmayus.youmatter.replicator.ReplicatorContainer;
-//import realmayus.youmatter.replicator.ContainerReplicator;
-
 import java.util.function.Supplier;
+
+import net.minecraft.network.FriendlyByteBuf;
+//import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.network.NetworkEvent;
+import realmayus.youmatter.replicator.ReplicatorMenu;
+//import realmayus.youmatter.replicator.ContainerReplicator;
 
 public class PacketChangeSettingsReplicatorServer {
 
     private boolean isActivated;
     private boolean mode;
 
-    public PacketChangeSettingsReplicatorServer(PacketBuffer buf) {
+    public PacketChangeSettingsReplicatorServer(FriendlyByteBuf buf) {
         isActivated = buf.readBoolean();
         mode = buf.readBoolean();
     }
 
-    void encode(PacketBuffer buf) {
+    void encode(FriendlyByteBuf buf) {
         buf.writeBoolean(isActivated);
         buf.writeBoolean(mode);
     }
@@ -36,11 +32,10 @@ public class PacketChangeSettingsReplicatorServer {
 
     void handle(Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
-            ServerPlayerEntity player = ctx.get().getSender();
-            if (player.openContainer instanceof ReplicatorContainer) {
-                ReplicatorContainer openContainer = (ReplicatorContainer) player.openContainer;
-                openContainer.te.setActive(isActivated);
-                openContainer.te.setCurrentMode(mode);
+            ServerPlayer player = ctx.get().getSender();
+            if (player.containerMenu instanceof ReplicatorMenu openContainer) {
+                openContainer.replicator.setActive(isActivated);
+                openContainer.replicator.setCurrentMode(mode);
             }
         });
         ctx.get().setPacketHandled(true);

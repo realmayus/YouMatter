@@ -1,95 +1,106 @@
 package realmayus.youmatter.encoder;
 
-import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraftforge.common.util.Constants;
+import java.util.Arrays;
+import java.util.List;
+
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraftforge.items.ItemStackHandler;
 import realmayus.youmatter.ObjectHolders;
 import realmayus.youmatter.YouMatter;
 import realmayus.youmatter.items.ThumbdriveItem;
 
 
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+public class EncoderScreen extends AbstractContainerScreen<EncoderMenu> {
 
-public class EncoderScreen extends ContainerScreen<EncoderContainer> {
     private static final int WIDTH = 176;
     private static final int HEIGHT = 168;
 
-    private EncoderTile te;
+    private EncoderBlockEntity encoder;
 
     private static final ResourceLocation GUI = new ResourceLocation(YouMatter.MODID, "textures/gui/encoder.png");
 
-    public EncoderScreen(EncoderContainer container, PlayerInventory inv, ITextComponent name) {
+    public EncoderScreen(EncoderMenu container, Inventory inv, Component name) {
         super(container, inv, name);
-        this.te = container.te;
+        this.encoder = container.encoder;
     }
 
     @Override
-    public void render(int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground();
-        super.render(mouseX, mouseY, partialTicks);
-        this.renderHoveredToolTip(mouseX, mouseY);
+    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
+        this.renderBackground(poseStack);
+        super.render(poseStack, mouseX, mouseY, partialTicks);
+
+        this.renderTooltip(poseStack, mouseX, mouseY);
 
         int xAxis = (mouseX - (width - WIDTH) / 2);
         int yAxis = (mouseY - (height - HEIGHT) / 2);
 
         if(xAxis >= 141 && xAxis <= 156 && yAxis >= 37 && yAxis <= 57) {
-            drawTooltip(mouseX, mouseY, Stream.of(I18n.format("youmatter.gui.energy.title"), I18n.format("youmatter.gui.energy.description", te.getClientEnergy())).collect(Collectors.toList()));
+            drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(new TextComponent(I18n.get("youmatter.gui.energy.title")), new TextComponent(I18n.get("youmatter.gui.energy.description", encoder.getEnergy()))));
         }
-
         if (xAxis >= 16 && xAxis <= 32 && yAxis >= 59 && yAxis <= 75) {
-            if (te.inventory.getStackInSlot(1).getItem() instanceof ThumbdriveItem) {
-                CompoundNBT nbt = te.inventory.getStackInSlot(1).getTag();
-                if (nbt != null) {
-                    ListNBT list = nbt.getList("stored_items", Constants.NBT.TAG_STRING);
-                    if (list.size() >= 8) {
-                        drawTooltip(mouseX, mouseY, Stream.of(I18n.format("youmatter.warning.encoder2")).collect(Collectors.toList()));
+            if (encoder.inventory.isPresent()) {
+                ItemStackHandler inventory = encoder.inventory.resolve().get();
+                if (inventory.getStackInSlot(1).getItem() instanceof ThumbdriveItem) {
+                    CompoundTag nbt = inventory.getStackInSlot(1).getTag();
+                    if (nbt != null) {
+                        ListTag list = nbt.getList("stored_items", Tag.TAG_STRING);
+                        if (list.size() >= 8) {
+                            drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(new TextComponent(I18n.get("youmatter.warning.encoder2"))));
+                        }
                     }
+
+                    return; //only dfraw the warning tooltip if the inventory is not present, or there is no thumbdrive inserted
                 }
-            } else {
-                drawTooltip(mouseX, mouseY, Stream.of(I18n.format("youmatter.warning.encoder1")).collect(Collectors.toList()));
             }
+
+            drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(new TextComponent(I18n.get("youmatter.warning.encoder1"))));
         }
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+    protected void renderBg(PoseStack poseStack, float partialTicks, int mouseX, int mouseY) {
         //Setting color to white because JEI is bae (gui would be yellow)
-        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        this.minecraft.getTextureManager().bindTexture(GUI);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem._setShaderTexture(0, GUI);
+
         int relX = (this.width - WIDTH) / 2;
         int relY = (this.height - HEIGHT) / 2;
-        this.blit(relX, relY, 0, 0, WIDTH, HEIGHT);
+        this.blit(poseStack, relX, relY, 0, 0, WIDTH, HEIGHT);
     }
 
     @Override
-    protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-        drawEnergyBolt(te.getClientEnergy());
-        drawProgressDisplayChain(te.getClientProgress());
+    protected void renderLabels(PoseStack poseStack, int mouseX, int mouseY) {
+        drawEnergyBolt(poseStack, encoder.getEnergy());
+        drawProgressDisplayChain(poseStack, encoder.getProgress());
 
-        if (!(te.inventory.getStackInSlot(1).getItem() instanceof ThumbdriveItem)) {
-            this.blit(16, 59, 176, 66, 16, 16);
-        } else {
-            CompoundNBT nbt = te.inventory.getStackInSlot(1).getTag();
-            if (nbt != null) {
-                ListNBT list = nbt.getList("stored_items", Constants.NBT.TAG_STRING);
-                if (list.size() >= 8) {
-                    this.blit(16, 59, 176, 66, 16, 16);
+        encoder.inventory.ifPresent(inventory -> {
+            if (!(inventory.getStackInSlot(1).getItem() instanceof ThumbdriveItem)) {
+                this.blit(poseStack, 16, 59, 176, 66, 16, 16);
+            } else {
+                CompoundTag nbt = inventory.getStackInSlot(1).getTag();
+                if (nbt != null) {
+                    ListTag list = nbt.getList("stored_items", Tag.TAG_STRING);
+                    if (list.size() >= 8) {
+                        this.blit(poseStack, 16, 59, 176, 66, 16, 16);
+                    }
                 }
             }
-        }
-        font.drawString(I18n.format(ObjectHolders.ENCODER_BLOCK.getTranslationKey()), 8, 6, 0x404040);
+        });
+        font.draw(poseStack, I18n.get(ObjectHolders.ENCODER_BLOCK.getDescriptionId()), 8, 6, 0x404040);
     }
 
-    private void drawProgressDisplayChain(int progress) {
+    private void drawProgressDisplayChain(PoseStack poseStack, int progress) {
         int arrow1;
         int lock;
         int arrow2;
@@ -112,27 +123,26 @@ public class EncoderScreen extends ContainerScreen<EncoderContainer> {
             arrow2 = 100;
         }
 
-        this.minecraft.getTextureManager().bindTexture(GUI);
-        this.blit(22, 41, 176, 41, Math.round((arrow1 / 100.0f) * 18), 12);
-        this.blit(47, 40, 176, 53, 7, Math.round((lock / 100.0f) * 13));
-        this.blit(61, 41, 176, 41, Math.round((arrow2 / 100.0f) * 18), 12);
+        RenderSystem._setShaderTexture(0, GUI);
+        this.blit(poseStack, 22, 41, 176, 41, Math.round((arrow1 / 100.0f) * 18), 12);
+        this.blit(poseStack, 47, 40, 176, 53, 7, Math.round((lock / 100.0f) * 13));
+        this.blit(poseStack, 61, 41, 176, 41, Math.round((arrow2 / 100.0f) * 18), 12);
 
     }
 
-    private void drawEnergyBolt(int energy) {
-        this.minecraft.getTextureManager().bindTexture(GUI);
+    private void drawEnergyBolt(PoseStack poseStack, int energy) {
+        RenderSystem._setShaderTexture(0, GUI);
 
         if(energy == 0) {
-            this.blit(141, 36, 176, 21, 15, 20);
+            this.blit(poseStack, 141, 36, 176, 21, 15, 20);
         } else {
             double percentage = energy * 100.0F / 1000000;  // i know this is dumb
             float percentagef = (float) percentage / 100; // but it works.
-            this.blit(141, 36, 176, 0, 15, Math.round(20 * percentagef)); // it's not really intended that the bolt fills from the top but it looks cool tbh.
-
+            this.blit(poseStack, 141, 36, 176, 0, 15, Math.round(20 * percentagef)); // it's not really intended that the bolt fills from the top but it looks cool tbh.
         }
     }
 
-    private void drawTooltip(int x, int y, List<String> tooltips) {
-        renderTooltip(tooltips, x, y);
+    private void drawTooltip(PoseStack poseStack, int x, int y, List<Component> tooltips) {
+        renderComponentTooltip(poseStack, tooltips, x, y);
     }
 }

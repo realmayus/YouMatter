@@ -1,24 +1,25 @@
 package realmayus.youmatter.items;
 
-import net.minecraft.client.resources.I18n;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.World;
-import realmayus.youmatter.YouMatter;
+import java.util.List;
 
 import javax.annotation.Nullable;
-import java.util.List;
+
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
+import realmayus.youmatter.YouMatter;
 
 public class TransistorRawItem extends Item {
     public TransistorRawItem() {
-        super(new Properties().group(YouMatter.ITEM_GROUP));
+        super(new Properties().tab(YouMatter.ITEM_GROUP));
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        tooltip.add(new StringTextComponent(I18n.format("youmatter.tooltip.craftingItem")));
+    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
+        tooltip.add(new TextComponent(I18n.get("youmatter.tooltip.craftingItem")));
     }
 }
