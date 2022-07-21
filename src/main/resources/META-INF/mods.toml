@@ -1,33 +1,34 @@
 # The name of the mod loader type to load - for regular FML @Mod mods it should be javafml
 modLoader="javafml"
 # A version range to match for said mod loader - for regular FML @Mod it will be the forge version
-loaderVersion="[31,)"
+loaderVersion="[41,)"
 # A URL to refer people to when problems occur with this mod
 issueTrackerURL="https://github.com/realmayus/youmatter/issues"
 # If the mods defined in this file should show as seperate resource packs
 showAsResourcePack=false
+license="MIT License"
 
 [[mods]]
   modId="youmatter"
-  version="${version}"
+  version="${file.jarVersion}"
   displayName="YouMatter"
-  displayURL="https://minecraftforge.net"
-  credits="I'd like to thank my mother and father."
-  authors="Author"
+  displayURL="https://www.curseforge.com/minecraft/mc-mods/youmatter"
+  credits="Thanks to Hailtothebreak and bl4ckscor3 for the 1.16.1 and 1.16.4 ports respectively!"
+  authors="realmayus"
   description='''
-  Lets you craft dirt into diamonds. This is a traditional mod that has existed for eons. It is ancient. The holy Notch created it. Jeb rainbowfied it. Dinnerbone made it upside down. Etc.
+  A mod that allows you to duplicate items using U-Matter, an expensive fluid that can be obtained using machines by consuming energy.
   '''
 
   [[dependencies.youmatter]]
     modId="forge"
     mandatory=true
-    versionRange="[31,)"
+    versionRange="[41.0.94,)"
     ordering="NONE"
     side="BOTH"
 
   [[dependencies.youmatter]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.15.2]"
+    versionRange="[1.19,1.20)"
     ordering="NONE"
     side="BOTH"

@@ -1,25 +1,34 @@
 package realmayus.youmatter.replicator;
 
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.InventoryHelper;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.item.BucketItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.StringNBT;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import static realmayus.youmatter.util.GeneralUtils.getUMatterAmountForItem;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.BucketItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -33,33 +42,19 @@ import net.minecraftforge.registries.ForgeRegistries;
 import realmayus.youmatter.ModFluids;
 import realmayus.youmatter.ObjectHolders;
 import realmayus.youmatter.YMConfig;
-import realmayus.youmatter.util.CustomInvWrapper;
 import realmayus.youmatter.util.GeneralUtils;
 import realmayus.youmatter.util.MyEnergyStorage;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.IntStream;
+public class ReplicatorBlockEntity extends BlockEntity implements MenuProvider {
 
-import static realmayus.youmatter.util.GeneralUtils.getUMatterAmountForItem;
-
-public class ReplicatorTile extends TileEntity implements ITickableTileEntity, INamedContainerProvider {
-
-    public ReplicatorTile() {
-        super(ObjectHolders.REPLICATOR_TILE);
+    public ReplicatorBlockEntity(BlockPos pos, BlockState state) {
+        super(ObjectHolders.REPLICATOR_BLOCK_ENTITY, pos, state);
     }
 
 
     private boolean currentMode = true;  //true = loop; false = one time
 
-    private boolean currentClientMode = false;
-
     private boolean isActive = false;
-
-    private boolean isActiveClient = false;
 
     boolean isCurrentMode() {
         return currentMode;
@@ -67,14 +62,11 @@ public class ReplicatorTile extends TileEntity implements ITickableTileEntity, I
 
     public void setCurrentMode(boolean currentMode) {
         this.currentMode = currentMode;
-    }
+        setChanged();
 
-    boolean isCurrentClientMode() {
-        return currentClientMode;
-    }
-
-    void setCurrentClientMode(boolean currentClientMode) {
-        this.currentClientMode = currentClientMode;
+        if(level != null && !level.isClientSide) {
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+        }
     }
 
     boolean isActive() {
@@ -83,14 +75,11 @@ public class ReplicatorTile extends TileEntity implements ITickableTileEntity, I
 
     public void setActive(boolean active) {
         isActive = active;
-    }
+        setChanged();
 
-    boolean isActiveClient() {
-        return isActiveClient;
-    }
-
-    void setActiveClient(boolean activeClient) {
-        isActiveClient = activeClient;
+        if(level != null && !level.isClientSide) {
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+        }
     }
 
     private static final int MAX_UMATTER = 10500;
@@ -98,9 +87,9 @@ public class ReplicatorTile extends TileEntity implements ITickableTileEntity, I
     private FluidTank tank = new FluidTank(MAX_UMATTER) {
         @Override
         protected void onContentsChanged() {
-            BlockState state = world.getBlockState(pos);
-            world.notifyBlockUpdate(pos, state, state, 3);
-            markDirty();
+            BlockState state = level.getBlockState(worldPosition);
+            level.sendBlockUpdated(worldPosition, state, state, 3);
+            setChanged();
         }
     };
 
@@ -108,7 +97,7 @@ public class ReplicatorTile extends TileEntity implements ITickableTileEntity, I
         return tank;
     }
 
-    private IFluidHandler fluidHandler = new IFluidHandler() {
+    private LazyOptional<IFluidHandler> fluidHandler = LazyOptional.of(() -> new IFluidHandler() {
         @Override
         public int getTanks() {
             return 1;
@@ -158,66 +147,87 @@ public class ReplicatorTile extends TileEntity implements ITickableTileEntity, I
             assert ModFluids.UMATTER.get() != null;
             return new FluidStack(ModFluids.UMATTER.get(), 0);
         }
-    };
+    });
 
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
         if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            return LazyOptional.of(() -> invWrapper).cast();
+            return inventory.cast();
         }
         if(cap == CapabilityEnergy.ENERGY) {
-            return LazyOptional.of(() -> myEnergyStorage).cast();
+            return myEnergyStorage.cast();
 
         }
         if(cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
-            return LazyOptional.of(() -> fluidHandler).cast();
+            return fluidHandler.cast();
         }
 
         return super.getCapability(cap, side);
     }
 
 
-    public ItemStackHandler inventory = new ItemStackHandler(5) {
+    public LazyOptional<ItemStackHandler> inventory = LazyOptional.of(() -> new ItemStackHandler(5) {
+        @Override
+        public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+            if (slot == 2) {
+                return stack;
+            } else {
+                return super.insertItem(slot, stack, simulate);
+            }
+        }
+
+        @Override
+        public ItemStack extractItem(int slot, int amount, boolean simulate) {
+            if (slot == 2) {
+                return ItemStack.EMPTY;
+            } else {
+                return super.extractItem(slot, amount, simulate);
+            }
+        }
+
         @Override
         protected void onContentsChanged(int slot) {
-            ReplicatorTile.this.markDirty();
+            ReplicatorBlockEntity.this.setChanged();
         }
-    };
-
-    CustomInvWrapper invWrapper = new CustomInvWrapper(inventory);
+    });
 
     private List<ItemStack> cachedItems;
 
     @Override
-    public void remove() {
-        this.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent(h -> IntStream.range(0, h.getSlots()).forEach(i -> InventoryHelper.spawnItemStack(world, pos.getX(), pos.getY(), pos.getZ(), h.getStackInSlot(i))));
+    public void setRemoved() {
+        super.setRemoved();
+        inventory.invalidate();
+        myEnergyStorage.invalidate();
+        fluidHandler.invalidate();
     }
 
     // Current displayed item index -> cachedItems
     private int currentIndex = 0;
     private int currentPartTick = 0; // only execute the following code every 5 ticks
     private ItemStack currentItem;
-    @Override
-    public void tick() {
+    public static void tick(Level level, BlockPos pos, BlockState state, ReplicatorBlockEntity be) {
+        be.tick(level, pos, state);
+    }
+
+    public void tick(Level level, BlockPos pos, BlockState state) {
         if(currentPartTick == 5) {
             currentPartTick = 0;
-            //only execute this code on the server
-            if(!world.isRemote) {
-                if (!this.inventory.getStackInSlot(3).isEmpty()) {
-                    ItemStack item = this.inventory.getStackInSlot(3);
-                    if (item.getItem() instanceof BucketItem && GeneralUtils.canAddItemToSlot(this.inventory.getStackInSlot(4).getStack(), new ItemStack(Items.BUCKET, 1), false)) {
+            inventory.ifPresent(inventory -> {
+                if (!inventory.getStackInSlot(3).isEmpty()) {
+                    ItemStack item = inventory.getStackInSlot(3);
+                    if (item.getItem() instanceof BucketItem && GeneralUtils.canAddItemToSlot(inventory.getStackInSlot(4), new ItemStack(Items.BUCKET, 1), false)) {
                         item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).ifPresent(h -> {
-                            if (!h.getFluidInTank(0).isEmpty() && h.getFluidInTank(0).getFluid().isEquivalentTo(ModFluids.UMATTER.get())) {
+                            if (!h.getFluidInTank(0).isEmpty() && h.getFluidInTank(0).getFluid().isSame(ModFluids.UMATTER.get())) {
                                 if (MAX_UMATTER - getTank().getFluidAmount() >= 1000) {
                                     getTank().fill(new FluidStack(ModFluids.UMATTER.get(), 1000), IFluidHandler.FluidAction.EXECUTE);
-                                    this.inventory.setStackInSlot(3, ItemStack.EMPTY);
-                                    this.inventory.insertItem(4, new ItemStack(Items.BUCKET, 1), false);
+                                    inventory.setStackInSlot(3, ItemStack.EMPTY);
+                                    inventory.insertItem(4, new ItemStack(Items.BUCKET, 1), false);
                                 }
                             }
                         });
-                    } else if(GeneralUtils.canAddItemToSlot(this.inventory.getStackInSlot(4).getStack(), this.inventory.getStackInSlot(3).getStack(), false)) {
+                    } else if(GeneralUtils.canAddItemToSlot(inventory.getStackInSlot(4), inventory.getStackInSlot(3), false)) {
                         item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).ifPresent(h -> {
-                            if (h.getFluidInTank(0).getFluid().isEquivalentTo(ModFluids.UMATTER.get())) {
+                            if (h.getFluidInTank(0).getFluid().isSame(ModFluids.UMATTER.get())) {
                                 if (h.getFluidInTank(0).getAmount() > MAX_UMATTER - getTank().getFluidAmount()) { //given fluid is more than what fits in the U-Tank
                                     getTank().fill(h.drain(MAX_UMATTER - getTank().getFluidAmount(), IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
                                 } else { //given fluid fits perfectly in U-Tank
@@ -225,8 +235,8 @@ public class ReplicatorTile extends TileEntity implements ITickableTileEntity, I
                                 }
                             }
                         });
-                        this.inventory.setStackInSlot(3, ItemStack.EMPTY);
-                        this.inventory.insertItem(4, item, false);
+                        inventory.setStackInSlot(3, ItemStack.EMPTY);
+                        inventory.insertItem(4, item, false);
                     }
                 }
 
@@ -239,14 +249,13 @@ public class ReplicatorTile extends TileEntity implements ITickableTileEntity, I
                 } else {
                     if (thumbdrive.hasTag()) {
                         if(thumbdrive.getTag() != null) {
-                            ListNBT taglist = (ListNBT) thumbdrive.getTag().get("stored_items");
+                            ListTag taglist = (ListTag) thumbdrive.getTag().get("stored_items");
                             cachedItems = new ArrayList<>();
                             if (taglist != null) {
-                                for(INBT nbt : taglist) {
+                                for(Tag nbt : taglist) {
                                     if (nbt != null) {
-                                        if(nbt instanceof StringNBT) {
-                                            StringNBT item = (StringNBT) nbt;
-                                            ItemStack newitem = new ItemStack(Objects.requireNonNull(ForgeRegistries.ITEMS.getValue(new ResourceLocation(item.getString()))), 1);
+                                        if(nbt instanceof StringTag item) {
+                                            ItemStack newitem = new ItemStack(Objects.requireNonNull(ForgeRegistries.ITEMS.getValue(new ResourceLocation(item.getAsString()))), 1);
                                             cachedItems.add(newitem);
                                         }
                                     }
@@ -256,13 +265,15 @@ public class ReplicatorTile extends TileEntity implements ITickableTileEntity, I
                                     if (!inventory.getStackInSlot(2).isEmpty()) {
                                         if (isActive) {
                                             currentItem = cachedItems.get(currentIndex);
-                                            if (myEnergyStorage.getEnergyStored() >= YMConfig.CONFIG.energyReplicator.get()) {
-                                                if(tank.getFluidAmount() >= getUMatterAmountForItem(currentItem.getItem())) {
-                                                    tank.drain(getUMatterAmountForItem(currentItem.getItem()), IFluidHandler.FluidAction.EXECUTE);
-                                                    progress++;
-                                                    myEnergyStorage.consumePower(YMConfig.CONFIG.energyReplicator.get());
+                                            myEnergyStorage.ifPresent(myEnergyStorage -> {
+                                                if (myEnergyStorage.getEnergyStored() >= YMConfig.CONFIG.energyReplicator.get()) {
+                                                    if(tank.getFluidAmount() >= getUMatterAmountForItem(currentItem.getItem())) {
+                                                        tank.drain(getUMatterAmountForItem(currentItem.getItem()), IFluidHandler.FluidAction.EXECUTE);
+                                                        progress++;
+                                                        myEnergyStorage.extractEnergy(YMConfig.CONFIG.energyReplicator.get(), false);
+                                                    }
                                                 }
-                                            }
+                                            });
 
                                         }
                                     }
@@ -279,12 +290,14 @@ public class ReplicatorTile extends TileEntity implements ITickableTileEntity, I
                                         } else {
                                             if (currentItem != null) {
                                                 if (!currentItem.isEmpty()) {
-                                                    if (currentItem.isItemEqual(inventory.getStackInSlot(2))) { // Check if selected item hasn't changed
-                                                        if(inventory.getStackInSlot(1).isEmpty() || GeneralUtils.canAddItemToSlot(inventory.getStackInSlot(1).getStack(), currentItem, false)) { //check if output slot is still empty
-                                                            if (myEnergyStorage.getEnergyStored() >= YMConfig.CONFIG.energyReplicator.get()) {
-                                                                progress++;
-                                                                myEnergyStorage.consumePower(YMConfig.CONFIG.energyReplicator.get());
-                                                            }
+                                                    if (currentItem.sameItem(inventory.getStackInSlot(2))) { // Check if selected item hasn't changed
+                                                        if(inventory.getStackInSlot(1).isEmpty() || GeneralUtils.canAddItemToSlot(inventory.getStackInSlot(1), currentItem, false)) { //check if output slot is still empty
+                                                            myEnergyStorage.ifPresent(myEnergyStorage -> {
+                                                                if (myEnergyStorage.getEnergyStored() >= YMConfig.CONFIG.energyReplicator.get()) {
+                                                                    progress++;
+                                                                    myEnergyStorage.extractEnergy(YMConfig.CONFIG.energyReplicator.get(), false);
+                                                                }
+                                                            });
                                                         }
                                                     } else {
                                                         progress = 0; // abort if not
@@ -296,15 +309,13 @@ public class ReplicatorTile extends TileEntity implements ITickableTileEntity, I
                                                 }
                                             }
                                         }
-
                                     }
                                 }
                             }
-
                         }
                     }
                 }
-            }
+            });
         }
         currentPartTick++;
     }
@@ -330,16 +341,13 @@ public class ReplicatorTile extends TileEntity implements ITickableTileEntity, I
     private void renderItem(List<ItemStack> cache, int index) {
         if(index <= cache.size() - 1 && index >= 0) {
             if(cache.get(index) != null) {
-                inventory.setStackInSlot(2, cache.get(index));
+                inventory.ifPresent(inventory -> inventory.setStackInSlot(2, cache.get(index)));
             }
         }
     }
 
-    private MyEnergyStorage myEnergyStorage = new MyEnergyStorage(1000000, 2000);
+    private LazyOptional<MyEnergyStorage> myEnergyStorage = LazyOptional.of(() -> new MyEnergyStorage(this, 1000000, 2000));
 
-    private int clientEnergy = -1;
-
-    private int clientProgress = -1;
     private int progress = 0;
 
     public int getProgress() {
@@ -348,45 +356,34 @@ public class ReplicatorTile extends TileEntity implements ITickableTileEntity, I
 
     public void setProgress(int progress) {
         this.progress = progress;
-    }
-
-    int getClientProgress() {
-        return clientProgress;
-    }
-
-    void setClientProgress(int clientProgress) {
-        this.clientProgress = clientProgress;
-    }
-
-    int getClientEnergy() {
-        return clientEnergy;
-    }
-
-    void setClientEnergy(int clientEnergy) {
-        this.clientEnergy = clientEnergy;
+        setChanged();
     }
 
     public int getEnergy() {
-        return myEnergyStorage.getEnergyStored();
+        return myEnergyStorage.resolve().get().getEnergyStored();
+    }
+
+    public void setEnergy(int energy) {
+        myEnergyStorage.resolve().get().setEnergy(energy);
     }
 
     @Override
-    public void read(CompoundNBT compound) {
-        super.read(compound);
+    public void load(CompoundTag compound) {
+        super.load(compound);
         tank.readFromNBT(compound.getCompound("tank"));
-        myEnergyStorage.setEnergy(compound.getInt("energy"));
+        setEnergy(compound.getInt("energy"));
         setActive(compound.getBoolean("isActive"));
         setProgress(compound.getInt("progress"));
         setCurrentMode(compound.getBoolean("mode"));
         if (compound.contains("inventory")) {
-            inventory.deserializeNBT((CompoundNBT) compound.get("inventory"));
+            inventory.resolve().get().deserializeNBT((CompoundTag) compound.get("inventory"));
         }
     }
 
     @Override
-    public CompoundNBT write(CompoundNBT compound) {
-        super.write(compound);
-        CompoundNBT tagTank = new CompoundNBT();
+    public void saveAdditional(CompoundTag compound) {
+        super.saveAdditional(compound);
+        CompoundTag tagTank = new CompoundTag();
         tank.writeToNBT(tagTank);
         compound.put("tank", tagTank);
         compound.putInt("energy", getEnergy());
@@ -394,20 +391,29 @@ public class ReplicatorTile extends TileEntity implements ITickableTileEntity, I
         compound.putBoolean("mode", isCurrentMode());
         compound.putInt("progress", getProgress());
         if (inventory != null) {
-            compound.put("inventory", inventory.serializeNBT());
+            compound.put("inventory", inventory.resolve().get().serializeNBT());
         }
-        return compound;
     }
 
     @Override
-    public ITextComponent getDisplayName() {
-        return new TranslationTextComponent(ObjectHolders.REPLICATOR_BLOCK.getTranslationKey());
+    public CompoundTag getUpdateTag() {
+        return saveWithoutMetadata();
+    }
+
+    @Override
+    public ClientboundBlockEntityDataPacket getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public Component getDisplayName() {
+        return Component.translatable(ObjectHolders.REPLICATOR_BLOCK.getDescriptionId());
     }
 
     @Nullable
     @Override
-    public Container createMenu(int windowID, PlayerInventory playerInventory, PlayerEntity playerEntity) {
-        return new ReplicatorContainer(windowID, world, pos, playerInventory, playerEntity);
+    public AbstractContainerMenu createMenu(int windowID, Inventory playerInventory, Player player) {
+        return new ReplicatorMenu(windowID, level, worldPosition, playerInventory, player);
 
     }
 }

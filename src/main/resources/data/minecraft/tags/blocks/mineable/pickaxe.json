@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "youmatter:scanner",
+    "youmatter:encoder",
+    "youmatter:creator",
+    "youmatter:replicator"
+  ]
+}

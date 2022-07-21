@@ -1,18 +1,19 @@
 package realmayus.youmatter.network;
 
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
-import realmayus.youmatter.creator.CreatorContainer;
 //import realmayus.youmatter.creator.ContainerCreator;
 import java.util.function.Supplier;
+
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.network.NetworkEvent;
+import realmayus.youmatter.creator.CreatorMenu;
 
 public class PacketChangeSettingsCreatorServer{
 
     private boolean isActivated;
 
 
-    public PacketChangeSettingsCreatorServer(PacketBuffer buf) {
+    public PacketChangeSettingsCreatorServer(FriendlyByteBuf buf) {
         isActivated = buf.readBoolean();
     }
 
@@ -20,17 +21,16 @@ public class PacketChangeSettingsCreatorServer{
         this.isActivated = isActivated;
     }
 
-    void encode(PacketBuffer buf) {
+    void encode(FriendlyByteBuf buf) {
         buf.writeBoolean(isActivated);
     }
 
     void handle(Supplier<NetworkEvent.Context> ctx) {
         // This is the player the packet was sent to the server from
         ctx.get().enqueueWork(() -> {
-            ServerPlayerEntity player = ctx.get().getSender();
-            if (player.openContainer instanceof CreatorContainer) {
-                CreatorContainer openContainer = (CreatorContainer) player.openContainer;
-                openContainer.te.setActivated(isActivated);
+            ServerPlayer player = ctx.get().getSender();
+            if (player.containerMenu instanceof CreatorMenu openContainer) {
+                openContainer.creator.setActivated(isActivated);
             }
         });
         ctx.get().setPacketHandled(true);

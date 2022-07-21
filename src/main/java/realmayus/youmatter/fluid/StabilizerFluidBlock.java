@@ -1,28 +1,28 @@
 package realmayus.youmatter.fluid;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.FlowingFluidBlock;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.fluid.FlowingFluid;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.Effects;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-
 import java.util.function.Supplier;
 
-public class StabilizerFluidBlock extends FlowingFluidBlock {
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FlowingFluid;
+
+public class StabilizerFluidBlock extends LiquidBlock {
     public StabilizerFluidBlock(Supplier<? extends FlowingFluid> supplier, Properties properties) {
         super(supplier, properties);
     }
 
     @Override
-    public void onEntityCollision(BlockState state, World worldIn, BlockPos pos, Entity entityIn) {
-        if (entityIn instanceof LivingEntity) {
-            ((LivingEntity)entityIn).addPotionEffect(new EffectInstance(Effects.JUMP_BOOST, 200, 5));
+    public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
+        if (entity instanceof LivingEntity livingEntity) {
+            livingEntity.addEffect(new MobEffectInstance(MobEffects.JUMP, 200, 5));
         }
-        super.onEntityCollision(state, worldIn, pos, entityIn);
+        super.entityInside(state, level, pos, entity);
     }
 
 

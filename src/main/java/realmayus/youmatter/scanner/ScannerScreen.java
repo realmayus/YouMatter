@@ -1,75 +1,74 @@
 package realmayus.youmatter.scanner;
 
-import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import java.util.Arrays;
+import java.util.List;
+
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
 import realmayus.youmatter.ObjectHolders;
 import realmayus.youmatter.YouMatter;
 
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-public class ScannerScreen extends ContainerScreen<ScannerContainer> {
+public class ScannerScreen extends AbstractContainerScreen<ScannerMenu> {
     private static final int WIDTH = 176;
     private static final int HEIGHT = 168;
 
-    private ScannerTile te;
+    private ScannerBlockEntity scanner;
 
     private static final ResourceLocation GUI = new ResourceLocation(YouMatter.MODID, "textures/gui/scanner.png");
 
-    public ScannerScreen(ScannerContainer container, PlayerInventory inv, ITextComponent name) {
+    public ScannerScreen(ScannerMenu container, Inventory inv, Component name) {
         super(container, inv, name);
-        this.te = container.te;
+        this.scanner = container.scanner;
     }
 
     @Override
-    public void render(int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground();
-        super.render(mouseX, mouseY, partialTicks);
-        this.renderHoveredToolTip(mouseX, mouseY);
+    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
+        this.renderBackground(poseStack);
+        super.render(poseStack, mouseX, mouseY, partialTicks);
+        this.renderTooltip(poseStack, mouseX, mouseY);
 
         int xAxis = (mouseX - (width - WIDTH) / 2);
         int yAxis = (mouseY - (height - HEIGHT) / 2);
 
         if (xAxis >= 141 && xAxis <= 156 && yAxis >= 37 && yAxis <= 57) {
-            drawTooltip(mouseX, mouseY, Stream.of(I18n.format("youmatter.gui.energy.title"), I18n.format("youmatter.gui.energy.description", te.getClientEnergy())).collect(Collectors.toList()));
+            drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(Component.literal(I18n.get("youmatter.gui.energy.title")), Component.literal(I18n.get("youmatter.gui.energy.description", scanner.getEnergy()))));
         }
 
-        if (!te.getHasEncoderClient()) {
+        if (!scanner.getHasEncoder()) {
             if (xAxis >= 16 && xAxis <= 32 && yAxis >= 59 && yAxis <= 75) {
-                drawTooltip(mouseX, mouseY, Stream.of(I18n.format("youmatter.warning.scanner1"), I18n.format("youmatter.warning.scanner2"), I18n.format("youmatter.warning.scanner3")).collect(Collectors.toList()));
-
+                drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(Component.literal(I18n.get("youmatter.warning.scanner1")), Component.literal(I18n.get("youmatter.warning.scanner2")), Component.literal(I18n.get("youmatter.warning.scanner3"))));
             }
         }
 
     }
 
     @Override
-    protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-        drawEnergyBolt(te.getClientEnergy());
-        drawProgressDisplayChain(te.getClientProgress());
+    protected void renderLabels(PoseStack poseStack, int mouseX, int mouseY) {
+        drawEnergyBolt(poseStack, scanner.getEnergy());
+        drawProgressDisplayChain(poseStack, scanner.getProgress());
 
-        if(!te.getHasEncoderClient()) {
-            this.blit(16, 59, 176, 101, 16, 16);
+        if(!scanner.getHasEncoder()) {
+            this.blit(poseStack, 16, 59, 176, 101, 16, 16);
         }
-        font.drawString(I18n.format(ObjectHolders.SCANNER_BLOCK.getTranslationKey()), 8, 6, 0x404040);
+        font.draw(poseStack, I18n.get(ObjectHolders.SCANNER_BLOCK.getDescriptionId()), 8, 6, 0x404040);
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        this.minecraft.getTextureManager().bindTexture(GUI);
+    protected void renderBg(PoseStack poseStack, float partialTicks, int mouseX, int mouseY) {
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem._setShaderTexture(0, GUI);
         int relX = (this.width - WIDTH) / 2;
         int relY = (this.height - HEIGHT) / 2;
-        this.blit(relX, relY, 0, 0, WIDTH, HEIGHT);
+        this.blit(poseStack, relX, relY, 0, 0, WIDTH, HEIGHT);
     }
 
-    private void drawProgressDisplayChain(int progress) {
+    private void drawProgressDisplayChain(PoseStack poseStack, int progress) {
         int circuits;
         int arrow;
 
@@ -84,26 +83,26 @@ public class ScannerScreen extends ContainerScreen<ScannerContainer> {
             arrow = 100;
         }
 
-        this.minecraft.getTextureManager().bindTexture(GUI);
-        this.blit(79, 62, 176, 41, Math.round((arrow / 100.0f) * 18), 12);
-        this.blit(104, 34, 176, 53, 17, Math.round((circuits / 100.0f) * 24));
-        this.blit(54, 34, 176, 77, 17, Math.round((circuits / 100.0f) * 24));
+        RenderSystem._setShaderTexture(0, GUI);
+        this.blit(poseStack, 79, 62, 176, 41, Math.round((arrow / 100.0f) * 18), 12);
+        this.blit(poseStack, 104, 34, 176, 53, 17, Math.round((circuits / 100.0f) * 24));
+        this.blit(poseStack, 54, 34, 176, 77, 17, Math.round((circuits / 100.0f) * 24));
     }
 
-    private void drawEnergyBolt(int energy) {
-        this.minecraft.getTextureManager().bindTexture(GUI);
+    private void drawEnergyBolt(PoseStack poseStack, int energy) {
+        RenderSystem._setShaderTexture(0, GUI);
 
         if(energy == 0) {
-            this.blit(141, 35, 176, 21, 15, 20);
+            this.blit(poseStack, 141, 35, 176, 21, 15, 20);
         } else {
             double percentage = energy * 100.0F / 1000000;  // i know this is dumb
             float percentagef = (float) percentage / 100; // but it works.
-            this.blit(141, 35, 176, 0, 15, Math.round(20 * percentagef)); // it's not really intended that the bolt fills from the top but it looks cool tbh.
+            this.blit(poseStack, 141, 35, 176, 0, 15, Math.round(20 * percentagef)); // it's not really intended that the bolt fills from the top but it looks cool tbh.
 
         }
     }
 
-    private void drawTooltip(int x, int y, List<String> tooltips) {
-        renderTooltip(tooltips, x, y);
+    private void drawTooltip(PoseStack poseStack, int x, int y, List<Component> tooltips) {
+        renderComponentTooltip(poseStack, tooltips, x, y);
     }
 }

@@ -1,13 +1,13 @@
 package realmayus.youmatter.util;
 
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.RecipeManager;
-import realmayus.youmatter.YMConfig;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeManager;
+import realmayus.youmatter.YMConfig;
 
 public class GeneralUtils {
 
@@ -16,10 +16,10 @@ public class GeneralUtils {
      * @param manager a RecipeManager object.
      * @return every recipe that is available in a handy list.
      */
-    public static List<IRecipe<?>> getMatchingRecipes(RecipeManager manager, ItemStack is) { // List of Recipes > List of Required Items For that recipe > List of allowed ItemStacks as an ingredient (see OreDict)
-        List<IRecipe<?>> returnValue = new ArrayList<>();
-        for(IRecipe<?> recipe : manager.getRecipes()) {
-            if(recipe.getRecipeOutput().isItemEqual(is)) {
+    public static List<Recipe<?>> getMatchingRecipes(RecipeManager manager, ItemStack is) { // List of Recipes > List of Required Items For that recipe > List of allowed ItemStacks as an ingredient (see OreDict)
+        List<Recipe<?>> returnValue = new ArrayList<>();
+        for(Recipe<?> recipe : manager.getRecipes()) {
+            if(recipe.getResultItem().sameItem(is)) {
                 returnValue.add(recipe);
             }
         }
@@ -27,8 +27,8 @@ public class GeneralUtils {
     }
 
     public static int getUMatterAmountForItem(Item item) {
-        if(YMConfig.CONFIG.getOverride(item.getRegistryName().toString()) != null) {
-            return Integer.parseInt((String)YMConfig.CONFIG.getOverride(item.getRegistryName().toString())[1]);
+        if(YMConfig.CONFIG.getOverride(RegistryUtil.getRegistryName(item).toString()) != null) {
+            return Integer.parseInt((String)YMConfig.CONFIG.getOverride(RegistryUtil.getRegistryName(item).toString())[1]);
         } else {
             return YMConfig.CONFIG.defaultAmount.get();
         }
@@ -44,12 +44,12 @@ public class GeneralUtils {
     }
 
     public static boolean hasCustomUMatterValue(ItemStack item) {
-        return YMConfig.CONFIG.getOverride(item.getItem().getRegistryName().toString()) != null;
+        return YMConfig.CONFIG.getOverride(RegistryUtil.getRegistryName(item.getItem()).toString()) != null;
     }
 
     public static boolean hasCustomUMatterValue(ItemStack[] items) {
         for(ItemStack is : items) {
-            if(YMConfig.CONFIG.getOverride(is.getItem().getRegistryName().toString()) != null) {
+            if(YMConfig.CONFIG.getOverride(RegistryUtil.getRegistryName(is.getItem()).toString()) != null) {
                 return true;
             }
         }
@@ -58,7 +58,7 @@ public class GeneralUtils {
 
     public static boolean canAddItemToSlot(ItemStack slotStack, ItemStack givenStack, boolean stackSizeMatters) {
         boolean flag = slotStack.isEmpty();
-        if (!flag && givenStack.isItemEqual(slotStack) /*&& ItemStack.areItemStackTagsEqual(slotStack, givenStack)*/) {
+        if (!flag && givenStack.sameItem(slotStack) /*&& ItemStack.areItemStackTagsEqual(slotStack, givenStack)*/) {
             return slotStack.getCount() + (stackSizeMatters ? 0 : givenStack.getCount()) <= givenStack.getMaxStackSize();
         } else {
             return flag;
