@@ -30,17 +30,14 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.registries.ForgeRegistries;
-import realmayus.youmatter.ModFluids;
-import realmayus.youmatter.ObjectHolders;
+import realmayus.youmatter.ModContent;
 import realmayus.youmatter.YMConfig;
 import realmayus.youmatter.util.GeneralUtils;
 import realmayus.youmatter.util.MyEnergyStorage;
@@ -48,7 +45,7 @@ import realmayus.youmatter.util.MyEnergyStorage;
 public class ReplicatorBlockEntity extends BlockEntity implements MenuProvider {
 
     public ReplicatorBlockEntity(BlockPos pos, BlockState state) {
-        super(ObjectHolders.REPLICATOR_BLOCK_ENTITY, pos, state);
+        super(ModContent.REPLICATOR_BLOCK_ENTITY.get(), pos, state);
     }
 
 
@@ -116,7 +113,7 @@ public class ReplicatorBlockEntity extends BlockEntity implements MenuProvider {
 
         @Override
         public boolean isFluidValid(int tank, @Nonnull FluidStack stack) {
-            if (stack.getFluid().equals(ModFluids.UMATTER.get())) {
+            if (stack.getFluid().equals(ModContent.UMATTER.get())) {
                 return true;
             }
             return false;
@@ -124,7 +121,7 @@ public class ReplicatorBlockEntity extends BlockEntity implements MenuProvider {
 
         @Override
         public int fill(FluidStack resource, FluidAction action) {
-            if (resource.getFluid().equals(ModFluids.UMATTER.get())) {
+            if (resource.getFluid().equals(ModContent.UMATTER.get())) {
                 if (MAX_UMATTER - getTank().getFluidAmount() < resource.getAmount()) {
                     return tank.fill(new FluidStack(resource.getFluid(), MAX_UMATTER), action);
                 } else {
@@ -137,28 +134,28 @@ public class ReplicatorBlockEntity extends BlockEntity implements MenuProvider {
         @Nonnull
         @Override
         public FluidStack drain(FluidStack resource, FluidAction action) {
-            assert ModFluids.UMATTER.get() != null;
-            return new FluidStack(ModFluids.UMATTER.get(), 0);
+            assert ModContent.UMATTER.get() != null;
+            return new FluidStack(ModContent.UMATTER.get(), 0);
         }
 
         @Nonnull
         @Override
         public FluidStack drain(int maxDrain, FluidAction action) {
-            assert ModFluids.UMATTER.get() != null;
-            return new FluidStack(ModFluids.UMATTER.get(), 0);
+            assert ModContent.UMATTER.get() != null;
+            return new FluidStack(ModContent.UMATTER.get(), 0);
         }
     });
 
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+        if (cap == ForgeCapabilities.ITEM_HANDLER) {
             return inventory.cast();
         }
-        if(cap == CapabilityEnergy.ENERGY) {
+        if(cap == ForgeCapabilities.ENERGY) {
             return myEnergyStorage.cast();
 
         }
-        if(cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
+        if(cap == ForgeCapabilities.FLUID_HANDLER) {
             return fluidHandler.cast();
         }
 
@@ -216,18 +213,18 @@ public class ReplicatorBlockEntity extends BlockEntity implements MenuProvider {
                 if (!inventory.getStackInSlot(3).isEmpty()) {
                     ItemStack item = inventory.getStackInSlot(3);
                     if (item.getItem() instanceof BucketItem && GeneralUtils.canAddItemToSlot(inventory.getStackInSlot(4), new ItemStack(Items.BUCKET, 1), false)) {
-                        item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).ifPresent(h -> {
-                            if (!h.getFluidInTank(0).isEmpty() && h.getFluidInTank(0).getFluid().isSame(ModFluids.UMATTER.get())) {
+                        item.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).ifPresent(h -> {
+                            if (!h.getFluidInTank(0).isEmpty() && h.getFluidInTank(0).getFluid().isSame(ModContent.UMATTER.get())) {
                                 if (MAX_UMATTER - getTank().getFluidAmount() >= 1000) {
-                                    getTank().fill(new FluidStack(ModFluids.UMATTER.get(), 1000), IFluidHandler.FluidAction.EXECUTE);
+                                    getTank().fill(new FluidStack(ModContent.UMATTER.get(), 1000), IFluidHandler.FluidAction.EXECUTE);
                                     inventory.setStackInSlot(3, ItemStack.EMPTY);
                                     inventory.insertItem(4, new ItemStack(Items.BUCKET, 1), false);
                                 }
                             }
                         });
                     } else if(GeneralUtils.canAddItemToSlot(inventory.getStackInSlot(4), inventory.getStackInSlot(3), false)) {
-                        item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).ifPresent(h -> {
-                            if (h.getFluidInTank(0).getFluid().isSame(ModFluids.UMATTER.get())) {
+                        item.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).ifPresent(h -> {
+                            if (h.getFluidInTank(0).getFluid().isSame(ModContent.UMATTER.get())) {
                                 if (h.getFluidInTank(0).getAmount() > MAX_UMATTER - getTank().getFluidAmount()) { //given fluid is more than what fits in the U-Tank
                                     getTank().fill(h.drain(MAX_UMATTER - getTank().getFluidAmount(), IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
                                 } else { //given fluid fits perfectly in U-Tank
@@ -407,7 +404,7 @@ public class ReplicatorBlockEntity extends BlockEntity implements MenuProvider {
 
     @Override
     public Component getDisplayName() {
-        return Component.translatable(ObjectHolders.REPLICATOR_BLOCK.getDescriptionId());
+        return Component.translatable(ModContent.REPLICATOR_BLOCK.get().getDescriptionId());
     }
 
     @Nullable

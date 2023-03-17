@@ -24,16 +24,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
-import realmayus.youmatter.ModFluids;
-import realmayus.youmatter.ObjectHolders;
+import realmayus.youmatter.ModContent;
 import realmayus.youmatter.YMConfig;
 import realmayus.youmatter.replicator.ReplicatorBlockEntity;
 import realmayus.youmatter.util.GeneralUtils;
@@ -43,7 +40,7 @@ import realmayus.youmatter.util.RegistryUtil;
 public class CreatorBlockEntity extends BlockEntity implements MenuProvider {
 
     public CreatorBlockEntity(BlockPos pos, BlockState state) {
-        super(ObjectHolders.CREATOR_TILE, pos, state);
+        super(ModContent.CREATOR_BLOCK_ENTITY.get(), pos, state);
     }
 
     private static final int MAX_UMATTER = 11000;
@@ -67,15 +64,15 @@ public class CreatorBlockEntity extends BlockEntity implements MenuProvider {
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+        if (cap == ForgeCapabilities.ITEM_HANDLER) {
             return inventory.cast();
         }
 
-        if(cap == CapabilityEnergy.ENERGY) {
+        if(cap == ForgeCapabilities.ENERGY) {
             return myEnergyStorage.cast();
 
         }
-        if(cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
+        if(cap == ForgeCapabilities.FLUID_HANDLER) {
             return fluidHandler.cast();
 
         }
@@ -146,7 +143,7 @@ public class CreatorBlockEntity extends BlockEntity implements MenuProvider {
         public boolean isFluidValid(int tank, @Nonnull FluidStack stack) {
             if (tank == 0) {
                 return false;
-            } else if (tank == 1 && stack.getFluid().equals(ModFluids.STABILIZER.get())) {
+            } else if (tank == 1 && stack.getFluid().equals(ModContent.STABILIZER.get())) {
                 return true;
             }
             return false;
@@ -154,7 +151,7 @@ public class CreatorBlockEntity extends BlockEntity implements MenuProvider {
 
         @Override
         public int fill(FluidStack resource, FluidAction action) {
-            if (resource.getFluid().equals(ModFluids.STABILIZER.get())) {
+            if (resource.getFluid().equals(ModContent.STABILIZER.get())) {
                 if (MAX_STABILIZER - getSTank().getFluidAmount() < resource.getAmount()) {
                     return sTank.fill(new FluidStack(resource.getFluid(), MAX_STABILIZER), action);
                 } else {
@@ -167,7 +164,7 @@ public class CreatorBlockEntity extends BlockEntity implements MenuProvider {
         @Nonnull
         @Override
         public FluidStack drain(FluidStack resource, FluidAction action) {
-            if (resource.getFluid().equals(ModFluids.UMATTER.get())) {
+            if (resource.getFluid().equals(ModContent.UMATTER.get())) {
                 if (uTank.getFluidAmount() < resource.getAmount()) {
                     uTank.drain(uTank.getFluid(), action);
                     return uTank.getFluid();
@@ -269,7 +266,7 @@ public class CreatorBlockEntity extends BlockEntity implements MenuProvider {
                 if (getEnergy() >= 0.3f * 1000000 && sTank.getFluidAmount() >= 125) { // if energy more than 30 % of max energy
                     if (uTank.getFluidAmount() + YMConfig.CONFIG.productionPerTick.get() <= MAX_UMATTER) {
                         sTank.drain(125, IFluidHandler.FluidAction.EXECUTE);
-                        uTank.fill(new FluidStack(ModFluids.UMATTER.get(), YMConfig.CONFIG.productionPerTick.get()), IFluidHandler.FluidAction.EXECUTE);
+                        uTank.fill(new FluidStack(ModContent.UMATTER.get(), YMConfig.CONFIG.productionPerTick.get()), IFluidHandler.FluidAction.EXECUTE);
                         myEnergyStorage.ifPresent(myEnergyStorage -> myEnergyStorage.extractEnergy(Math.round(getEnergy()/3f), false));
                     }
                 }
@@ -278,9 +275,9 @@ public class CreatorBlockEntity extends BlockEntity implements MenuProvider {
             Object[] neighborTE = getNeighborTileEntity(pos);
             if(neighborTE != null){
                 if (uTank.getFluidAmount() >= 500) { // set a maximum output of 500 mB (every two seconds)
-                    uTank.drain(level.getBlockEntity((BlockPos)neighborTE[0]).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, (Direction)neighborTE[1]).map(h -> h.fill(new FluidStack(ModFluids.UMATTER.get(), 500), IFluidHandler.FluidAction.EXECUTE)).orElse(0), IFluidHandler.FluidAction.EXECUTE);
+                    uTank.drain(level.getBlockEntity((BlockPos)neighborTE[0]).getCapability(ForgeCapabilities.FLUID_HANDLER, (Direction)neighborTE[1]).map(h -> h.fill(new FluidStack(ModContent.UMATTER.get(), 500), IFluidHandler.FluidAction.EXECUTE)).orElse(0), IFluidHandler.FluidAction.EXECUTE);
                 } else {
-                    uTank.drain(level.getBlockEntity((BlockPos)neighborTE[0]).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, (Direction)neighborTE[1]).map(h -> h.fill(new FluidStack(ModFluids.UMATTER.get(), uTank.getFluidAmount()), IFluidHandler.FluidAction.EXECUTE)).orElse(0), IFluidHandler.FluidAction.EXECUTE);
+                    uTank.drain(level.getBlockEntity((BlockPos)neighborTE[0]).getCapability(ForgeCapabilities.FLUID_HANDLER, (Direction)neighborTE[1]).map(h -> h.fill(new FluidStack(ModContent.UMATTER.get(), uTank.getFluidAmount()), IFluidHandler.FluidAction.EXECUTE)).orElse(0), IFluidHandler.FluidAction.EXECUTE);
                 }
             }
             currentPartTick = 0;
@@ -292,13 +289,13 @@ public class CreatorBlockEntity extends BlockEntity implements MenuProvider {
                         if (getUTank().getFluidAmount() >= 1000) {
                             getUTank().drain(1000, IFluidHandler.FluidAction.EXECUTE);
                             inventory.setStackInSlot(3, ItemStack.EMPTY);
-                            inventory.insertItem(4, new ItemStack(ObjectHolders.UMATTER_BUCKET, 1), false);
+                            inventory.insertItem(4, new ItemStack(ModContent.UMATTER_BUCKET.get(), 1), false);
                         }
                     } else {
-                        item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).ifPresent(h -> {
-                            if (h.getFluidInTank(0).getFluid().isSame(ModFluids.UMATTER.get()) || h.getFluidInTank(0).isEmpty()) {
+                        item.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).ifPresent(h -> {
+                            if (h.getFluidInTank(0).getFluid().isSame(ModContent.UMATTER.get()) || h.getFluidInTank(0).isEmpty()) {
                                 if (h.getTankCapacity(0) - h.getFluidInTank(0).getAmount() < getUTank().getFluidAmount()) { //fluid in S-Tank is more than what fits in the item's tank
-                                    getUTank().drain(h.fill(new FluidStack(ModFluids.UMATTER.get(), h.getTankCapacity(0) - h.getFluidInTank(0).getAmount()), IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
+                                    getUTank().drain(h.fill(new FluidStack(ModContent.UMATTER.get(), h.getTankCapacity(0) - h.getFluidInTank(0).getAmount()), IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
                                 } else { //S-Tank's fluid fits perfectly in item's tank
                                     getUTank().drain(h.fill(getUTank().getFluid(), IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
                                 }
@@ -311,18 +308,18 @@ public class CreatorBlockEntity extends BlockEntity implements MenuProvider {
                 if (!inventory.getStackInSlot(1).isEmpty()) {
                     ItemStack item = inventory.getStackInSlot(1);
                     if (item.getItem() instanceof BucketItem && GeneralUtils.canAddItemToSlot(inventory.getStackInSlot(2), new ItemStack(Items.BUCKET, 1), false)) {
-                        item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).ifPresent(h -> {
-                            if (!h.getFluidInTank(0).isEmpty() && (h.getFluidInTank(0).getFluid().isSame(ModFluids.STABILIZER.get()) || YMConfig.CONFIG.alternativeStabilizer.get().equalsIgnoreCase(RegistryUtil.getRegistryName(h.getFluidInTank(0).getFluid()).getPath()))) {
+                        item.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).ifPresent(h -> {
+                            if (!h.getFluidInTank(0).isEmpty() && (h.getFluidInTank(0).getFluid().isSame(ModContent.STABILIZER.get()) || YMConfig.CONFIG.alternativeStabilizer.get().equalsIgnoreCase(RegistryUtil.getRegistryName(h.getFluidInTank(0).getFluid()).getPath()))) {
                                 if (MAX_STABILIZER - getSTank().getFluidAmount() >= 1000) {
-                                    getSTank().fill(new FluidStack(ModFluids.STABILIZER.get(), 1000), IFluidHandler.FluidAction.EXECUTE);
+                                    getSTank().fill(new FluidStack(ModContent.STABILIZER.get(), 1000), IFluidHandler.FluidAction.EXECUTE);
                                     inventory.setStackInSlot(1, ItemStack.EMPTY);
                                     inventory.insertItem(2, new ItemStack(Items.BUCKET, 1), false);
                                 }
                             }
                         });
                     } else if(GeneralUtils.canAddItemToSlot(inventory.getStackInSlot(2), inventory.getStackInSlot(1), false)) {
-                        item.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).ifPresent(h -> {
-                            if (h.getFluidInTank(0).getFluid().isSame(ModFluids.STABILIZER.get()) || YMConfig.CONFIG.alternativeStabilizer.get().equalsIgnoreCase(RegistryUtil.getRegistryName(h.getFluidInTank(0).getFluid()).getPath())) {
+                        item.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).ifPresent(h -> {
+                            if (h.getFluidInTank(0).getFluid().isSame(ModContent.STABILIZER.get()) || YMConfig.CONFIG.alternativeStabilizer.get().equalsIgnoreCase(RegistryUtil.getRegistryName(h.getFluidInTank(0).getFluid()).getPath())) {
                                 if (h.getFluidInTank(0).getAmount() > MAX_STABILIZER - getSTank().getFluidAmount()) { //given fluid is more than what fits in the S-Tank
                                     getSTank().fill(h.drain(MAX_STABILIZER - getSTank().getFluidAmount(), IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
                                 } else { //given fluid fits perfectly in S-Tank
@@ -348,14 +345,14 @@ public class CreatorBlockEntity extends BlockEntity implements MenuProvider {
             BlockEntity offsetBe = level.getBlockEntity(offsetPos);
 
             if(offsetBe != null) {
-                offsetBe.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, facing).ifPresent(x -> foundPos.put(offsetPos, facing));
+                offsetBe.getCapability(ForgeCapabilities.FLUID_HANDLER, facing).ifPresent(x -> foundPos.put(offsetPos, facing));
             }
         }
 
         // Prioritize Replicator
         for (Map.Entry<BlockPos, Direction> entry : foundPos.entrySet()) {
             if (level.getBlockEntity(entry.getKey()) instanceof ReplicatorBlockEntity replicator) {
-                if(replicator.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, entry.getValue()).map(h -> h.fill(new FluidStack(ModFluids.UMATTER.get(), 500), IFluidHandler.FluidAction.SIMULATE)).orElse(0) > 0) {
+                if(replicator.getCapability(ForgeCapabilities.FLUID_HANDLER, entry.getValue()).map(h -> h.fill(new FluidStack(ModContent.UMATTER.get(), 500), IFluidHandler.FluidAction.SIMULATE)).orElse(0) > 0) {
                     //Replicator can take fluid
                     return new Object[] {entry.getKey(), entry.getValue()}; // position, facing
                 }
@@ -364,7 +361,7 @@ public class CreatorBlockEntity extends BlockEntity implements MenuProvider {
 
         // Replicator not found / can't take fluid, now trying other blocks
         for (Map.Entry<BlockPos, Direction> entry : foundPos.entrySet()) {
-            if(Objects.requireNonNull(level.getBlockEntity(entry.getKey())).getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, entry.getValue()).map(h -> h.fill(new FluidStack(ModFluids.UMATTER.get(), 500), IFluidHandler.FluidAction.SIMULATE)).orElse(0) > 0) {
+            if(Objects.requireNonNull(level.getBlockEntity(entry.getKey())).getCapability(ForgeCapabilities.FLUID_HANDLER, entry.getValue()).map(h -> h.fill(new FluidStack(ModContent.UMATTER.get(), 500), IFluidHandler.FluidAction.SIMULATE)).orElse(0) > 0) {
                 //Tile can take fluid
                 return new Object[] {entry.getKey(), entry.getValue()}; // position, facing
             }
@@ -376,7 +373,7 @@ public class CreatorBlockEntity extends BlockEntity implements MenuProvider {
 
     @Override
     public Component getDisplayName() {
-        return Component.translatable(ObjectHolders.CREATOR_BLOCK.getDescriptionId());
+        return Component.translatable(ModContent.CREATOR_BLOCK.get().getDescriptionId());
     }
 
     @Nullable

@@ -15,7 +15,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraftforge.items.ItemStackHandler;
-import realmayus.youmatter.ObjectHolders;
+import realmayus.youmatter.ModContent;
 import realmayus.youmatter.YouMatter;
 import realmayus.youmatter.items.ThumbdriveItem;
 
@@ -96,7 +96,7 @@ public class EncoderScreen extends AbstractContainerScreen<EncoderMenu> {
                 }
             }
         });
-        font.draw(poseStack, I18n.get(ObjectHolders.ENCODER_BLOCK.getDescriptionId()), 8, 6, 0x404040);
+        font.draw(poseStack, I18n.get(ModContent.ENCODER_BLOCK.get().getDescriptionId()), 8, 6, 0x404040);
     }
 
     private void drawProgressDisplayChain(PoseStack poseStack, int progress) {

@@ -10,12 +10,10 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import realmayus.youmatter.YouMatter;
 
 public class MachineCasingItem extends Item {
-
     public MachineCasingItem() {
-        super(new Properties().tab(YouMatter.ITEM_GROUP));
+        super(new Properties());
     }
 
     @Override

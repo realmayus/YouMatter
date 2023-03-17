@@ -22,7 +22,7 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
-import realmayus.youmatter.ObjectHolders;
+import realmayus.youmatter.ModContent;
 import realmayus.youmatter.YouMatter;
 import realmayus.youmatter.network.PacketChangeSettingsReplicatorServer;
 import realmayus.youmatter.network.PacketHandler;
@@ -68,7 +68,7 @@ public class ReplicatorScreen extends AbstractContainerScreen<ReplicatorMenu> {
         drawModeIcon(poseStack, replicator.isCurrentMode());
         drawProgressArrow(poseStack, replicator.getProgress());
 
-        font.draw(poseStack, I18n.get(ObjectHolders.REPLICATOR_BLOCK.getDescriptionId()), 8, 6, 0x404040);
+        font.draw(poseStack, I18n.get(ModContent.REPLICATOR_BLOCK.get().getDescriptionId()), 8, 6, 0x404040);
     }
 
     private void drawEnergyBolt(PoseStack poseStack, int energy) {

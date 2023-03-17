@@ -1,6 +1,5 @@
 package realmayus.youmatter.items;
 
-
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -12,12 +11,10 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import realmayus.youmatter.YouMatter;
 
 public class ThumbdriveItem extends Item {
-
     public ThumbdriveItem() {
-        super(new Item.Properties().stacksTo(1).tab(YouMatter.ITEM_GROUP));
+        super(new Item.Properties().stacksTo(1));
     }
 
     @Override
@@ -31,5 +28,4 @@ public class ThumbdriveItem extends Item {
             }
         }
     }
-
 }

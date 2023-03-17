@@ -11,7 +11,7 @@ import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import realmayus.youmatter.ObjectHolders;
+import realmayus.youmatter.ModContent;
 import realmayus.youmatter.YouMatter;
 
 public class ScannerScreen extends AbstractContainerScreen<ScannerMenu> {
@@ -56,7 +56,7 @@ public class ScannerScreen extends AbstractContainerScreen<ScannerMenu> {
         if(!scanner.getHasEncoder()) {
             this.blit(poseStack, 16, 59, 176, 101, 16, 16);
         }
-        font.draw(poseStack, I18n.get(ObjectHolders.SCANNER_BLOCK.getDescriptionId()), 8, 6, 0x404040);
+        font.draw(poseStack, I18n.get(ModContent.SCANNER_BLOCK.get().getDescriptionId()), 8, 6, 0x404040);
     }
 
     @Override
