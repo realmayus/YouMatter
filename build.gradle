@@ -28,7 +28,7 @@ version = '2.2.0'
 group = 'realmayus.youmatter' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 
 java {
-	archivesBaseName = 'youmatter-1.19.3'
+	archivesBaseName = 'youmatter-1.19.4'
 	toolchain.languageVersion = JavaLanguageVersion.of(17)
 }
 
@@ -38,7 +38,7 @@ minecraft {
     // stable_#            Stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not always work.
     // Simply re-run your setup task after changing the mappings to update your workspace.
-    mappings channel: 'official', version: '1.19.3'
+    mappings channel: 'official', version: '1.19.4'
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
     
     // Default run configurations.
@@ -100,7 +100,7 @@ dependencies {
     // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
     // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
-    minecraft 'net.minecraftforge:forge:1.19.3-44.1.23'
+    minecraft 'net.minecraftforge:forge:1.19.4-45.0.9'
 
     // You may put jars on which you depend on in ./libs or you may define them like so..
     // compile "some.group:artifact:version:classifier"
@@ -122,7 +122,7 @@ dependencies {
 
 //    runtimeOnly fg.deobf("mekanism:Mekanism:1.18.2-10.2.0.459")
 //    implementation fg.deobf("curse.maven:refinedstorage:2871849")
-    implementation fg.deobf("curse.maven:jei-238222:4434399")
+//    implementation fg.deobf("curse.maven:jei-238222:4434399")
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..

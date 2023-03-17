@@ -7,6 +7,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.language.I18n;
@@ -49,12 +50,11 @@ public class ReplicatorScreen extends AbstractContainerScreen<ReplicatorMenu> {
     @Override
     protected void renderBg(PoseStack poseStack, float partialTicks, int mouseX, int mouseY) {
         //Setting color to white because JEI is bae (gui would be yellow)
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem._setShaderTexture(0, GUI);
 
         int relX = (this.width - WIDTH) / 2;
         int relY = (this.height - HEIGHT) / 2;
-        this.blit(poseStack, relX, relY, 0, 0, WIDTH, HEIGHT);
+        GuiComponent.blit(poseStack, relX, relY, 0, 0, WIDTH, HEIGHT);
 
         drawFluidTank(poseStack, 26, 20, replicator.getTank());
 
@@ -75,11 +75,11 @@ public class ReplicatorScreen extends AbstractContainerScreen<ReplicatorMenu> {
         RenderSystem._setShaderTexture(0, GUI);
 
         if(replicator.getEnergy() == 0) {
-            this.blit(poseStack, 127, 58, 176, 114, 15, 20);
+            GuiComponent.blit(poseStack, 127, 58, 176, 114, 15, 20);
         } else {
             double percentage = energy * 100.0F / 1000000;  // i know this is dumb
             float percentagef = (float)percentage / 100; // but it works.
-            this.blit(poseStack, 127, 58, 176, 93, 15, Math.round(20 * percentagef)); // it's not really intended that the bolt fills from the top but it looks cool tbh.
+            GuiComponent.blit(poseStack, 127, 58, 176, 93, 15, Math.round(20 * percentagef)); // it's not really intended that the bolt fills from the top but it looks cool tbh.
 
         }
     }
@@ -87,16 +87,16 @@ public class ReplicatorScreen extends AbstractContainerScreen<ReplicatorMenu> {
 
     private void drawProgressArrow(PoseStack poseStack, int progress) {
         RenderSystem._setShaderTexture(0, GUI);
-        this.blit(poseStack, 91, 38, 176, 134, 11, Math.round((progress / 100.0f) * 19));
+        GuiComponent.blit(poseStack, 91, 38, 176, 134, 11, Math.round((progress / 100.0f) * 19));
     }
 
     private void drawActiveIcon(PoseStack poseStack, boolean isActive) {
         RenderSystem._setShaderTexture(0, GUI);
 
         if(isActive) {
-            this.blit(poseStack, 154, 12, 176, 24, 8, 9);
+            GuiComponent.blit(poseStack, 154, 12, 176, 24, 8, 9);
         } else {
-            this.blit(poseStack, 154, 12, 184, 24, 8, 9);
+            GuiComponent.blit(poseStack, 154, 12, 184, 24, 8, 9);
         }
     }
 
@@ -105,9 +105,9 @@ public class ReplicatorScreen extends AbstractContainerScreen<ReplicatorMenu> {
 
         if (mode){
             //loop
-            this.blit(poseStack, 152, 34, 176, 11, 13,13);
+            GuiComponent.blit(poseStack, 152, 34, 176, 11, 13,13);
         } else {
-            this.blit(poseStack, 151, 35, 176, 0, 13, 11);
+            GuiComponent.blit(poseStack, 151, 35, 176, 0, 13, 11);
         }
     }
 
@@ -210,9 +210,6 @@ public class ReplicatorScreen extends AbstractContainerScreen<ReplicatorMenu> {
         final float scale = tank.getFluidAmount() / (float) tank.getCapacity();
         final FluidStack fluidStack = tank.getFluid();
 
-        //Reset color
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-
 
         //Draw fluid
         int meterHeight = 55;
@@ -224,10 +221,7 @@ public class ReplicatorScreen extends AbstractContainerScreen<ReplicatorMenu> {
         //Draw lines
         RenderSystem._setShaderTexture(0, GUI);
         int meterWidth = 14;
-        this.blit(poseStack, this.leftPos + x, this.topPos + y, 176, 35, meterWidth, meterHeight);
-
-        //Reset color
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        GuiComponent.blit(poseStack, this.leftPos + x, this.topPos + y, 176, 35, meterWidth, meterHeight);
 
     }
 

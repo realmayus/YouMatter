@@ -33,7 +33,7 @@ public class YouMatter {
         event.registerCreativeModeTab(new ResourceLocation(MODID, "tab"), builder -> builder
                 .icon(() -> new ItemStack(ModContent.SCANNER_BLOCK.get()))
                 .title(Component.literal("YouMatter")) //todo localize
-                .displayItems((features, output, hasPermissions) -> {
+                .displayItems((displayParameters, output) -> {
                     output.acceptAll(List.of(
                             new ItemStack(ModContent.SCANNER_BLOCK.get()),
                             new ItemStack(ModContent.ENCODER_BLOCK.get()),
