@@ -19,11 +19,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
-import realmayus.youmatter.ObjectHolders;
+import realmayus.youmatter.ModContent;
 import realmayus.youmatter.YMConfig;
 import realmayus.youmatter.encoder.EncoderBlock;
 import realmayus.youmatter.encoder.EncoderBlockEntity;
@@ -35,7 +34,7 @@ public class ScannerBlockEntity extends BlockEntity implements MenuProvider {
     public boolean hasEncoder = false;
 
     public ScannerBlockEntity(BlockPos pos, BlockState state) {
-        super(ObjectHolders.SCANNER_BLOCK_ENTITY, pos, state);
+        super(ModContent.SCANNER_BLOCK_ENTITY.get(), pos, state);
     }
 
     public boolean getHasEncoder() {
@@ -50,10 +49,10 @@ public class ScannerBlockEntity extends BlockEntity implements MenuProvider {
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+        if (cap == ForgeCapabilities.ITEM_HANDLER) {
             return inventory.cast();
         }
-        if(cap == CapabilityEnergy.ENERGY) {
+        if(cap == ForgeCapabilities.ENERGY) {
             return myEnergyStorage.cast();
         }
         return super.getCapability(cap, side);
@@ -204,7 +203,7 @@ public class ScannerBlockEntity extends BlockEntity implements MenuProvider {
 
     @Override
     public Component getDisplayName() {
-        return Component.translatable(ObjectHolders.SCANNER_BLOCK.getDescriptionId());
+        return Component.translatable(ModContent.SCANNER_BLOCK.get().getDescriptionId());
     }
 
     @Nullable

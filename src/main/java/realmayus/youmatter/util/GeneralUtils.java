@@ -3,6 +3,7 @@ package realmayus.youmatter.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
@@ -16,10 +17,10 @@ public class GeneralUtils {
      * @param manager a RecipeManager object.
      * @return every recipe that is available in a handy list.
      */
-    public static List<Recipe<?>> getMatchingRecipes(RecipeManager manager, ItemStack is) { // List of Recipes > List of Required Items For that recipe > List of allowed ItemStacks as an ingredient (see OreDict)
+    public static List<Recipe<?>> getMatchingRecipes(RegistryAccess registryAccess, RecipeManager manager, ItemStack is) { // List of Recipes > List of Required Items For that recipe > List of allowed ItemStacks as an ingredient (see OreDict)
         List<Recipe<?>> returnValue = new ArrayList<>();
         for(Recipe<?> recipe : manager.getRecipes()) {
-            if(recipe.getResultItem().sameItem(is)) {
+            if(recipe.getResultItem(registryAccess).sameItem(is)) {
                 returnValue.add(recipe);
             }
         }

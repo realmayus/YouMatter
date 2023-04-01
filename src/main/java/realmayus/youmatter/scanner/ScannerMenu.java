@@ -7,11 +7,11 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
-import realmayus.youmatter.ObjectHolders;
+import realmayus.youmatter.ModContent;
 
 public class ScannerMenu extends AbstractContainerMenu {
 
@@ -20,7 +20,7 @@ public class ScannerMenu extends AbstractContainerMenu {
 
 
     public ScannerMenu(int windowId, Level level, BlockPos pos, Inventory playerInventory, Player player) {
-        super(ObjectHolders.SCANNER_MENU, windowId);
+        super(ModContent.SCANNER_MENU.get(), windowId);
         scanner = level.getBlockEntity(pos) instanceof ScannerBlockEntity scanner ? scanner : null;
         this.playerInventory = new InvWrapper(playerInventory);
 
@@ -33,7 +33,7 @@ public class ScannerMenu extends AbstractContainerMenu {
         Level level = scanner.getLevel();
         BlockPos pos = scanner.getBlockPos();
 
-        return !level.getBlockState(pos).is(ObjectHolders.SCANNER_BLOCK) ? false : player.distanceToSqr(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D) <= 64.0D;
+        return !level.getBlockState(pos).is(ModContent.SCANNER_BLOCK.get()) ? false : player.distanceToSqr(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D) <= 64.0D;
     }
 
 
@@ -55,7 +55,7 @@ public class ScannerMenu extends AbstractContainerMenu {
     }
 
     private void addCustomSlots() {
-        scanner.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(h -> addSlot(new SlotItemHandler(h, 1, 80, 37)));
+        scanner.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(h -> addSlot(new SlotItemHandler(h, 1, 80, 37)));
     }
 
 

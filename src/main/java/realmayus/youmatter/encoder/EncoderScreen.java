@@ -6,6 +6,7 @@ import java.util.List;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
+import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.nbt.CompoundTag;
@@ -15,7 +16,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraftforge.items.ItemStackHandler;
-import realmayus.youmatter.ObjectHolders;
+import realmayus.youmatter.ModContent;
 import realmayus.youmatter.YouMatter;
 import realmayus.youmatter.items.ThumbdriveItem;
 
@@ -70,12 +71,11 @@ public class EncoderScreen extends AbstractContainerScreen<EncoderMenu> {
     @Override
     protected void renderBg(PoseStack poseStack, float partialTicks, int mouseX, int mouseY) {
         //Setting color to white because JEI is bae (gui would be yellow)
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem._setShaderTexture(0, GUI);
 
         int relX = (this.width - WIDTH) / 2;
         int relY = (this.height - HEIGHT) / 2;
-        this.blit(poseStack, relX, relY, 0, 0, WIDTH, HEIGHT);
+        GuiComponent.blit(poseStack, relX, relY, 0, 0, WIDTH, HEIGHT);
     }
 
     @Override
@@ -85,18 +85,18 @@ public class EncoderScreen extends AbstractContainerScreen<EncoderMenu> {
 
         encoder.inventory.ifPresent(inventory -> {
             if (!(inventory.getStackInSlot(1).getItem() instanceof ThumbdriveItem)) {
-                this.blit(poseStack, 16, 59, 176, 66, 16, 16);
+                GuiComponent.blit(poseStack, 16, 59, 176, 66, 16, 16);
             } else {
                 CompoundTag nbt = inventory.getStackInSlot(1).getTag();
                 if (nbt != null) {
                     ListTag list = nbt.getList("stored_items", Tag.TAG_STRING);
                     if (list.size() >= 8) {
-                        this.blit(poseStack, 16, 59, 176, 66, 16, 16);
+                        GuiComponent.blit(poseStack, 16, 59, 176, 66, 16, 16);
                     }
                 }
             }
         });
-        font.draw(poseStack, I18n.get(ObjectHolders.ENCODER_BLOCK.getDescriptionId()), 8, 6, 0x404040);
+        font.draw(poseStack, I18n.get(ModContent.ENCODER_BLOCK.get().getDescriptionId()), 8, 6, 0x404040);
     }
 
     private void drawProgressDisplayChain(PoseStack poseStack, int progress) {
@@ -123,9 +123,9 @@ public class EncoderScreen extends AbstractContainerScreen<EncoderMenu> {
         }
 
         RenderSystem._setShaderTexture(0, GUI);
-        this.blit(poseStack, 22, 41, 176, 41, Math.round((arrow1 / 100.0f) * 18), 12);
-        this.blit(poseStack, 47, 40, 176, 53, 7, Math.round((lock / 100.0f) * 13));
-        this.blit(poseStack, 61, 41, 176, 41, Math.round((arrow2 / 100.0f) * 18), 12);
+        GuiComponent.blit(poseStack, 22, 41, 176, 41, Math.round((arrow1 / 100.0f) * 18), 12);
+        GuiComponent.blit(poseStack, 47, 40, 176, 53, 7, Math.round((lock / 100.0f) * 13));
+        GuiComponent.blit(poseStack, 61, 41, 176, 41, Math.round((arrow2 / 100.0f) * 18), 12);
 
     }
 
@@ -133,11 +133,11 @@ public class EncoderScreen extends AbstractContainerScreen<EncoderMenu> {
         RenderSystem._setShaderTexture(0, GUI);
 
         if(energy == 0) {
-            this.blit(poseStack, 141, 36, 176, 21, 15, 20);
+            GuiComponent.blit(poseStack, 141, 36, 176, 21, 15, 20);
         } else {
             double percentage = energy * 100.0F / 1000000;  // i know this is dumb
             float percentagef = (float) percentage / 100; // but it works.
-            this.blit(poseStack, 141, 36, 176, 0, 15, Math.round(20 * percentagef)); // it's not really intended that the bolt fills from the top but it looks cool tbh.
+            GuiComponent.blit(poseStack, 141, 36, 176, 0, 15, Math.round(20 * percentagef)); // it's not really intended that the bolt fills from the top but it looks cool tbh.
         }
     }
 

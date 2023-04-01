@@ -23,9 +23,9 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.network.NetworkHooks;
-import realmayus.youmatter.ObjectHolders;
+import realmayus.youmatter.ModContent;
 
 public class EncoderBlock extends BaseEntityBlock {
 
@@ -46,14 +46,14 @@ public class EncoderBlock extends BaseEntityBlock {
 
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        return createTickerHelper(type, ObjectHolders.ENCODER_BLOCK_ENTITY, EncoderBlockEntity::tick);
+        return createTickerHelper(type, ModContent.ENCODER_BLOCK_ENTITY.get(), EncoderBlockEntity::tick);
     }
 
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
         if (!state.is(newState.getBlock())) {
             if (level.getBlockEntity(pos) instanceof EncoderBlockEntity encoder) {
-                encoder.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent(h -> IntStream.range(0, h.getSlots()).forEach(i -> Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), h.getStackInSlot(i))));
+                encoder.getCapability(ForgeCapabilities.ITEM_HANDLER, null).ifPresent(h -> IntStream.range(0, h.getSlots()).forEach(i -> Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), h.getStackInSlot(i))));
             }
         }
 
@@ -86,7 +86,7 @@ public class EncoderBlock extends BaseEntityBlock {
     public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         BlockEntity be = level.getBlockEntity(pos);
         if(be instanceof EncoderBlockEntity){
-            be.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent(h -> IntStream.range(0, h.getSlots()).forEach(i -> level.addFreshEntity(new ItemEntity(level, pos.getX(), pos.getY(), pos.getZ(), h.getStackInSlot(i)))));
+            be.getCapability(ForgeCapabilities.ITEM_HANDLER, null).ifPresent(h -> IntStream.range(0, h.getSlots()).forEach(i -> level.addFreshEntity(new ItemEntity(level, pos.getX(), pos.getY(), pos.getZ(), h.getStackInSlot(i)))));
         }
         super.playerWillDestroy(level, pos, state, player);
     }

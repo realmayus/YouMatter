@@ -8,13 +8,11 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
-import realmayus.youmatter.ModFluids;
-import realmayus.youmatter.ObjectHolders;
+import realmayus.youmatter.ModContent;
 import realmayus.youmatter.items.ThumbdriveItem;
 import realmayus.youmatter.util.DisplaySlot;
 
@@ -24,7 +22,7 @@ public class ReplicatorMenu extends AbstractContainerMenu {
     private IItemHandler playerInventory;
 
     public ReplicatorMenu(int windowId, Level level, BlockPos pos, Inventory playerInventory, Player player) {
-        super(ObjectHolders.REPLICATOR_MENU, windowId);
+        super(ModContent.REPLICATOR_MENU.get(), windowId);
         replicator = level.getBlockEntity(pos) instanceof ReplicatorBlockEntity replicator ? replicator : null;
         this.playerInventory = new InvWrapper(playerInventory);
 
@@ -37,7 +35,7 @@ public class ReplicatorMenu extends AbstractContainerMenu {
         Level level = replicator.getLevel();
         BlockPos pos = replicator.getBlockPos();
 
-        return !level.getBlockState(pos).is(ObjectHolders.REPLICATOR_BLOCK) ? false : player.distanceToSqr(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D) <= 64.0D;
+        return !level.getBlockState(pos).is(ModContent.REPLICATOR_BLOCK.get()) ? false : player.distanceToSqr(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D) <= 64.0D;
     }
 
 
@@ -59,7 +57,7 @@ public class ReplicatorMenu extends AbstractContainerMenu {
     }
 
     private void addCustomSlots() {
-        replicator.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(h -> {
+        replicator.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(h -> {
             // Flash drive
             addSlot(new SlotItemHandler(h, 0, 150, 60));
             // Output slot
@@ -92,14 +90,14 @@ public class ReplicatorMenu extends AbstractContainerMenu {
                         return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                     }
                 } else if(slotStack.getItem() instanceof BucketItem bucket) {
-                    if(bucket.getFluid().equals(ModFluids.UMATTER.get())) {
+                    if(bucket.getFluid().equals(ModContent.UMATTER.get())) {
                         if(!this.moveItemStackTo(slotStack, 39, 40, false)) {
                             return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                         }
                     }
-                } else if(slotStack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).isPresent()) {
-                    return slotStack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY).map(h -> {
-                        if (h.getFluidInTank(0).getFluid().isSame(ModFluids.UMATTER.get())) {
+                } else if(slotStack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).isPresent()) {
+                    return slotStack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).map(h -> {
+                        if (h.getFluidInTank(0).getFluid().isSame(ModContent.UMATTER.get())) {
                             if(!this.moveItemStackTo(slotStack, 39, 40, false)) {
                                 return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                             }

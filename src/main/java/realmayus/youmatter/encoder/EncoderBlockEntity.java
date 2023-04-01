@@ -23,11 +23,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
-import realmayus.youmatter.ObjectHolders;
+import realmayus.youmatter.ModContent;
 import realmayus.youmatter.YMConfig;
 import realmayus.youmatter.items.ThumbdriveItem;
 import realmayus.youmatter.util.MyEnergyStorage;
@@ -38,17 +37,17 @@ public class EncoderBlockEntity extends BlockEntity implements MenuProvider {
     private List<ItemStack> queue = new ArrayList<>();
 
     public EncoderBlockEntity(BlockPos pos, BlockState state) {
-        super(ObjectHolders.ENCODER_BLOCK_ENTITY, pos, state);
+        super(ModContent.ENCODER_BLOCK_ENTITY.get(), pos, state);
     }
 
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+        if (cap == ForgeCapabilities.ITEM_HANDLER) {
             return inventory.cast();
         }
 
-        if(cap == CapabilityEnergy.ENERGY) {
+        if(cap == ForgeCapabilities.ENERGY) {
             return myEnergyStorage.cast();
 
         }
@@ -209,7 +208,7 @@ public class EncoderBlockEntity extends BlockEntity implements MenuProvider {
 
     @Override
     public Component getDisplayName() {
-        return Component.translatable(ObjectHolders.ENCODER_BLOCK.getDescriptionId());
+        return Component.translatable(ModContent.ENCODER_BLOCK.get().getDescriptionId());
     }
 
     @Nullable

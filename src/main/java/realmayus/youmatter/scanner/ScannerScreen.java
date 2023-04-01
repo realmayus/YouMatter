@@ -6,12 +6,13 @@ import java.util.List;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
+import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import realmayus.youmatter.ObjectHolders;
+import realmayus.youmatter.ModContent;
 import realmayus.youmatter.YouMatter;
 
 public class ScannerScreen extends AbstractContainerScreen<ScannerMenu> {
@@ -54,18 +55,17 @@ public class ScannerScreen extends AbstractContainerScreen<ScannerMenu> {
         drawProgressDisplayChain(poseStack, scanner.getProgress());
 
         if(!scanner.getHasEncoder()) {
-            this.blit(poseStack, 16, 59, 176, 101, 16, 16);
+            GuiComponent.blit(poseStack, 16, 59, 176, 101, 16, 16);
         }
-        font.draw(poseStack, I18n.get(ObjectHolders.SCANNER_BLOCK.getDescriptionId()), 8, 6, 0x404040);
+        font.draw(poseStack, I18n.get(ModContent.SCANNER_BLOCK.get().getDescriptionId()), 8, 6, 0x404040);
     }
 
     @Override
     protected void renderBg(PoseStack poseStack, float partialTicks, int mouseX, int mouseY) {
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem._setShaderTexture(0, GUI);
         int relX = (this.width - WIDTH) / 2;
         int relY = (this.height - HEIGHT) / 2;
-        this.blit(poseStack, relX, relY, 0, 0, WIDTH, HEIGHT);
+        GuiComponent.blit(poseStack, relX, relY, 0, 0, WIDTH, HEIGHT);
     }
 
     private void drawProgressDisplayChain(PoseStack poseStack, int progress) {
@@ -84,20 +84,20 @@ public class ScannerScreen extends AbstractContainerScreen<ScannerMenu> {
         }
 
         RenderSystem._setShaderTexture(0, GUI);
-        this.blit(poseStack, 79, 62, 176, 41, Math.round((arrow / 100.0f) * 18), 12);
-        this.blit(poseStack, 104, 34, 176, 53, 17, Math.round((circuits / 100.0f) * 24));
-        this.blit(poseStack, 54, 34, 176, 77, 17, Math.round((circuits / 100.0f) * 24));
+        GuiComponent.blit(poseStack, 79, 62, 176, 41, Math.round((arrow / 100.0f) * 18), 12);
+        GuiComponent.blit(poseStack, 104, 34, 176, 53, 17, Math.round((circuits / 100.0f) * 24));
+        GuiComponent.blit(poseStack, 54, 34, 176, 77, 17, Math.round((circuits / 100.0f) * 24));
     }
 
     private void drawEnergyBolt(PoseStack poseStack, int energy) {
         RenderSystem._setShaderTexture(0, GUI);
 
         if(energy == 0) {
-            this.blit(poseStack, 141, 35, 176, 21, 15, 20);
+            GuiComponent.blit(poseStack, 141, 35, 176, 21, 15, 20);
         } else {
             double percentage = energy * 100.0F / 1000000;  // i know this is dumb
             float percentagef = (float) percentage / 100; // but it works.
-            this.blit(poseStack, 141, 35, 176, 0, 15, Math.round(20 * percentagef)); // it's not really intended that the bolt fills from the top but it looks cool tbh.
+            GuiComponent.blit(poseStack, 141, 35, 176, 0, 15, Math.round(20 * percentagef)); // it's not really intended that the bolt fills from the top but it looks cool tbh.
 
         }
     }

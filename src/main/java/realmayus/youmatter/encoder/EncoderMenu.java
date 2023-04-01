@@ -8,11 +8,11 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
-import realmayus.youmatter.ObjectHolders;
+import realmayus.youmatter.ModContent;
 import realmayus.youmatter.items.ThumbdriveItem;
 
 public class EncoderMenu extends AbstractContainerMenu {
@@ -22,7 +22,7 @@ public class EncoderMenu extends AbstractContainerMenu {
     private IItemHandler playerInventory;
 
     public EncoderMenu(int windowId, Level world, BlockPos pos, Inventory playerInventory, Player player) {
-        super(ObjectHolders.ENCODER_MENU, windowId);
+        super(ModContent.ENCODER_MENU.get(), windowId);
         encoder = world.getBlockEntity(pos) instanceof EncoderBlockEntity encoder ? encoder : null;
         this.playerInventory = new InvWrapper(playerInventory);
 
@@ -35,7 +35,7 @@ public class EncoderMenu extends AbstractContainerMenu {
         Level level = encoder.getLevel();
         BlockPos pos = encoder.getBlockPos();
 
-        return !level.getBlockState(pos).is(ObjectHolders.ENCODER_BLOCK) ? false : player.distanceToSqr(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D) <= 64.0D;
+        return !level.getBlockState(pos).is(ModContent.ENCODER_BLOCK.get()) ? false : player.distanceToSqr(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D) <= 64.0D;
     }
 
     private void addPlayerSlots(IItemHandler itemHandler) {
@@ -56,7 +56,7 @@ public class EncoderMenu extends AbstractContainerMenu {
     }
 
     private void addCustomSlots() {
-        encoder.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(h -> addSlot(new SlotItemHandler(h, 1, 90, 38)));
+        encoder.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(h -> addSlot(new SlotItemHandler(h, 1, 90, 38)));
     }
 
     /**
