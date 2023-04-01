@@ -24,7 +24,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '2.2.0'
+version = '2.2.1'
 group = 'realmayus.youmatter' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 
 java {
@@ -120,8 +120,12 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
-//    runtimeOnly fg.deobf("mekanism:Mekanism:1.18.2-10.2.0.459")
-//    implementation fg.deobf("curse.maven:refinedstorage:2871849")
+    //runtimeOnly fg.deobf("mekanism:Mekanism:1.19.2-10.3.8.477")
+//    implementation fg.deobf("curse.maven:solar-336538:4458961")
+//    implementation fg.deobf("curse.maven:tank-291006:4461010")
+//    implementation fg.deobf("curse.maven:tankdep-638508:4438326")
+//    implementation fg.deobf("curse.maven:tankdep2-320926:4183340")
+//    implementation fg.deobf("curse.maven:mekanism-268560:4385637")
 //    implementation fg.deobf("curse.maven:jei-238222:4434399")
 }
 
