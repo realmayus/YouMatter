@@ -287,7 +287,7 @@ public class ReplicatorBlockEntity extends BlockEntity implements MenuProvider {
                                         } else {
                                             if (currentItem != null) {
                                                 if (!currentItem.isEmpty()) {
-                                                    if (currentItem.sameItem(inventory.getStackInSlot(2))) { // Check if selected item hasn't changed
+                                                    if (ItemStack.isSameItem(currentItem, inventory.getStackInSlot(2))) { // Check if selected item hasn't changed
                                                         if(inventory.getStackInSlot(1).isEmpty() || GeneralUtils.canAddItemToSlot(inventory.getStackInSlot(1), currentItem, false)) { //check if output slot is still empty
                                                             myEnergyStorage.ifPresent(myEnergyStorage -> {
                                                                 if (myEnergyStorage.getEnergyStored() >= YMConfig.CONFIG.energyReplicator.get()) {

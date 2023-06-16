@@ -5,7 +5,7 @@ buildscript {
     }
 
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '[6.0,6.2)', changing: true
     }
 }
 
@@ -18,7 +18,6 @@ repositories {
     }
 }
 
-
 apply plugin: 'net.minecraftforge.gradle'
 // Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 apply plugin: 'eclipse'
@@ -27,8 +26,11 @@ apply plugin: 'maven-publish'
 version = '2.2.1'
 group = 'realmayus.youmatter' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 
+base {
+	archivesName = 'youmatter-1.20.1'
+}
+
 java {
-	archivesBaseName = 'youmatter-1.19.4'
 	toolchain.languageVersion = JavaLanguageVersion.of(17)
 }
 
@@ -38,8 +40,9 @@ minecraft {
     // stable_#            Stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not always work.
     // Simply re-run your setup task after changing the mappings to update your workspace.
-    mappings channel: 'official', version: '1.19.4'
+    mappings channel: 'official', version: '1.20.1'
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
+    copyIdeResources = true
     
     // Default run configurations.
     // These can be tweaked, removed, or duplicated as needed.
@@ -100,7 +103,7 @@ dependencies {
     // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
     // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
-    minecraft 'net.minecraftforge:forge:1.19.4-45.0.9'
+    minecraft 'net.minecraftforge:forge:1.20.1-47.0.3'
 
     // You may put jars on which you depend on in ./libs or you may define them like so..
     // compile "some.group:artifact:version:classifier"
@@ -126,11 +129,14 @@ dependencies {
 //    implementation fg.deobf("curse.maven:tankdep-638508:4438326")
 //    implementation fg.deobf("curse.maven:tankdep2-320926:4183340")
 //    implementation fg.deobf("curse.maven:mekanism-268560:4385637")
-//    implementation fg.deobf("curse.maven:jei-238222:4434399")
+    implementation fg.deobf("curse.maven:jei-238222:4585879")
+    implementation fg.deobf("curse.maven:useful-machinery-355129:4587036")
+    implementation fg.deobf("curse.maven:useful-foundation-355245:4585346")
+    implementation fg.deobf("curse.maven:themcbroslib-387586:4584364")
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
-jar {
+tasks.named('jar', Jar).configure {
     manifest {
         attributes([
                 "Specification-Title": "youmatter",
@@ -138,10 +144,13 @@ jar {
                 "Specification-Version": "1", // We are version 1 of ourselves
                 "Implementation-Title": project.name,
                 "Implementation-Version": "${version}",
-                "Implementation-Vendor" :"realmayus",
-                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+                "Implementation-Vendor": "realmayus"
         ])
     }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
 }
 
 // Example configuration to allow publishing using the maven-publish task
@@ -164,14 +173,4 @@ publishing {
             url "file:///${project.projectDir}/mcmodsrepo"
         }
     }
-}
-
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-build.dependsOn sourcesJar
-
-artifacts {
-    archives sourcesJar
 }

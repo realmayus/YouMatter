@@ -3,10 +3,7 @@ package realmayus.youmatter.encoder;
 import java.util.Arrays;
 import java.util.List;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
-
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.nbt.CompoundTag;
@@ -36,17 +33,17 @@ public class EncoderScreen extends AbstractContainerScreen<EncoderMenu> {
     }
 
     @Override
-    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground(poseStack);
-        super.render(poseStack, mouseX, mouseY, partialTicks);
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        this.renderBackground(guiGraphics);
+        super.render(guiGraphics, mouseX, mouseY, partialTicks);
 
-        this.renderTooltip(poseStack, mouseX, mouseY);
+        this.renderTooltip(guiGraphics, mouseX, mouseY);
 
         int xAxis = (mouseX - (width - WIDTH) / 2);
         int yAxis = (mouseY - (height - HEIGHT) / 2);
 
         if(xAxis >= 141 && xAxis <= 156 && yAxis >= 37 && yAxis <= 57) {
-            drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(Component.literal(I18n.get("youmatter.gui.energy.title")), Component.literal(I18n.get("youmatter.gui.energy.description", encoder.getEnergy()))));
+            drawTooltip(guiGraphics, mouseX, mouseY, Arrays.asList(Component.literal(I18n.get("youmatter.gui.energy.title")), Component.literal(I18n.get("youmatter.gui.energy.description", encoder.getEnergy()))));
         }
         if (xAxis >= 16 && xAxis <= 32 && yAxis >= 59 && yAxis <= 75) {
             if (encoder.inventory.isPresent()) {
@@ -56,7 +53,7 @@ public class EncoderScreen extends AbstractContainerScreen<EncoderMenu> {
                     if (nbt != null) {
                         ListTag list = nbt.getList("stored_items", Tag.TAG_STRING);
                         if (list.size() >= 8) {
-                            drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(Component.literal(I18n.get("youmatter.warning.encoder2"))));
+                            drawTooltip(guiGraphics, mouseX, mouseY, Arrays.asList(Component.literal(I18n.get("youmatter.warning.encoder2"))));
                         }
                     }
 
@@ -64,42 +61,39 @@ public class EncoderScreen extends AbstractContainerScreen<EncoderMenu> {
                 }
             }
 
-            drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(Component.literal(I18n.get("youmatter.warning.encoder1"))));
+            drawTooltip(guiGraphics, mouseX, mouseY, Arrays.asList(Component.literal(I18n.get("youmatter.warning.encoder1"))));
         }
     }
 
     @Override
-    protected void renderBg(PoseStack poseStack, float partialTicks, int mouseX, int mouseY) {
-        //Setting color to white because JEI is bae (gui would be yellow)
-        RenderSystem._setShaderTexture(0, GUI);
-
+    protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
         int relX = (this.width - WIDTH) / 2;
         int relY = (this.height - HEIGHT) / 2;
-        GuiComponent.blit(poseStack, relX, relY, 0, 0, WIDTH, HEIGHT);
+        guiGraphics.blit(GUI, relX, relY, 0, 0, WIDTH, HEIGHT);
     }
 
     @Override
-    protected void renderLabels(PoseStack poseStack, int mouseX, int mouseY) {
-        drawEnergyBolt(poseStack, encoder.getEnergy());
-        drawProgressDisplayChain(poseStack, encoder.getProgress());
+    protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        drawEnergyBolt(guiGraphics, encoder.getEnergy());
+        drawProgressDisplayChain(guiGraphics, encoder.getProgress());
 
         encoder.inventory.ifPresent(inventory -> {
             if (!(inventory.getStackInSlot(1).getItem() instanceof ThumbdriveItem)) {
-                GuiComponent.blit(poseStack, 16, 59, 176, 66, 16, 16);
+                guiGraphics.blit(GUI, 16, 59, 176, 66, 16, 16);
             } else {
                 CompoundTag nbt = inventory.getStackInSlot(1).getTag();
                 if (nbt != null) {
                     ListTag list = nbt.getList("stored_items", Tag.TAG_STRING);
                     if (list.size() >= 8) {
-                        GuiComponent.blit(poseStack, 16, 59, 176, 66, 16, 16);
+                        guiGraphics.blit(GUI, 16, 59, 176, 66, 16, 16);
                     }
                 }
             }
         });
-        font.draw(poseStack, I18n.get(ModContent.ENCODER_BLOCK.get().getDescriptionId()), 8, 6, 0x404040);
+        guiGraphics.drawString(font, I18n.get(ModContent.ENCODER_BLOCK.get().getDescriptionId()), 8, 6, 0x404040, false);
     }
 
-    private void drawProgressDisplayChain(PoseStack poseStack, int progress) {
+    private void drawProgressDisplayChain(GuiGraphics guiGraphics, int progress) {
         int arrow1;
         int lock;
         int arrow2;
@@ -122,26 +116,23 @@ public class EncoderScreen extends AbstractContainerScreen<EncoderMenu> {
             arrow2 = 100;
         }
 
-        RenderSystem._setShaderTexture(0, GUI);
-        GuiComponent.blit(poseStack, 22, 41, 176, 41, Math.round((arrow1 / 100.0f) * 18), 12);
-        GuiComponent.blit(poseStack, 47, 40, 176, 53, 7, Math.round((lock / 100.0f) * 13));
-        GuiComponent.blit(poseStack, 61, 41, 176, 41, Math.round((arrow2 / 100.0f) * 18), 12);
+        guiGraphics.blit(GUI, 22, 41, 176, 41, Math.round((arrow1 / 100.0f) * 18), 12);
+        guiGraphics.blit(GUI, 47, 40, 176, 53, 7, Math.round((lock / 100.0f) * 13));
+        guiGraphics.blit(GUI, 61, 41, 176, 41, Math.round((arrow2 / 100.0f) * 18), 12);
 
     }
 
-    private void drawEnergyBolt(PoseStack poseStack, int energy) {
-        RenderSystem._setShaderTexture(0, GUI);
-
+    private void drawEnergyBolt(GuiGraphics guiGraphics, int energy) {
         if(energy == 0) {
-            GuiComponent.blit(poseStack, 141, 36, 176, 21, 15, 20);
+            guiGraphics.blit(GUI, 141, 36, 176, 21, 15, 20);
         } else {
             double percentage = energy * 100.0F / 1000000;  // i know this is dumb
             float percentagef = (float) percentage / 100; // but it works.
-            GuiComponent.blit(poseStack, 141, 36, 176, 0, 15, Math.round(20 * percentagef)); // it's not really intended that the bolt fills from the top but it looks cool tbh.
+            guiGraphics.blit(GUI, 141, 36, 176, 0, 15, Math.round(20 * percentagef)); // it's not really intended that the bolt fills from the top but it looks cool tbh.
         }
     }
 
-    private void drawTooltip(PoseStack poseStack, int x, int y, List<Component> tooltips) {
-        renderComponentTooltip(poseStack, tooltips, x, y);
+    private void drawTooltip(GuiGraphics guiGraphics, int x, int y, List<Component> tooltips) {
+        guiGraphics.renderComponentTooltip(font, tooltips, x, y);
     }
 }
