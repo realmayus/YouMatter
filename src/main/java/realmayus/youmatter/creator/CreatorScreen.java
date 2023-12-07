@@ -3,11 +3,8 @@ package realmayus.youmatter.creator;
 import java.util.Arrays;
 import java.util.List;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
-
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.language.I18n;
@@ -42,86 +39,78 @@ public class CreatorScreen extends AbstractContainerScreen<CreatorMenu> {
     }
 
     @Override
-    protected void renderBg(PoseStack poseStack, float partialTicks, int mouseX, int mouseY) {
-        //Setting color to white because JEI is bae (gui would be yellow)
-        RenderSystem._setShaderTexture(0, GUI);
-
+    protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
         int relX = (this.width - WIDTH) / 2;
         int relY = (this.height - HEIGHT) / 2;
-        GuiComponent.blit(poseStack, relX, relY, 0, 0, WIDTH, HEIGHT);
+        guiGraphics.blit(GUI, relX, relY, 0, 0, WIDTH, HEIGHT);
 
-        drawFluidTank(poseStack, 89, 22, creator.getUTank());
-        drawFluidTank(poseStack,31, 22, creator.getSTank());
+        drawFluidTank(guiGraphics, 89, 22, creator.getUTank());
+        drawFluidTank(guiGraphics,31, 22, creator.getSTank());
     }
 
-    private void drawActiveIcon(PoseStack poseStack, boolean isActive) {
-        RenderSystem._setShaderTexture(0, GUI);
-
+    private void drawActiveIcon(GuiGraphics guiGraphics, boolean isActive) {
         if(isActive) {
-            GuiComponent.blit(poseStack, 154, 13, 176, 24, 8, 9);
+            guiGraphics.blit(GUI, 154, 13, 176, 24, 8, 9);
 
         } else {
-            GuiComponent.blit(poseStack, 154, 13, 176, 15, 8, 9);
+            guiGraphics.blit(GUI, 154, 13, 176, 15, 8, 9);
         }
     }
 
 
     @Override
-    protected void renderLabels(PoseStack poseStack, int mouseX, int mouseY) {
-        drawEnergyBolt(poseStack, creator.getEnergy());
-        drawActiveIcon(poseStack, creator.isActivated());
+    protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        drawEnergyBolt(guiGraphics, creator.getEnergy());
+        drawActiveIcon(guiGraphics, creator.isActivated());
 
-        RenderSystem._setShaderTexture(0, GUI);
 
-        font.draw(poseStack, I18n.get(ModContent.CREATOR_BLOCK.get().getDescriptionId()), 8, 6, 0x404040);
+        guiGraphics.drawString(font, I18n.get(ModContent.CREATOR_BLOCK.get().getDescriptionId()), 8, 6, 0x404040, false);
     }
 
-    private void drawEnergyBolt(PoseStack poseStack, int energy) {
-        RenderSystem._setShaderTexture(0, GUI);
-
+    private void drawEnergyBolt(GuiGraphics guiGraphics, int energy) {
         if(energy == 0) {
-            GuiComponent.blit(poseStack, 150, 58, 176, 114, 15, 20);
+            guiGraphics.blit(GUI, 150, 58, 176, 114, 15, 20);
         } else {
             double percentage = energy * 100.0F / 1000000;  // i know this is dumb
             float percentagef = (float) percentage / 100; // but it works.
-            GuiComponent.blit(poseStack, 150, 58, 176, 93, 15, Math.round(20 * percentagef)); // it's not really intended that the bolt fills from the top but it looks cool tbh.
+            guiGraphics.blit(GUI, 150, 58, 176, 93, 15, Math.round(20 * percentagef)); // it's not really intended that the bolt fills from the top but it looks cool tbh.
 
         }
     }
 
     @Override
-    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         //Render the dark background
-        this.renderBackground(poseStack);
-        super.render(poseStack, mouseX, mouseY, partialTicks);
+        this.renderBackground(guiGraphics);
+        super.render(guiGraphics, mouseX, mouseY, partialTicks);
         //Render any tooltips
-        this.renderTooltip(poseStack, mouseX, mouseY);
+        this.renderTooltip(guiGraphics, mouseX, mouseY);
 
         int xAxis = (mouseX - (width - imageWidth) / 2);
         int yAxis = (mouseY - (height - imageHeight) / 2);
 
         if(xAxis >= 31 && xAxis <= 44 && yAxis >= 20 && yAxis <= 75) {
-            drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(Component.literal(I18n.get("youmatter.gui.stabilizer.title")), Component.literal(I18n.get("youmatter.gui.stabilizer.description", creator.getSTank().getFluidAmount()))));
+            drawTooltip(guiGraphics, mouseX, mouseY, Arrays.asList(Component.literal(I18n.get("youmatter.gui.stabilizer.title")), Component.literal(I18n.get("youmatter.gui.stabilizer.description", creator.getSTank().getFluidAmount()))));
         }
         if(xAxis >= 89 && xAxis <= 102 && yAxis >= 20 && yAxis <= 75) {
-            drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(Component.literal(I18n.get("youmatter.gui.umatter.title")), Component.literal(I18n.get("youmatter.gui.umatter.description", creator.getUTank().getFluidAmount()))));
+            drawTooltip(guiGraphics, mouseX, mouseY, Arrays.asList(Component.literal(I18n.get("youmatter.gui.umatter.title")), Component.literal(I18n.get("youmatter.gui.umatter.description", creator.getUTank().getFluidAmount()))));
         }
         if(xAxis >= 150 && xAxis <= 164 && yAxis >= 57 && yAxis <= 77) {
-            drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(Component.literal(I18n.get("youmatter.gui.energy.title")), Component.literal(I18n.get("youmatter.gui.energy.description", creator.getEnergy()))));
+            drawTooltip(guiGraphics, mouseX, mouseY, Arrays.asList(Component.literal(I18n.get("youmatter.gui.energy.title")), Component.literal(I18n.get("youmatter.gui.energy.description", creator.getEnergy()))));
         }
         if(xAxis >= 148 && xAxis <= 167 && yAxis >= 7 && yAxis <= 27) {
-            drawTooltip(poseStack, mouseX, mouseY, Arrays.asList(Component.literal(creator.isActivated() ? I18n.get("youmatter.gui.active") : I18n.get("youmatter.gui.paused")), Component.literal(I18n.get("youmatter.gui.clicktochange"))));
+            drawTooltip(guiGraphics, mouseX, mouseY, Arrays.asList(Component.literal(creator.isActivated() ? I18n.get("youmatter.gui.active") : I18n.get("youmatter.gui.paused")), Component.literal(I18n.get("youmatter.gui.clicktochange"))));
         }
     }
 
 
-    private void drawTooltip(PoseStack poseStack, int x, int y, List<Component> tooltips) {
-        renderComponentTooltip(poseStack, tooltips, x, y);
+    private void drawTooltip(GuiGraphics guiGraphics, int x, int y, List<Component> tooltips) {
+        guiGraphics.renderComponentTooltip(font, tooltips, x, y);
     }
 
 
     //both drawFluid and drawFluidTank is courtesy of DarkGuardsMan and was modified to suit my needs. Go check him out: https://github.com/BuiltBrokenModding/Atomic-Science | MIT License |  Copyright (c) 2018 Built Broken Modding License: https://opensource.org/licenses/MIT
-    private void drawFluid(PoseStack poseStack, int x, int y, int line, int col, int width, int drawSize, FluidStack fluidStack)
+    private void drawFluid(GuiGraphics guiGraphics, int x, int y, int line, int col, int width, int drawSize, FluidStack fluidStack)
     {
         if (fluidStack != null && fluidStack.getFluid() != null && !fluidStack.isEmpty())
         {
@@ -143,10 +132,6 @@ public class CreatorScreen extends AbstractContainerScreen<CreatorMenu> {
                 fluidIcon = waterSprite;
             }
 
-            //Bind fluid texture
-
-            RenderSystem._setShaderTexture(0, TextureAtlas.LOCATION_BLOCKS);
-
             final int textureSize = 16;
             int start = 0;
             int renderY;
@@ -160,7 +145,7 @@ public class CreatorScreen extends AbstractContainerScreen<CreatorMenu> {
                 }
 
                 //TODO?
-                blit(poseStack, x + col, y + line + 58 - renderY - start, 1000, width, textureSize - (textureSize - renderY), this.minecraft.getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(fluidIcon));
+                guiGraphics.blit(x + col, y + line + 58 - renderY - start, 1000, width, textureSize - (textureSize - renderY), this.minecraft.getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(fluidIcon));
 
 
                 start = start + textureSize;
@@ -168,7 +153,7 @@ public class CreatorScreen extends AbstractContainerScreen<CreatorMenu> {
         }
     }
 
-    private void drawFluidTank(PoseStack poseStack, int x, int y, IFluidTank tank) {
+    private void drawFluidTank(GuiGraphics guiGraphics, int x, int y, IFluidTank tank) {
 
         //Get data
         final float scale = tank.getFluidAmount() / (float) tank.getCapacity();
@@ -179,13 +164,12 @@ public class CreatorScreen extends AbstractContainerScreen<CreatorMenu> {
         int meterHeight = 55;
         if (fluidStack != null)
         {
-            this.drawFluid(poseStack, this.leftPos + x -1, this.topPos + y, -3, 1, 14, (int) ((meterHeight - 1) * scale), fluidStack);
+            this.drawFluid(guiGraphics, this.leftPos + x -1, this.topPos + y, -3, 1, 14, (int) ((meterHeight - 1) * scale), fluidStack);
         }
 
         //Draw lines
-        RenderSystem._setShaderTexture(0, GUI);
         int meterWidth = 14;
-        GuiComponent.blit(poseStack, this.leftPos + x, this.topPos + y, 176, 35, meterWidth, meterHeight);
+        guiGraphics.blit(GUI, this.leftPos + x, this.topPos + y, 176, 35, meterWidth, meterHeight);
 
     }
 

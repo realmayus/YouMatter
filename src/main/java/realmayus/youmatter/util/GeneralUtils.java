@@ -20,7 +20,7 @@ public class GeneralUtils {
     public static List<Recipe<?>> getMatchingRecipes(RegistryAccess registryAccess, RecipeManager manager, ItemStack is) { // List of Recipes > List of Required Items For that recipe > List of allowed ItemStacks as an ingredient (see OreDict)
         List<Recipe<?>> returnValue = new ArrayList<>();
         for(Recipe<?> recipe : manager.getRecipes()) {
-            if(recipe.getResultItem(registryAccess).sameItem(is)) {
+            if(ItemStack.isSameItem(recipe.getResultItem(registryAccess), is)) {
                 returnValue.add(recipe);
             }
         }
@@ -59,7 +59,7 @@ public class GeneralUtils {
 
     public static boolean canAddItemToSlot(ItemStack slotStack, ItemStack givenStack, boolean stackSizeMatters) {
         boolean flag = slotStack.isEmpty();
-        if (!flag && givenStack.sameItem(slotStack) /*&& ItemStack.areItemStackTagsEqual(slotStack, givenStack)*/) {
+        if (!flag && ItemStack.isSameItem(givenStack, slotStack) /*&& ItemStack.areItemStackTagsEqual(slotStack, givenStack)*/) {
             return slotStack.getCount() + (stackSizeMatters ? 0 : givenStack.getCount()) <= givenStack.getMaxStackSize();
         } else {
             return flag;
