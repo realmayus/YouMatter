@@ -1,25 +1,45 @@
+[![CurseForge](https://cf.way2muchnoise.eu/917449.svg?badge_style=for_the_badge)](https://www.curseforge.com/minecraft/mc-mods/youmatter) [![Modrinth](https://img.shields.io/badge/Modrinth-NA?style=for-the-badge&logo=modrinth&logoColor=000000&color=00AF5C)](https://modrinth.com/mod/youmatter) [![Discord](https://img.shields.io/badge/Discord-NA?style=for-the-badge&logo=discord&logoColor=000000&color=5865F2)](https://discord.gg/Kka3MQSQ2s)
 
-Installation information
-=======
+## YouMatter
+A standalone UU-Matter mod for Legacy Forge and NeoForge. Why? Because it matters.
 
-This template repository can be directly cloned to get you started with a new
-mod. Simply create a new repository cloned from this one, by following the
-instructions provided by [GitHub](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template).
+YouMatter is available for `1.12.2` through `1.20.1` on Legacy Forge and `1.21.1+` on NeoForge. Check out the respective branches.
 
-Once you have your clone, simply open the repository in the IDE of your choice. The usual recommendation for an IDE is either IntelliJ IDEA or Eclipse.
+You know that fluid called "UU-Matter" from IndustrialCraft2, don't you? Well, here you have it as a standalone mod.
+I added some quirks that make it slightly less overpowered, such as adding an extra requirement for producing U-Matter.
 
-If at any point you are missing libraries in your IDE, or you've run into problems you can
-run `gradlew --refresh-dependencies` to refresh the local cache. `gradlew clean` to reset everything 
-{this does not affect your code} and then start the process again.
+**As of Minecraft 1.21.1, onyxromero (formerly kobaltromero) is maintaining this project.**
 
-Mapping Names:
-============
-By default, the MDK is configured to use the official mapping names from Mojang for methods and fields 
-in the Minecraft codebase. These names are covered by a specific license. All modders should be aware of this
-license. For the latest license text, refer to the mapping file itself, or the reference copy here:
-https://github.com/NeoForged/NeoForm/blob/main/Mojang.md
+### Why?
+IC² is outdated, has many bugs and often is just included in modpacks because of its UU-Matter features. That was the inspiration for creating a standalone mod.
 
-Additional Resources: 
-==========
-Community Documentation: https://docs.neoforged.net/  
-NeoForged Discord: https://discord.neoforged.net/
+### Getting Started w/ YouMatter
+In order to get started with YouMatter you need to find or craft a Portable Black Hole. This varies depending on what version of YouMatter and Minecraft you are using. You can find these in End Cities if there's no crafting recipe. (You can verify this by checking JEI or a similar mod)
+
+**Tip**: You can duplicate Portable Black Holes as many times as you need to in a crafting table.
+
+Once you've acquired a Portable Black Hole, you'll need to craft the following:
+
+- **1x** U-Matter Creator
+- **1x** Scanner
+- **1x** Encoder
+- **1x** Replicator
+- **1x** Thumb Drive
+- **1x** Bucket of Stabilizer
+
+After you've got the required machines & items you'll be able to start cloning items indefinitely.
+
+**Note:** You'll need another mod capable of generating a lot of FE. YouMatter does not come with any form of power generation.
+
+### How to use
+
+1. **Produce U-Matter:** Use a Creator powered by energy and stabilizer.
+2. **Scan Desired Item:** Place target item into Scanner block.
+3. **Encode Data:** Insert Thumb Drive into a nearby Encoder.
+4. **Load Replicator:** Transfer U-Matter and the encoded Thumb Drive into the Replicator.
+5. **Configure & Power:** Select your run mode (single/multiple), select the item on the Thumb Drive, and supply power to the Replicator.
+6. **Activate:** Start the Replicator to complete the Process!
+
+**Important:** Make sure that there is an Encoder next to the scanner! Also, the scanner will consume your item after scanning.
+
+For more updates about the mod, feel free to join the realverse discord server.
