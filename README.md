@@ -1,4 +1,4 @@
-[![CurseForge](https://cf.way2muchnoise.eu/917449.svg?badge_style=for_the_badge)](https://www.curseforge.com/minecraft/mc-mods/youmatter) [![Modrinth](https://img.shields.io/badge/Modrinth-NA?style=for-the-badge&logo=modrinth&logoColor=000000&color=00AF5C)](https://modrinth.com/mod/youmatter) [![Discord](https://img.shields.io/badge/Discord-NA?style=for-the-badge&logo=discord&logoColor=000000&color=5865F2)](https://discord.gg/Kka3MQSQ2s)
+[![CurseForge](https://cf.way2muchnoise.eu/361476.svg?badge_style=for_the_badge)](https://www.curseforge.com/minecraft/mc-mods/youmatter) [![Modrinth](https://img.shields.io/badge/Modrinth-NA?style=for-the-badge&logo=modrinth&logoColor=000000&color=00AF5C)](https://modrinth.com/mod/youmatter) [![Discord](https://img.shields.io/badge/Discord-NA?style=for-the-badge&logo=discord&logoColor=000000&color=5865F2)](https://discord.gg/Kka3MQSQ2s)
 
 ## YouMatter
 A standalone UU-Matter mod for Legacy Forge and NeoForge. Why? Because it matters.
