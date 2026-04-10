@@ -1,32 +1,16 @@
 package org.realverse.youmatter.network;
 
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.network.NetworkEvent;
-import realmayus.youmatter.replicator.ReplicatorMenu;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import org.realverse.youmatter.YouMatter;
 
-import java.util.function.Supplier;
-//import realmayus.youmatter.replicator.ContainerReplicator;
+public record PacketShowPrevious() implements CustomPacketPayload {
+    public static final CustomPacketPayload.Type<PacketShowPrevious> TYPE = new CustomPacketPayload.Type(ResourceLocation.fromNamespaceAndPath(YouMatter.MODID, "packet_show_previous"));
+    public static final StreamCodec<ByteBuf, PacketShowPrevious> STREAM_CODEC = StreamCodec.unit(new PacketShowPrevious());
 
-public class PacketShowPrevious {
-
-    public PacketShowPrevious(FriendlyByteBuf buf) {
+    public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
-    public PacketShowPrevious() {
-    }
-
-    void encode(FriendlyByteBuf buf) {
-
-    }
-
-    void handle(Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
-            ServerPlayer player = ctx.get().getSender();
-            if (player.containerMenu instanceof ReplicatorMenu openContainer) {
-                openContainer.replicator.renderPrevious();
-            }
-        });
-        ctx.get().setPacketHandled(true);
-    }
-
 }

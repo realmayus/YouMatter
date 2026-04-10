@@ -1,29 +1,69 @@
 package org.realverse.youmatter.network;
 
-import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.simple.SimpleChannel;
-import org.apache.logging.log4j.Level;
-import realmayus.youmatter.YouMatter;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class PacketHandler {
-    public static SimpleChannel INSTANCE;
+    private PacketHandler() {
+    }
 
-    private static int ID = 0;
-    private static int nextID() {return ID++;}
+    public static class CreatorSettings {
+        private CreatorSettings() {
+        }
 
-    public static void registerMessages() {
-        YouMatter.logger.log(Level.INFO, "Registered Packets");
-        INSTANCE = NetworkRegistry.newSimpleChannel(new ResourceLocation(YouMatter.MODID, "youmatter"), () -> "1.0", s -> true, s -> true);
+        public static void handle(PacketChangeSettingsCreatorServer data, IPayloadContext ctx) {
+            ctx.enqueueWork(() -> {
+                AbstractContainerMenu menu = ctx.player().containerMenu;
+                if (menu instanceof CreatorMenu openContainer) {
+                    openContainer.creator.setActivated(data.isActivated());
+                }
 
-        //To: Client
-        //(nothing here)
+            });
+        }
+    }
 
-        //To: Server
-        INSTANCE.registerMessage(nextID(), PacketShowNext.class, PacketShowNext::encode, PacketShowNext::new, PacketShowNext::handle);
-        INSTANCE.registerMessage(nextID(), PacketShowPrevious.class, PacketShowPrevious::encode, PacketShowPrevious::new, PacketShowPrevious::handle);
-        INSTANCE.registerMessage(nextID(), PacketChangeSettingsReplicatorServer.class, PacketChangeSettingsReplicatorServer::encode, PacketChangeSettingsReplicatorServer::new, PacketChangeSettingsReplicatorServer::handle);
-        INSTANCE.registerMessage(nextID(), PacketChangeSettingsCreatorServer.class, PacketChangeSettingsCreatorServer::encode, PacketChangeSettingsCreatorServer::new, PacketChangeSettingsCreatorServer::handle);
+    public static class ShowNext {
+        private ShowNext() {
+        }
 
+        public static void handle(PacketShowNext data, IPayloadContext ctx) {
+            ctx.enqueueWork(() -> {
+                AbstractContainerMenu menu = ctx.player().containerMenu;
+                if (menu instanceof ReplicatorMenu openContainer) {
+                    openContainer.replicator.renderNext();
+                }
+
+            });
+        }
+    }
+
+    public static class ShowPrevious {
+        private ShowPrevious() {
+        }
+
+        public static void handle(PacketShowPrevious data, IPayloadContext ctx) {
+            ctx.enqueueWork(() -> {
+                AbstractContainerMenu menu = ctx.player().containerMenu;
+                if (menu instanceof ReplicatorMenu openContainer) {
+                    openContainer.replicator.renderPrevious();
+                }
+
+            });
+        }
+    }
+
+    public static class ReplicatorSettings {
+        private ReplicatorSettings() {
+        }
+
+        public static void handle(PacketChangeSettingsReplicatorServer data, IPayloadContext ctx) {
+            ctx.enqueueWork(() -> {
+                AbstractContainerMenu menu = ctx.player().containerMenu;
+                if (menu instanceof ReplicatorMenu openContainer) {
+                    openContainer.replicator.setActivated(data.isActivated());
+                    openContainer.replicator.setCurrentMode(data.mode());
+                }
+            });
+        }
     }
 }

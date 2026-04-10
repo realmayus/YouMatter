@@ -2,8 +2,8 @@ package org.realverse.youmatter.util;
 
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.SlotItemHandler;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.SlotItemHandler;
 
 import javax.annotation.Nonnull;
 
@@ -21,6 +21,4 @@ public class DisplaySlot extends SlotItemHandler {
     public boolean mayPickup(Player player) {
         return false;
     }
-
-
 }

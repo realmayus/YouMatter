@@ -1,44 +1,21 @@
 package org.realverse.youmatter.network;
 
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.network.NetworkEvent;
-import realmayus.youmatter.replicator.ReplicatorMenu;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import org.realverse.youmatter.YouMatter;
 
-import java.util.function.Supplier;
+public record PacketChangeSettingsReplicatorServer(boolean isActivated, boolean mode) implements CustomPacketPayload {
+    public static final CustomPacketPayload.Type<PacketChangeSettingsReplicatorServer> TYPE = new CustomPacketPayload.Type(ResourceLocation.fromNamespaceAndPath(YouMatter.MODID, "packet_settings_replicator"));
+    public static final StreamCodec<ByteBuf, PacketChangeSettingsReplicatorServer> STREAM_CODEC;
 
-//import net.minecraft.entity.player.EntityPlayerMP;
-//import realmayus.youmatter.replicator.ContainerReplicator;
-
-public class PacketChangeSettingsReplicatorServer {
-
-    private boolean isActivated;
-    private boolean mode;
-
-    public PacketChangeSettingsReplicatorServer(FriendlyByteBuf buf) {
-        isActivated = buf.readBoolean();
-        mode = buf.readBoolean();
+    public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 
-    void encode(FriendlyByteBuf buf) {
-        buf.writeBoolean(isActivated);
-        buf.writeBoolean(mode);
-    }
-
-    public PacketChangeSettingsReplicatorServer(boolean isActivated, boolean mode) {
-        this.isActivated = isActivated;
-        this.mode = mode;
-    }
-
-
-    void handle(Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
-            ServerPlayer player = ctx.get().getSender();
-            if (player.containerMenu instanceof ReplicatorMenu openContainer) {
-                openContainer.replicator.setActive(isActivated);
-                openContainer.replicator.setCurrentMode(mode);
-            }
-        });
-        ctx.get().setPacketHandled(true);
+    static {
+        STREAM_CODEC = StreamCodec.composite(ByteBufCodecs.BOOL, PacketChangeSettingsReplicatorServer::isActivated, ByteBufCodecs.BOOL, PacketChangeSettingsReplicatorServer::mode, PacketChangeSettingsReplicatorServer::new);
     }
 }

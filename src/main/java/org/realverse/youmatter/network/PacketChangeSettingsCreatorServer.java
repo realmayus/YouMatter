@@ -1,39 +1,21 @@
 package org.realverse.youmatter.network;
 
-//import realmayus.youmatter.creator.ContainerCreator;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import org.realverse.youmatter.YouMatter;
 
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.network.NetworkEvent;
-import realmayus.youmatter.creator.CreatorMenu;
+public record PacketChangeSettingsCreatorServer(boolean isActivated) implements CustomPacketPayload {
+    public static final CustomPacketPayload.Type<PacketChangeSettingsCreatorServer> TYPE = new CustomPacketPayload.Type(ResourceLocation.fromNamespaceAndPath(YouMatter.MODID, "creator_settings_packet"));
+    public static final StreamCodec<ByteBuf, PacketChangeSettingsCreatorServer> STREAM_CODEC;
 
-import java.util.function.Supplier;
-
-public class PacketChangeSettingsCreatorServer{
-
-    private boolean isActivated;
-
-
-    public PacketChangeSettingsCreatorServer(FriendlyByteBuf buf) {
-        isActivated = buf.readBoolean();
+    public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 
-    public PacketChangeSettingsCreatorServer(boolean isActivated) {
-        this.isActivated = isActivated;
-    }
-
-    void encode(FriendlyByteBuf buf) {
-        buf.writeBoolean(isActivated);
-    }
-
-    void handle(Supplier<NetworkEvent.Context> ctx) {
-        // This is the player the packet was sent to the server from
-        ctx.get().enqueueWork(() -> {
-            ServerPlayer player = ctx.get().getSender();
-            if (player.containerMenu instanceof CreatorMenu openContainer) {
-                openContainer.creator.setActivated(isActivated);
-            }
-        });
-        ctx.get().setPacketHandled(true);
+    static {
+        STREAM_CODEC = StreamCodec.composite(ByteBufCodecs.BOOL, PacketChangeSettingsCreatorServer::isActivated, PacketChangeSettingsCreatorServer::new);
     }
 }

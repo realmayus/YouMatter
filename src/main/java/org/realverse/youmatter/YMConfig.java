@@ -1,74 +1,70 @@
 package org.realverse.youmatter;
 
-import com.google.common.collect.Lists;
-import net.minecraftforge.common.ForgeConfigSpec;
-import org.apache.commons.lang3.tuple.Pair;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import net.neoforged.fml.loading.FMLPaths;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 public class YMConfig {
+    private static final Path PATH = Path.of(String.valueOf(FMLPaths.CONFIGDIR.get()), "youmatter-config.json");
+    private static final Gson GSON = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+    private static Data config;
 
-    public static final ForgeConfigSpec CONFIG_SPEC;
-    public static final YMConfig CONFIG;
+    public static class Data {
+        public boolean filterMode = true;
+        public List<String> filterItems = List.of("youmatter:umatter_bucket", "youmatter:stabilizer_bucket");
+        public List<String> overrides = List.of("minecraft:diamond=2500", "minecraft:nether_star=5000");
+        public int thumbDriveSlots = 8;
+        public int defaultAmount = 1000;
+        public int energyReplicator = 2048;
+        public int energyEncoder = 512;
+        public int energyScanner = 512;
+        public int productionPerTick = 1;
 
-    public final ForgeConfigSpec.ConfigValue<List<? extends String>> filterItems;
-    public final ForgeConfigSpec.BooleanValue filterMode;
-    public final ForgeConfigSpec.ConfigValue<List<? extends String>> overrides;
-    public final ForgeConfigSpec.ConfigValue<Integer> defaultAmount;
-
-    public final ForgeConfigSpec.ConfigValue<Integer> energyReplicator;
-    public final ForgeConfigSpec.ConfigValue<Integer> energyEncoder;
-    public final ForgeConfigSpec.ConfigValue<Integer> energyScanner;
-
-    public final ForgeConfigSpec.ConfigValue<Integer> productionPerTick;
-
-    public final ForgeConfigSpec.ConfigValue<String> alternativeStabilizer;
-
-    static {
-        Pair<YMConfig, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder().configure(YMConfig::new);
-        CONFIG_SPEC = specPair.getRight();
-        CONFIG = specPair.getLeft();
-    }
-
-    YMConfig(ForgeConfigSpec.Builder builder) {
-        filterMode = builder
-                .comment("Use the filterItems list as blacklist (true) or as whitelist (false). Whitelist means, that you can only duplicate those items in that list. Blacklist is vice-versa.")
-                .define("filterMode", true);
-        filterItems = builder
-                .comment("List of items that are being treated specially. See filterMode for further details. Format: \"modid:item\"")
-                .defineList("filterItems", Lists.newArrayList("youmatter:umatter_bucket", "youmatter:stabilizer_bucket"), e -> e instanceof String && ((String) e).contains(":"));
-        overrides = builder
-                .comment("Overrides: Set your desired required U-Matter values for each item. These do not apply when you e.g. have whitelist on but it doesn't include the desired override. Format: \"modid:item=amount\"")
-                .defineList("overrides", Lists.newArrayList("minecraft:diamond=2500", "minecraft:nether_star=5000"), e -> e instanceof String && ((String) e).contains(":") && ((String) e).contains("="));
-        defaultAmount = builder
-                .comment("The default amount that is required to duplicate an item if it is not overridden.")
-                .define("defaultAmount", 1000);
-        energyReplicator = builder
-                .comment("The energy consumption of the replicator per tick. Default: 2048")
-                .define("energyReplicator", 2048);
-        energyEncoder = builder
-                .comment("The energy consumption of the encoder per tick. Default: 512")
-                .define("energyEncoder", 512);
-        energyScanner = builder
-                .comment("The energy consumption of the scanner per tick. Default: 512")
-                .define("energyScanner", 512);
-        productionPerTick = builder
-                .comment("Determines how much U-Matter [in mB] the creator produces every work cycle. Energy is withdrawn like this: if energy more than 30% of max energy, consume 30% and add [whatever value below] of U-Matter to the tank. Default is 1mB/work cycle. Don't increase this too much due to balancing issues.")
-                .define("productionPerTick", 1);
-        alternativeStabilizer = builder
-                .comment("Allows you to specify an alternative to YouMatter's stabilizer fluid. Leave empty if you only want to accept the default fluid.")
-                .define("alternativeStabilizer", "");
-
-    }
-
-    public Object[] getOverride(String registryName) {
-        for(String s : overrides.get()) {
-            String foundName = s.substring(0, s.indexOf('='));
-            String foundValue = s.substring(s.indexOf('=')).substring(1);
-            if (foundName.equalsIgnoreCase(registryName)) {
-                return new Object[]{foundName, foundValue};
+        public Object[] getOverride(String registryName) {
+            for(String s : overrides) {
+                String foundName = s.substring(0, s.indexOf('='));
+                String foundValue = s.substring(s.indexOf('=')).substring(1);
+                if (foundName.equalsIgnoreCase(registryName)) {
+                    return new Object[]{foundName, foundValue};
+                }
             }
+            return null;
         }
-        return null;
+    }
+
+    public static void loadConfig() {
+        try {
+            if (!Files.exists(PATH)) {
+                Files.createDirectories(PATH.getParent());
+                config = new Data();
+                saveConfig();
+            } else {
+                try (Reader reader = Files.newBufferedReader(PATH)) {
+                    config = GSON.fromJson(reader, Data.class);
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load YouMatter config", e);
+        }
+    }
+
+    public static void saveConfig() {
+        try (Writer writer = Files.newBufferedWriter(PATH)) {
+            GSON.toJson(config, writer);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to save YouMatter config", e);
+        }
+    }
+
+    public static Data get() {
+        if (config == null) loadConfig();
+        return config;
     }
 }

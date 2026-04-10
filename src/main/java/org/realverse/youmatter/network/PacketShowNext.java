@@ -1,31 +1,16 @@
 package org.realverse.youmatter.network;
 
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.network.NetworkEvent;
-import realmayus.youmatter.replicator.ReplicatorMenu;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import org.realverse.youmatter.YouMatter;
 
-import java.util.function.Supplier;
-//import realmayus.youmatter.replicator.ContainerReplicator;
+public record PacketShowNext() implements CustomPacketPayload {
+    public static final CustomPacketPayload.Type<PacketShowNext> TYPE = new CustomPacketPayload.Type(ResourceLocation.fromNamespaceAndPath(YouMatter.MODID, "packet_show_next"));
+    public static final StreamCodec<ByteBuf, PacketShowNext> STREAM_CODEC = StreamCodec.unit(new PacketShowNext());
 
-public class PacketShowNext {
-
-    public PacketShowNext(FriendlyByteBuf buf) {
-    }
-    public PacketShowNext() {
-    }
-
-    void encode(FriendlyByteBuf buf) {
-
-    }
-
-    void handle(Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
-            ServerPlayer player = ctx.get().getSender();
-            if (player.containerMenu instanceof ReplicatorMenu openContainer) {
-                openContainer.replicator.renderNext();
-            }
-        });
-        ctx.get().setPacketHandled(true);
+    public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

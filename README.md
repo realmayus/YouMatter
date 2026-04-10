@@ -33,7 +33,7 @@ After you've got the required machines & items you'll be able to start cloning i
 
 ### How to use
 
-1. **Produce U-Matter:** Use a Creator powered by energy and stabilizer.
+1. **Produce U-Matter:** Use a U-Matter Creator powered by FE and stabilizer.
 2. **Scan Desired Item:** Place target item into Scanner block.
 3. **Encode Data:** Insert Thumb Drive into a nearby Encoder.
 4. **Load Replicator:** Transfer U-Matter and the encoded Thumb Drive into the Replicator.
