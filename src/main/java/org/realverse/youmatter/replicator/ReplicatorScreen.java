@@ -14,17 +14,17 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.IFluidTank;
-import realmayus.youmatter.ModContent;
-import realmayus.youmatter.YouMatter;
-import realmayus.youmatter.network.PacketChangeSettingsReplicatorServer;
-import realmayus.youmatter.network.PacketHandler;
-import realmayus.youmatter.network.PacketShowNext;
-import realmayus.youmatter.network.PacketShowPrevious;
-import realmayus.youmatter.util.DisplaySlot;
-import realmayus.youmatter.util.GeneralUtils;
+import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.IFluidTank;
+import net.neoforged.neoforge.network.PacketDistributor;
+import org.realverse.youmatter.ModContent;
+import org.realverse.youmatter.YouMatter;
+import org.realverse.youmatter.network.PacketChangeSettingsReplicatorServer;
+import org.realverse.youmatter.network.PacketShowNext;
+import org.realverse.youmatter.network.PacketShowPrevious;
+import org.realverse.youmatter.util.DisplaySlot;
+import org.realverse.youmatter.util.GeneralUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -37,7 +37,7 @@ public class ReplicatorScreen extends AbstractContainerScreen<ReplicatorMenu> {
 
     private ReplicatorBlockEntity replicator;
 
-    private static final ResourceLocation GUI = new ResourceLocation(YouMatter.MODID, "textures/gui/replicator.png");
+    private static final ResourceLocation GUI = ResourceLocation.fromNamespaceAndPath(YouMatter.MODID, "textures/gui/replicator.png");
 
     public ReplicatorScreen(ReplicatorMenu container, Inventory inv, Component name) {
         super(container, inv, name);
@@ -101,7 +101,7 @@ public class ReplicatorScreen extends AbstractContainerScreen<ReplicatorMenu> {
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         //Render the dark background
 
-        this.renderBackground(guiGraphics);
+        this.renderBackground(guiGraphics, mouseX, mouseY, partialTicks);
         super.render(guiGraphics, mouseX, mouseY, partialTicks);
 
 
@@ -218,25 +218,25 @@ public class ReplicatorScreen extends AbstractContainerScreen<ReplicatorMenu> {
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 replicator.renderPrevious();
                 //Sending packet to server
-                PacketHandler.INSTANCE.sendToServer(new PacketShowPrevious());
+                PacketDistributor.sendToServer(new PacketShowPrevious());
             } else if(xAxis >= 108 && xAxis <= 113 && yAxis >= 21 && yAxis <= 31) {
                 //Playing Click sound
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 replicator.renderNext();
                 //Sending packet to server
-                PacketHandler.INSTANCE.sendToServer(new PacketShowNext() );
+                PacketDistributor.sendToServer(new PacketShowNext());
             } else if(xAxis >= 148 && xAxis <= 167 && yAxis >= 7 && yAxis <= 27) {
                 //Playing Click sound
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 replicator.setActive(!replicator.isActive());
                 //Sending packet to server
-                PacketHandler.INSTANCE.sendToServer(new PacketChangeSettingsReplicatorServer(replicator.isActive(), replicator.isCurrentMode()) );
+                PacketDistributor.sendToServer(new PacketChangeSettingsReplicatorServer(replicator.isActive(), replicator.isCurrentMode()) );
             } else if(xAxis >= 148 && xAxis <= 167 && yAxis >= 31 && yAxis <= 51) {
                 //Playing Click sound
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 replicator.setCurrentMode(!replicator.isCurrentMode());
                 //Sending packet to server
-                PacketHandler.INSTANCE.sendToServer(new PacketChangeSettingsReplicatorServer(replicator.isActive(), replicator.isCurrentMode()) );
+                PacketDistributor.sendToServer(new PacketChangeSettingsReplicatorServer(replicator.isActive(), replicator.isCurrentMode()));
             }
         }
         return true;

@@ -2,6 +2,8 @@ package org.realverse.youmatter.network;
 
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
+import org.realverse.youmatter.creator.CreatorMenu;
+import org.realverse.youmatter.replicator.ReplicatorMenu;
 
 public class PacketHandler {
     private PacketHandler() {
@@ -60,7 +62,7 @@ public class PacketHandler {
             ctx.enqueueWork(() -> {
                 AbstractContainerMenu menu = ctx.player().containerMenu;
                 if (menu instanceof ReplicatorMenu openContainer) {
-                    openContainer.replicator.setActivated(data.isActivated());
+                    openContainer.replicator.setActive(data.isActivated());
                     openContainer.replicator.setCurrentMode(data.mode());
                 }
             });

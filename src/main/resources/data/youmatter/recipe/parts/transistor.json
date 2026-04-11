@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:smelting",
+  "category": "misc",
+  "ingredient": [
+    {
+      "item": "youmatter:transistor_raw"
+    }
+  ],
+  "result": {
+    "id": "youmatter:transistor"
+  },
+  "experience": 0.2,
+  "cookingtime": 200
+}

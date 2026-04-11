@@ -1,10 +1,10 @@
 package org.realverse.youmatter.encoder;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -13,20 +13,18 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.ItemStackHandler;
-import realmayus.youmatter.ModContent;
-import realmayus.youmatter.YMConfig;
-import realmayus.youmatter.items.ThumbdriveItem;
-import realmayus.youmatter.util.MyEnergyStorage;
-import realmayus.youmatter.util.RegistryUtil;
+import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.items.ItemStackHandler;
+import org.jetbrains.annotations.NotNull;
+import org.realverse.youmatter.ModContent;
+import org.realverse.youmatter.YMConfig;
+import org.realverse.youmatter.items.ThumbdriveItem;
+import org.realverse.youmatter.util.MyEnergyStorage;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,36 +32,27 @@ import java.util.List;
 public class EncoderBlockEntity extends BlockEntity implements MenuProvider {
 
     private List<ItemStack> queue = new ArrayList<>();
+    public ItemStackHandler inventory;
+    private final MyEnergyStorage myEnergyStorage;
 
     public EncoderBlockEntity(BlockPos pos, BlockState state) {
         super(ModContent.ENCODER_BLOCK_ENTITY.get(), pos, state);
+        this.inventory = new ItemStackHandler(5) {
+            protected void onContentsChanged(int slot) {
+                EncoderBlockEntity.this.setChanged();
+            }
+
+            public @NotNull ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+                return slot == 1 ? super.insertItem(slot, stack, simulate) : stack;
+            }
+        };
+        this.progress = 0;
+        this.myEnergyStorage = new MyEnergyStorage(this, 1000000, Integer.MAX_VALUE);
     }
-
-    @Nonnull
-    @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        if (cap == ForgeCapabilities.ITEM_HANDLER) {
-            return inventory.cast();
-        }
-
-        if(cap == ForgeCapabilities.ENERGY) {
-            return myEnergyStorage.cast();
-
-        }
-        return super.getCapability(cap, side);
-    }
-
-    public LazyOptional<ItemStackHandler> inventory = LazyOptional.of(() -> new ItemStackHandler(5) {
-        @Override
-        protected void onContentsChanged(int slot) {
-            EncoderBlockEntity.this.setChanged();
-        }
-    });
-
 
     // Calling this method signals incoming data from a neighboring scanner
     public void ignite(ItemStack itemStack) {
-        if(itemStack != ItemStack.EMPTY && itemStack != null) {
+        if (itemStack != ItemStack.EMPTY && itemStack != null) {
             queue.add(itemStack);
             setChanged();
         }
@@ -82,30 +71,28 @@ public class EncoderBlockEntity extends BlockEntity implements MenuProvider {
     }
 
     public int getEnergy() {
-        return myEnergyStorage.resolve().get().getEnergyStored();
+        return this.myEnergyStorage.getEnergyStored();
     }
 
     public void setEnergy(int energy) {
-        myEnergyStorage.resolve().get().setEnergy(energy);
+        myEnergyStorage.setEnergy(energy);
     }
 
-    private LazyOptional<MyEnergyStorage> myEnergyStorage = LazyOptional.of(() -> new MyEnergyStorage(this, 1000000, Integer.MAX_VALUE));
-
     @Override
-    public void load(CompoundTag compound) {
-        super.load(compound);
-        setProgress(compound.getInt("progress"));
-        setEnergy(compound.getInt("energy"));
-        if(compound.contains("inventory")) {
-            inventory.resolve().get().deserializeNBT((CompoundTag) compound.get("inventory"));
+    public void loadAdditional(CompoundTag compound, HolderLookup.Provider provider) {
+        super.loadAdditional(compound, provider);
+        this.setProgress(compound.getInt("progress"));
+        this.setEnergy(compound.getInt("energy"));
+        if (compound.contains("inventory")) {
+            this.inventory.deserializeNBT(provider, (CompoundTag) compound.get("inventory"));
         }
-        if(compound.contains("queue")) {
+        if (compound.contains("queue")) {
             if (compound.get("queue") instanceof ListTag) {
                 List<ItemStack> queueBuilder = new ArrayList<>();
-                for(Tag base: compound.getList("queue", Tag.TAG_COMPOUND)) {
+                for (Tag base : compound.getList("queue", Tag.TAG_COMPOUND)) {
                     if (base instanceof CompoundTag nbtTagCompound) {
-                        if(!ItemStack.of(nbtTagCompound).isEmpty()) {
-                            queueBuilder.add(ItemStack.of(nbtTagCompound));
+                        if (!ItemStack.parseOptional(provider, nbtTagCompound).isEmpty()) {
+                            queueBuilder.add(ItemStack.parseOptional(provider, nbtTagCompound));
                         }
                     }
                 }
@@ -115,25 +102,25 @@ public class EncoderBlockEntity extends BlockEntity implements MenuProvider {
     }
 
     @Override
-    public void saveAdditional(CompoundTag compound) {
-        super.saveAdditional(compound);
+    public void saveAdditional(CompoundTag compound, HolderLookup.Provider provider) {
+        super.saveAdditional(compound, provider);
         compound.putInt("progress", getProgress());
         compound.putInt("energy", getEnergy());
         if (inventory != null) {
-            compound.put("inventory", inventory.resolve().get().serializeNBT());
+            compound.put("inventory", this.inventory.serializeNBT(provider));
         }
         ListTag tempCompoundList = new ListTag();
         for (ItemStack is : queue) {
             if (!is.isEmpty()) {
-                tempCompoundList.add(is.save(new CompoundTag()));
+                tempCompoundList.add(is.save(provider, new CompoundTag()));
             }
         }
         compound.put("queue", tempCompoundList);
     }
 
     @Override
-    public CompoundTag getUpdateTag() {
-        return saveWithoutMetadata();
+    public @NotNull CompoundTag getUpdateTag(HolderLookup.Provider provider) {
+        return saveWithoutMetadata(provider);
     }
 
     @Override
@@ -144,8 +131,7 @@ public class EncoderBlockEntity extends BlockEntity implements MenuProvider {
     @Override
     public void setRemoved() {
         super.setRemoved();
-        inventory.invalidate();
-        myEnergyStorage.invalidate();
+        this.invalidateCapabilities();
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, EncoderBlockEntity be) {
@@ -153,54 +139,45 @@ public class EncoderBlockEntity extends BlockEntity implements MenuProvider {
     }
 
     public void tick(Level level, BlockPos pos, BlockState state) {
-        if(queue.size() > 0){
+        if (queue.size() > 0) {
             ItemStack processIS = queue.get(queue.size() - 1);
-            if(processIS != ItemStack.EMPTY) {
-                inventory.ifPresent(inventory -> {
-                    if(inventory.getStackInSlot(1).getItem() instanceof ThumbdriveItem) {
+            if (processIS != ItemStack.EMPTY) {
+                if (inventory != null) {
+                    if (inventory.getStackInSlot(1).getItem() instanceof ThumbdriveItem) {
                         if (progress < 100) {
-                            if(getEnergy() >= YMConfig.CONFIG.energyEncoder.get()) {
-                                CompoundTag nbt = inventory.getStackInSlot(1).getTag();
-                                if (nbt != null) {
-                                    if (nbt.contains("stored_items")) {
-                                        ListTag list = nbt.getList("stored_items", Tag.TAG_STRING);
-                                        if (list.size() < 8) {
-                                            progress = progress + 1;
-                                            myEnergyStorage.ifPresent(myEnergyStorage -> myEnergyStorage.extractEnergy(YMConfig.CONFIG.energyEncoder.get(), false));
-                                        }
+                            if (getEnergy() >= YMConfig.get().energyEncoder) {
+                                ItemContainerContents contents = inventory.getStackInSlot(1).get(DataComponents.CONTAINER);
+                                if (contents != null) {
+                                    List<ItemStack> list = contents.stream().toList();
+                                    if (list.size() < YMConfig.get().thumbDriveSlots) {
+                                        progress = progress + 1;
+                                        myEnergyStorage.extractEnergy(YMConfig.get().energyEncoder, false);
                                     }
                                 } else {
                                     progress = progress + 1; //doesn't have data stored yet
-                                    myEnergyStorage.ifPresent(myEnergyStorage -> myEnergyStorage.extractEnergy(YMConfig.CONFIG.energyEncoder.get(), false));
+                                    myEnergyStorage.extractEnergy(YMConfig.get().energyEncoder, false);
                                 }
                             }
                         } else {
-                            CompoundTag nbt = inventory.getStackInSlot(1).getTag();
-                            if (nbt != null) {
-                                if(nbt.contains("stored_items")) {
-                                    ListTag list = nbt.getList("stored_items", Tag.TAG_STRING);
-                                    if(list.size() < 8) {
-                                        list.add(StringTag.valueOf(RegistryUtil.getRegistryName(processIS.getItem()) + ""));
-                                        nbt.put("stored_items", list);
+                            ItemContainerContents contents = inventory.getStackInSlot(1).get(DataComponents.CONTAINER);
+                            if (contents != null) {
+                                List<ItemStack> list = new ArrayList<>(contents.stream().toList());
+                                if (list.size() < YMConfig.get().thumbDriveSlots) {
+                                    for (ItemStack stack : contents.nonEmptyItems()) {
+                                        list.add(stack);
                                     }
-                                } else {
-                                    ListTag list = new ListTag();
-                                    list.add(StringTag.valueOf(RegistryUtil.getRegistryName(processIS.getItem()) + ""));
-                                    nbt.put("stored_items", list);
+                                    this.inventory.getStackInSlot(1).set(DataComponents.CONTAINER, ItemContainerContents.fromItems(list));
                                 }
                             } else {
-                                nbt = new CompoundTag();
-                                ListTag list = new ListTag();
-                                list.add(StringTag.valueOf(RegistryUtil.getRegistryName(processIS.getItem()) + ""));
-                                nbt.put("stored_items", list);
-                                inventory.getStackInSlot(1).setTag(nbt);
+                                List<ItemStack> list = new ArrayList<>();
+                                list.add(processIS.getItem().getDefaultInstance());
+                                this.inventory.getStackInSlot(1).set(DataComponents.CONTAINER, ItemContainerContents.fromItems(list));
                             }
-
-                            queue.remove(processIS);
-                            progress = 0;
                         }
+                        queue.remove(processIS);
+                        progress = 0;
                     }
-                });
+                }
             }
         }
     }
@@ -214,6 +191,14 @@ public class EncoderBlockEntity extends BlockEntity implements MenuProvider {
     @Override
     public AbstractContainerMenu createMenu(int windowID, Inventory playerInventory, Player player) {
         return new EncoderMenu(windowID, level, worldPosition, playerInventory, player);
+    }
+
+    public ItemStackHandler getItemHandler() {
+        return this.inventory;
+    }
+
+    public IEnergyStorage getEnergyHandler() {
+        return this.myEnergyStorage;
     }
 }
 

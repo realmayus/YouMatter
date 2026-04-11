@@ -10,15 +10,13 @@ import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.SlotItemHandler;
-import net.minecraftforge.items.wrapper.InvWrapper;
-import realmayus.youmatter.ModContent;
-import realmayus.youmatter.YMConfig;
-import realmayus.youmatter.util.RegistryUtil;
-
-
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.SlotItemHandler;
+import net.neoforged.neoforge.items.wrapper.InvWrapper;
+import org.realverse.youmatter.ModContent;
+import org.realverse.youmatter.util.tags.Fluids;
 
 public class CreatorMenu extends AbstractContainerMenu {
 
@@ -61,12 +59,10 @@ public class CreatorMenu extends AbstractContainerMenu {
     }
 
     private void addCustomSlots() {
-        creator.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(h -> {
-            addSlot(new SlotItemHandler(h, 1, 52, 20));
-            addSlot(new SlotItemHandler(h, 2, 52, 62));
-            addSlot(new SlotItemHandler(h, 3, 110, 20));
-            addSlot(new SlotItemHandler(h, 4, 110, 62));
-        });
+        this.addSlot(new SlotItemHandler(this.creator.getItemHandler(), 1, 52, 20));
+        this.addSlot(new SlotItemHandler(this.creator.getItemHandler(), 2, 52, 62));
+        this.addSlot(new SlotItemHandler(this.creator.getItemHandler(), 3, 110, 20));
+        this.addSlot(new SlotItemHandler(this.creator.getItemHandler(), 4, 110, 62));
     }
 
     /**
@@ -80,42 +76,41 @@ public class CreatorMenu extends AbstractContainerMenu {
         if (slot != null && slot.hasItem()) {
             ItemStack slotStack = slot.getItem();
             itemStack = slotStack.copy();
+            IFluidHandlerItem handler = slotStack.getCapability(Capabilities.FluidHandler.ITEM);
 
             if (index >= 36 && index <= 39) { //originating slot is custom slot
                 if (!this.moveItemStackTo(slotStack, 0, 36, true)) {
                     return ItemStack.EMPTY; // Inventory is full, can't transfer item!
                 }
             } else {
-                if(slotStack.getItem() instanceof BucketItem bucket) {
-                    if (bucket.getFluid().equals(ModContent.STABILIZER.get()) || YMConfig.CONFIG.alternativeStabilizer.get().equalsIgnoreCase(RegistryUtil.getRegistryName(bucket.getFluid()).getPath())) {
-                        if(!this.moveItemStackTo(slotStack, 36, 37, false)) {
+                if (slotStack.getItem() instanceof BucketItem bucket) {
+                    if (bucket.content.is(Fluids.STABILIZER)) {
+                        if (!this.moveItemStackTo(slotStack, 36, 37, false)) {
                             return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                         }
-                    } else if(bucket == Items.BUCKET) {
-                        if(!this.moveItemStackTo(slotStack, 38, 39, false)) {
+                    } else if (bucket == Items.BUCKET) {
+                        if (!this.moveItemStackTo(slotStack, 38, 39, false)) {
                             return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                         }
                     }
-                } else if(slotStack.getItem().equals(Items.BUCKET)) {
-                    if(!this.moveItemStackTo(slotStack, 38, 39, false)) {
+                } else if (slotStack.getItem().equals(Items.BUCKET)) {
+                    if (!this.moveItemStackTo(slotStack, 38, 39, false)) {
                         return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                     }
 
-                } else if(slotStack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).isPresent()) {
-                    return slotStack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).map(h -> {
-                        if (h.getFluidInTank(0).isEmpty() || h.getFluidInTank(0).getFluid().isSame(ModContent.UMATTER.get())) {
-                            if(!this.moveItemStackTo(slotStack, 38, 39, false)) {
-                                return ItemStack.EMPTY; // custom slot is full, can't transfer item!
-                            }
-                        } else if (h.getFluidInTank(0).getFluid().isSame(ModContent.STABILIZER.get()) || YMConfig.CONFIG.alternativeStabilizer.get().equalsIgnoreCase(RegistryUtil.getRegistryName(h.getFluidInTank(0).getFluid()).getPath())) {
-                            if(!this.moveItemStackTo(slotStack, 36, 37, false)) {
-                                return ItemStack.EMPTY; // custom slot is full, can't transfer item!
-                            }
-                        } else {
-                            return ItemStack.EMPTY;
+                } else if (handler != null) {
+                    if (handler.getFluidInTank(0).isEmpty() || handler.getFluidInTank(0).getFluid().isSame(ModContent.UMATTER.get())) {
+                        if (!this.moveItemStackTo(slotStack, 38, 39, false)) {
+                            return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                         }
+                    } else if (handler.getFluidInTank(0).getFluid().isSame(ModContent.STABILIZER.get()) || handler.getFluidInTank(0).getFluid().is(Fluids.STABILIZER)) {
+                        if (!this.moveItemStackTo(slotStack, 36, 37, false)) {
+                            return ItemStack.EMPTY; // custom slot is full, can't transfer item!
+                        }
+                    } else {
                         return ItemStack.EMPTY;
-                    }).orElse(ItemStack.EMPTY);
+                    }
+                    return ItemStack.EMPTY;
                 }
                 return ItemStack.EMPTY;
             }

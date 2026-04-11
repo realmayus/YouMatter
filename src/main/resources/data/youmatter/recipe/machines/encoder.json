@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "cMc",
+    "MTM",
+    "MMM"
+  ],
+  "key": {
+    "c": {
+      "item": "youmatter:compute_module"
+    },
+    "M": {
+      "item": "youmatter:machine_casing"
+    },
+    "T": {
+      "item": "youmatter:transistor"
+    }
+  },
+  "result": {
+    "id": "youmatter:encoder"
+  }
+}

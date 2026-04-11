@@ -7,11 +7,10 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.SlotItemHandler;
-import net.minecraftforge.items.wrapper.InvWrapper;
-import realmayus.youmatter.ModContent;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.SlotItemHandler;
+import net.neoforged.neoforge.items.wrapper.InvWrapper;
+import org.realverse.youmatter.ModContent;
 
 public class ScannerMenu extends AbstractContainerMenu {
 
@@ -55,7 +54,9 @@ public class ScannerMenu extends AbstractContainerMenu {
     }
 
     private void addCustomSlots() {
-        scanner.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(h -> addSlot(new SlotItemHandler(h, 1, 80, 37)));
+        if(playerInventory != null) {
+            this.addSlot(new SlotItemHandler(this.scanner.getItemHandler(), 1, 80, 37));
+        }
     }
 
 

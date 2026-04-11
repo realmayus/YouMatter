@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " cc",
+    "Itt",
+    " cc"
+  ],
+  "key": {
+    "c": {
+      "item": "youmatter:machine_casing"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "t": {
+      "item": "youmatter:transistor"
+    }
+  },
+  "result": {
+    "id": "youmatter:thumb_drive"
+  }
+}

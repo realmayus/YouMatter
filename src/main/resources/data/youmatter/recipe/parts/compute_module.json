@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "wTw",
+    "TGT",
+    "wTw"
+  ],
+  "key": {
+    "w": {
+      "tag": "wooden_slabs"
+    },
+    "T": {
+      "item": "youmatter:transistor"
+    },
+    "G": {
+      "item": "minecraft:gold_ingot"
+    }
+  },
+  "result": {
+    "id": "youmatter:compute_module"
+  }
+}

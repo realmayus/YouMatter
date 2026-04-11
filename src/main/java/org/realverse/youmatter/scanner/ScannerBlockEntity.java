@@ -2,6 +2,7 @@ package org.realverse.youmatter.scanner;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -13,18 +14,15 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.ItemStackHandler;
-import realmayus.youmatter.ModContent;
-import realmayus.youmatter.YMConfig;
-import realmayus.youmatter.encoder.EncoderBlock;
-import realmayus.youmatter.encoder.EncoderBlockEntity;
-import realmayus.youmatter.util.MyEnergyStorage;
-import realmayus.youmatter.util.RegistryUtil;
+import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.items.ItemStackHandler;
+import org.realverse.youmatter.ModContent;
+import org.realverse.youmatter.YMConfig;
+import org.realverse.youmatter.encoder.EncoderBlock;
+import org.realverse.youmatter.encoder.EncoderBlockEntity;
+import org.realverse.youmatter.util.MyEnergyStorage;
+import org.realverse.youmatter.util.RegistryUtil;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
@@ -32,8 +30,18 @@ public class ScannerBlockEntity extends BlockEntity implements MenuProvider {
 
     public boolean hasEncoder = false;
 
+    public ItemStackHandler inventory;
+    private final MyEnergyStorage myEnergyStorage;
+
     public ScannerBlockEntity(BlockPos pos, BlockState state) {
         super(ModContent.SCANNER_BLOCK_ENTITY.get(), pos, state);
+        this.inventory = new ItemStackHandler(5) {
+            @Override
+            protected void onContentsChanged(int slot) {
+                ScannerBlockEntity.this.setChanged();
+            }
+        };
+        this.myEnergyStorage = new MyEnergyStorage(this, 1000000, Integer.MAX_VALUE);
     }
 
     public boolean getHasEncoder() {
@@ -44,24 +52,6 @@ public class ScannerBlockEntity extends BlockEntity implements MenuProvider {
         this.hasEncoder = hasEncoder;
         setChanged();
     }
-
-    @Nonnull
-    @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        if (cap == ForgeCapabilities.ITEM_HANDLER) {
-            return inventory.cast();
-        }
-        if(cap == ForgeCapabilities.ENERGY) {
-            return myEnergyStorage.cast();
-        }
-        return super.getCapability(cap, side);
-    }
-    public LazyOptional<ItemStackHandler> inventory = LazyOptional.of(() -> new ItemStackHandler(5) {
-        @Override
-        protected void onContentsChanged(int slot) {
-            ScannerBlockEntity.this.setChanged();
-        }
-    });
 
     private int progress = 0;
 
@@ -75,18 +65,16 @@ public class ScannerBlockEntity extends BlockEntity implements MenuProvider {
     }
 
     public int getEnergy() {
-        return myEnergyStorage.resolve().get().getEnergyStored();
+        return myEnergyStorage.getEnergyStored();
     }
 
     public void setEnergy(int energy) {
-        myEnergyStorage.resolve().get().setEnergy(energy);
+        myEnergyStorage.setEnergy(energy);
     }
 
-    private LazyOptional<MyEnergyStorage> myEnergyStorage = LazyOptional.of(() -> new MyEnergyStorage(this, 1000000, Integer.MAX_VALUE));
-
     @Override
-    public void load(CompoundTag compound) {
-        super.load(compound);
+    public void loadAdditional(CompoundTag compound, HolderLookup.Provider provider) {
+        super.loadAdditional(compound, provider);
         if (compound.contains("progress")) {
             setProgress(compound.getInt("progress"));
         }
@@ -94,26 +82,26 @@ public class ScannerBlockEntity extends BlockEntity implements MenuProvider {
             setEnergy(compound.getInt("energy"));
         }
         if(compound.contains("inventory")) {
-            inventory.resolve().get().deserializeNBT((CompoundTag) compound.get("inventory"));
+            inventory.deserializeNBT(provider, (CompoundTag) compound.get("inventory"));
         }
 
         setHasEncoder(compound.getBoolean("encoder"));
     }
 
     @Override
-    public void saveAdditional(CompoundTag compound) {
-        super.saveAdditional(compound);
+    public void saveAdditional(CompoundTag compound, HolderLookup.Provider provider) {
+        super.saveAdditional(compound, provider);
         compound.putInt("progress", getProgress());
         compound.putInt("energy", getEnergy());
         compound.putBoolean("encoder", getHasEncoder());
         if (inventory != null) {
-            compound.put("inventory", inventory.resolve().get().serializeNBT());
+            compound.put("inventory", inventory.serializeNBT(provider));
         }
     }
 
     @Override
-    public CompoundTag getUpdateTag() {
-        return saveWithoutMetadata();
+    public CompoundTag getUpdateTag(HolderLookup.Provider provider) {
+        return saveWithoutMetadata(provider);
     }
 
     @Override
@@ -137,12 +125,12 @@ public class ScannerBlockEntity extends BlockEntity implements MenuProvider {
                 }
 
                 hasEncoder = true;
-                inventory.ifPresent(inventory -> {
+                if(inventory != null) {
                     if(!inventory.getStackInSlot(1).isEmpty() && isItemAllowed(inventory.getStackInSlot(1))) {
-                        if(getEnergy() > YMConfig.CONFIG.energyScanner.get()) {
+                        if(getEnergy() > YMConfig.get().energyScanner) {
                             if (getProgress() < 100) {
                                 setProgress(getProgress() + 1);
-                                myEnergyStorage.ifPresent(myEnergyStorage -> myEnergyStorage.extractEnergy(YMConfig.CONFIG.energyScanner.get(), false));
+                                myEnergyStorage.extractEnergy(YMConfig.get().energyScanner, false);
                             } else {
                                 // Notifying the neighboring encoder of this scanner having finished its operation
                                 ((EncoderBlockEntity)level.getBlockEntity(encoderPos)).ignite(inventory.getStackInSlot(1)); //don't worry, this is already checked by getNeighborEncoder() c:
@@ -153,7 +141,7 @@ public class ScannerBlockEntity extends BlockEntity implements MenuProvider {
                     } else if (getProgress() != 0) {
                         setProgress(0); // if item was suddenly removed, reset progress to 0
                     }
-                });
+                }
             } else {
                 if(hasEncoder) {
                     setChanged();
@@ -170,20 +158,19 @@ public class ScannerBlockEntity extends BlockEntity implements MenuProvider {
 
     private boolean isItemAllowed(ItemStack itemStack) {
 
-        boolean matches = YMConfig.CONFIG.filterItems.get().stream().anyMatch(s -> s.equalsIgnoreCase(Objects.requireNonNull(RegistryUtil.getRegistryName(itemStack.getItem())).toString()));
+        boolean matches = YMConfig.get().filterItems.stream().anyMatch(s -> s.equalsIgnoreCase(Objects.requireNonNull(RegistryUtil.getRegistryName(itemStack.getItem())).toString()));
         //If list should act as a blacklist AND it contains the item, disallow scanning
-        if (YMConfig.CONFIG.filterMode.get() && matches) {
+        if (YMConfig.get().filterMode && matches) {
             return false;
             //If list should act as a whitelist AND it DOESN'T contain the item, disallow scanning
-        } else if (YMConfig.CONFIG.filterMode.get() || matches) return true;
+        } else if (YMConfig.get().filterMode || matches) return true;
         else return false;
     }
 
     @Override
     public void setRemoved() {
         super.setRemoved();
-        inventory.invalidate();
-        myEnergyStorage.invalidate();
+        this.invalidateCapabilities();
     }
 
     @Nullable
@@ -209,5 +196,13 @@ public class ScannerBlockEntity extends BlockEntity implements MenuProvider {
     @Override
     public AbstractContainerMenu createMenu(int windowID, Inventory playerInventory, Player player) {
         return new ScannerMenu(windowID, level, worldPosition, playerInventory, player);
+    }
+
+    public ItemStackHandler getItemHandler() {
+        return this.inventory;
+    }
+
+    public IEnergyStorage getEnergyHandler() {
+        return this.myEnergyStorage;
     }
 }

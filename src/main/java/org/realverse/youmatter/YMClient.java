@@ -12,6 +12,10 @@ import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.fluids.FluidType;
 import org.jetbrains.annotations.NotNull;
+import org.realverse.youmatter.creator.CreatorScreen;
+import org.realverse.youmatter.encoder.EncoderScreen;
+import org.realverse.youmatter.replicator.ReplicatorScreen;
+import org.realverse.youmatter.scanner.ScannerScreen;
 
 @Mod(
         value = YouMatter.MODID,

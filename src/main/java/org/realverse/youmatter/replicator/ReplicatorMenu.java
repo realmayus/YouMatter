@@ -8,13 +8,14 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.SlotItemHandler;
-import net.minecraftforge.items.wrapper.InvWrapper;
-import realmayus.youmatter.ModContent;
-import realmayus.youmatter.items.ThumbdriveItem;
-import realmayus.youmatter.util.DisplaySlot;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.SlotItemHandler;
+import net.neoforged.neoforge.items.wrapper.InvWrapper;
+import org.realverse.youmatter.ModContent;
+import org.realverse.youmatter.items.ThumbdriveItem;
+import org.realverse.youmatter.util.DisplaySlot;
 
 public class ReplicatorMenu extends AbstractContainerMenu {
 
@@ -57,18 +58,13 @@ public class ReplicatorMenu extends AbstractContainerMenu {
     }
 
     private void addCustomSlots() {
-        replicator.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(h -> {
-            // Flash drive
-            addSlot(new SlotItemHandler(h, 0, 150, 60));
-            // Output slot
-            addSlot(new SlotItemHandler(h, 1, 89, 60));
-            // Item Display slot
-            addSlot(new DisplaySlot(h, 2, 89, 17));
-            // bucket input slot
-            addSlot(new SlotItemHandler(h, 3, 47, 18));
-            // bucket output slot
-            addSlot(new SlotItemHandler(h, 4, 47, 60));
-        });
+        if(playerInventory != null) {
+            this.addSlot(new SlotItemHandler(this.replicator.getItemHandler(), 0, 47, 18));
+            this.addSlot(new DisplaySlot(this.replicator.getItemHandler(), 1, 89, 17));
+            this.addSlot(new SlotItemHandler(this.replicator.getItemHandler(), 2, 47, 60));
+            this.addSlot(new SlotItemHandler(this.replicator.getItemHandler(), 3, 89, 60));
+            this.addSlot(new SlotItemHandler(this.replicator.getItemHandler(), 4, 150, 60));
+        }
     }
 
     @Override
@@ -90,22 +86,23 @@ public class ReplicatorMenu extends AbstractContainerMenu {
                         return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                     }
                 } else if(slotStack.getItem() instanceof BucketItem bucket) {
-                    if(bucket.getFluid().equals(ModContent.UMATTER.get())) {
+                    if(bucket.content.equals(ModContent.UMATTER.get())) {
                         if(!this.moveItemStackTo(slotStack, 39, 40, false)) {
                             return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                         }
                     }
-                } else if(slotStack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).isPresent()) {
-                    return slotStack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).map(h -> {
-                        if (h.getFluidInTank(0).getFluid().isSame(ModContent.UMATTER.get())) {
-                            if(!this.moveItemStackTo(slotStack, 39, 40, false)) {
+                } else {
+                    IFluidHandlerItem handler = slotStack.getCapability(Capabilities.FluidHandler.ITEM);
+                    if (handler != null) {
+                        if (handler.getFluidInTank(0).getFluid().isSame(ModContent.UMATTER.get())) {
+                            if (!this.moveItemStackTo(slotStack, 39, 40, false)) {
                                 return ItemStack.EMPTY; // custom slot is full, can't transfer item!
                             }
                         } else {
                             return ItemStack.EMPTY;
                         }
                         return ItemStack.EMPTY;
-                    }).orElse(ItemStack.EMPTY);
+                    }
                 }
                 return ItemStack.EMPTY;
             }

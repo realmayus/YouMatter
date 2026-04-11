@@ -8,12 +8,11 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.SlotItemHandler;
-import net.minecraftforge.items.wrapper.InvWrapper;
-import realmayus.youmatter.ModContent;
-import realmayus.youmatter.items.ThumbdriveItem;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.SlotItemHandler;
+import net.neoforged.neoforge.items.wrapper.InvWrapper;
+import org.realverse.youmatter.ModContent;
+import org.realverse.youmatter.items.ThumbdriveItem;
 
 public class EncoderMenu extends AbstractContainerMenu {
 
@@ -56,7 +55,7 @@ public class EncoderMenu extends AbstractContainerMenu {
     }
 
     private void addCustomSlots() {
-        encoder.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(h -> addSlot(new SlotItemHandler(h, 1, 90, 38)));
+       this.addSlot(new SlotItemHandler(this.encoder.getItemHandler(), 1, 90, 38));
     }
 
     /**

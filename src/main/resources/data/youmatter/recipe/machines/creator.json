@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "MOc",
+    "OBO",
+    "bOb"
+  ],
+  "key": {
+    "M": {
+      "item": "youmatter:machine_casing"
+    },
+    "O": {
+      "tag": "c:obsidians/normal"
+    },
+    "c": {
+      "item": "youmatter:compute_module"
+    },
+    "B": {
+      "item": "youmatter:black_hole"
+    },
+    "b": {
+      "item": "minecraft:bucket"
+    }
+  },
+  "result": {
+    "id": "youmatter:creator"
+  }
+}

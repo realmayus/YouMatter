@@ -6,8 +6,8 @@ import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import realmayus.youmatter.ModContent;
-import realmayus.youmatter.YouMatter;
+import org.realverse.youmatter.ModContent;
+import org.realverse.youmatter.YouMatter;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,7 +18,7 @@ public class ScannerScreen extends AbstractContainerScreen<ScannerMenu> {
 
     private ScannerBlockEntity scanner;
 
-    private static final ResourceLocation GUI = new ResourceLocation(YouMatter.MODID, "textures/gui/scanner.png");
+    private static final ResourceLocation GUI = ResourceLocation.fromNamespaceAndPath(YouMatter.MODID, "textures/gui/scanner.png");
 
     public ScannerScreen(ScannerMenu container, Inventory inv, Component name) {
         super(container, inv, name);
@@ -27,7 +27,7 @@ public class ScannerScreen extends AbstractContainerScreen<ScannerMenu> {
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground(guiGraphics);
+        this.renderBackground(guiGraphics, mouseX, mouseY, partialTicks);
         super.render(guiGraphics, mouseX, mouseY, partialTicks);
         this.renderTooltip(guiGraphics, mouseX, mouseY);
 

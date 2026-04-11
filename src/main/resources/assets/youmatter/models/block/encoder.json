@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube",
+  "textures": {
+      "particle": "youmatter:block/encoder_side",
+      "north": "youmatter:block/encoder_side",
+      "south": "youmatter:block/encoder_side",
+      "west": "youmatter:block/encoder_side",
+      "east": "youmatter:block/encoder_side",
+      "up": "youmatter:block/generic_side",
+      "down": "youmatter:block/generic_side"
+  }
+}

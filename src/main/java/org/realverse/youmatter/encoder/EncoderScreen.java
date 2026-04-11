@@ -3,17 +3,19 @@ package org.realverse.youmatter.encoder;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraftforge.items.ItemStackHandler;
-import realmayus.youmatter.ModContent;
-import realmayus.youmatter.YouMatter;
-import realmayus.youmatter.items.ThumbdriveItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ItemContainerContents;
+import net.neoforged.neoforge.items.ItemStackHandler;
+import org.jetbrains.annotations.NotNull;
+import org.realverse.youmatter.ModContent;
+import org.realverse.youmatter.YouMatter;
+import org.realverse.youmatter.items.ThumbdriveItem;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -25,7 +27,7 @@ public class EncoderScreen extends AbstractContainerScreen<EncoderMenu> {
 
     private EncoderBlockEntity encoder;
 
-    private static final ResourceLocation GUI = new ResourceLocation(YouMatter.MODID, "textures/gui/encoder.png");
+    private static final ResourceLocation GUI = ResourceLocation.fromNamespaceAndPath(YouMatter.MODID, "textures/gui/encoder.png");
 
     public EncoderScreen(EncoderMenu container, Inventory inv, Component name) {
         super(container, inv, name);
@@ -33,8 +35,8 @@ public class EncoderScreen extends AbstractContainerScreen<EncoderMenu> {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground(guiGraphics);
+    public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        this.renderBackground(guiGraphics, mouseX, mouseY, partialTicks);
         super.render(guiGraphics, mouseX, mouseY, partialTicks);
 
         this.renderTooltip(guiGraphics, mouseX, mouseY);
@@ -46,18 +48,21 @@ public class EncoderScreen extends AbstractContainerScreen<EncoderMenu> {
             drawTooltip(guiGraphics, mouseX, mouseY, Arrays.asList(Component.literal(I18n.get("youmatter.gui.energy.title")), Component.literal(I18n.get("youmatter.gui.energy.description", encoder.getEnergy()))));
         }
         if (xAxis >= 16 && xAxis <= 32 && yAxis >= 59 && yAxis <= 75) {
-            if (encoder.inventory.isPresent()) {
-                ItemStackHandler inventory = encoder.inventory.resolve().get();
-                if (inventory.getStackInSlot(1).getItem() instanceof ThumbdriveItem) {
-                    CompoundTag nbt = inventory.getStackInSlot(1).getTag();
-                    if (nbt != null) {
-                        ListTag list = nbt.getList("stored_items", Tag.TAG_STRING);
-                        if (list.size() >= 8) {
+            if (this.encoder.inventory != null) {
+                ItemStackHandler inventory = this.encoder.inventory;
+                if (inventory.getStackInSlot(1).getItem() instanceof ThumbdriveItem thumb) {
+                    ItemContainerContents contents = this.encoder.inventory.getStackInSlot(1).get(DataComponents.CONTAINER);
+                    if (contents != null) {
+                        List<ItemStack> list = new ArrayList();
+                        for(ItemStack stack : contents.nonEmptyItems()) {
+                            list.add(stack);
+                        }
+                        if (list.size() >= thumb.getMaxStorage()) {
                             drawTooltip(guiGraphics, mouseX, mouseY, Arrays.asList(Component.literal(I18n.get("youmatter.warning.encoder2"))));
                         }
                     }
 
-                    return; //only dfraw the warning tooltip if the inventory is not present, or there is no thumbdrive inserted
+                    return; //only draw the warning tooltip if the inventory is not present, or there is no thumbdrive inserted
                 }
             }
 
@@ -77,19 +82,23 @@ public class EncoderScreen extends AbstractContainerScreen<EncoderMenu> {
         drawEnergyBolt(guiGraphics, encoder.getEnergy());
         drawProgressDisplayChain(guiGraphics, encoder.getProgress());
 
-        encoder.inventory.ifPresent(inventory -> {
-            if (!(inventory.getStackInSlot(1).getItem() instanceof ThumbdriveItem)) {
+        if(this.encoder.inventory != null) {
+            if (!(this.encoder.inventory.getStackInSlot(1).getItem() instanceof ThumbdriveItem thumb)) {
                 guiGraphics.blit(GUI, 16, 59, 176, 66, 16, 16);
             } else {
-                CompoundTag nbt = inventory.getStackInSlot(1).getTag();
-                if (nbt != null) {
-                    ListTag list = nbt.getList("stored_items", Tag.TAG_STRING);
-                    if (list.size() >= 8) {
+                ItemContainerContents contents = this.encoder.inventory.getStackInSlot(1).get(DataComponents.CONTAINER);
+                if (contents != null) {
+                    List<ItemStack> list = new ArrayList();
+
+                    for(ItemStack stack : contents.nonEmptyItems()) {
+                        list.add(stack);
+                    }
+                    if (list.size() >= thumb.getMaxStorage()) {
                         guiGraphics.blit(GUI, 16, 59, 176, 66, 16, 16);
                     }
                 }
             }
-        });
+        }
         guiGraphics.drawString(font, I18n.get(ModContent.ENCODER_BLOCK.get().getDescriptionId()), 8, 6, 0x404040, false);
     }
 

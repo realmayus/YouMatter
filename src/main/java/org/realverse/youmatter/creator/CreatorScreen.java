@@ -7,19 +7,20 @@ import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.IFluidTank;
-import realmayus.youmatter.ModContent;
-import realmayus.youmatter.YouMatter;
-import realmayus.youmatter.network.PacketChangeSettingsCreatorServer;
-import realmayus.youmatter.network.PacketHandler;
+import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.IFluidTank;
+import net.neoforged.neoforge.network.PacketDistributor;
+import org.realverse.youmatter.ModContent;
+import org.realverse.youmatter.YouMatter;
+import org.realverse.youmatter.network.PacketChangeSettingsCreatorServer;
 
 import java.util.Arrays;
 import java.util.List;
@@ -31,7 +32,7 @@ public class CreatorScreen extends AbstractContainerScreen<CreatorMenu> {
 
     private CreatorBlockEntity creator;
 
-    private static final ResourceLocation GUI = new ResourceLocation(YouMatter.MODID, "textures/gui/creator.png");
+    private static final ResourceLocation GUI = ResourceLocation.fromNamespaceAndPath(YouMatter.MODID, "textures/gui/creator.png");
 
     public CreatorScreen(CreatorMenu container, Inventory inv, Component name) {
         super(container, inv, name);
@@ -81,7 +82,7 @@ public class CreatorScreen extends AbstractContainerScreen<CreatorMenu> {
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         //Render the dark background
-        this.renderBackground(guiGraphics);
+        this.renderBackground(guiGraphics, mouseX, mouseY, partialTicks);
         super.render(guiGraphics, mouseX, mouseY, partialTicks);
         //Render any tooltips
         this.renderTooltip(guiGraphics, mouseX, mouseY);
@@ -90,13 +91,13 @@ public class CreatorScreen extends AbstractContainerScreen<CreatorMenu> {
         int yAxis = (mouseY - (height - imageHeight) / 2);
 
         if(xAxis >= 31 && xAxis <= 44 && yAxis >= 20 && yAxis <= 75) {
-            drawTooltip(guiGraphics, mouseX, mouseY, Arrays.asList(Component.literal(I18n.get("youmatter.gui.stabilizer.title")), Component.literal(I18n.get("youmatter.gui.stabilizer.description", creator.getSTank().getFluidAmount()))));
+            drawTooltip(guiGraphics, mouseX, mouseY, Arrays.asList(Component.literal(I18n.get("youmatter.gui.stabilizer.title")), Component.literal(I18n.get("youmatter.gui.stabilizer.description", this.creator.getSTank().getFluidAmount()))));
         }
         if(xAxis >= 89 && xAxis <= 102 && yAxis >= 20 && yAxis <= 75) {
-            drawTooltip(guiGraphics, mouseX, mouseY, Arrays.asList(Component.literal(I18n.get("youmatter.gui.umatter.title")), Component.literal(I18n.get("youmatter.gui.umatter.description", creator.getUTank().getFluidAmount()))));
+            drawTooltip(guiGraphics, mouseX, mouseY, Arrays.asList(Component.literal(I18n.get("youmatter.gui.umatter.title")), Component.literal(I18n.get("youmatter.gui.umatter.description", this.creator.getUTank().getFluidAmount()))));
         }
         if(xAxis >= 150 && xAxis <= 164 && yAxis >= 57 && yAxis <= 77) {
-            drawTooltip(guiGraphics, mouseX, mouseY, Arrays.asList(Component.literal(I18n.get("youmatter.gui.energy.title")), Component.literal(I18n.get("youmatter.gui.energy.description", creator.getEnergy()))));
+            drawTooltip(guiGraphics, mouseX, mouseY, Arrays.asList(Component.literal(I18n.get("youmatter.gui.energy.title")), Component.literal(I18n.get("youmatter.gui.energy.description", this.creator.getEnergy()))));
         }
         if(xAxis >= 148 && xAxis <= 167 && yAxis >= 7 && yAxis <= 27) {
             drawTooltip(guiGraphics, mouseX, mouseY, Arrays.asList(Component.literal(creator.isActivated() ? I18n.get("youmatter.gui.active") : I18n.get("youmatter.gui.paused")), Component.literal(I18n.get("youmatter.gui.clicktochange"))));
@@ -184,7 +185,7 @@ public class CreatorScreen extends AbstractContainerScreen<CreatorMenu> {
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 creator.setActivated(!creator.isActivated());
                 //Sending packet to server
-                PacketHandler.INSTANCE.sendToServer(new PacketChangeSettingsCreatorServer(creator.isActivated()));
+                PacketDistributor.sendToServer(new PacketChangeSettingsCreatorServer(this.creator.isActivated()));
             }
         }
         return true;

@@ -1,0 +1,14 @@
+{
+  "type": "youmatter:add_item",
+  "conditions" : [
+    {
+      "condition" : "neoforge:loot_table_id",
+      "loot_table_id" : "minecraft:chests/end_city_treasure"
+    },
+    {
+      "chance" : 100,
+      "condition": "minecraft:random_chance"
+    }
+  ],
+  "item" : "youmatter:black_hole"
+}
