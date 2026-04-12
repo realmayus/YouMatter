@@ -59,11 +59,15 @@ public class ReplicatorMenu extends AbstractContainerMenu {
 
     private void addCustomSlots() {
         if(playerInventory != null) {
-            this.addSlot(new SlotItemHandler(this.replicator.getItemHandler(), 0, 47, 18));
-            this.addSlot(new DisplaySlot(this.replicator.getItemHandler(), 1, 89, 17));
-            this.addSlot(new SlotItemHandler(this.replicator.getItemHandler(), 2, 47, 60));
-            this.addSlot(new SlotItemHandler(this.replicator.getItemHandler(), 3, 89, 60));
-            this.addSlot(new SlotItemHandler(this.replicator.getItemHandler(), 4, 150, 60));
+            this.addSlot(new SlotItemHandler(this.replicator.getItemHandler(), 0, 150, 60));
+            // Output slot
+            this.addSlot(new SlotItemHandler(this.replicator.getItemHandler(), 1, 89, 60));
+            // Item Display slot
+            this.addSlot(new DisplaySlot(this.replicator.getItemHandler(), 2, 89, 17));
+            // bucket input slot
+            this.addSlot(new SlotItemHandler(this.replicator.getItemHandler(), 3, 47, 18));
+            // bucket output slot
+            this.addSlot(new SlotItemHandler(this.replicator.getItemHandler(), 4, 47, 60));
         }
     }
 

@@ -12,6 +12,7 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.Level;
@@ -139,45 +140,61 @@ public class EncoderBlockEntity extends BlockEntity implements MenuProvider {
     }
 
     public void tick(Level level, BlockPos pos, BlockState state) {
-        if (queue.size() > 0) {
-            ItemStack processIS = queue.get(queue.size() - 1);
-            if (processIS != ItemStack.EMPTY) {
-                if (inventory != null) {
-                    if (inventory.getStackInSlot(1).getItem() instanceof ThumbdriveItem) {
-                        if (progress < 100) {
-                            if (getEnergy() >= YMConfig.get().energyEncoder) {
-                                ItemContainerContents contents = inventory.getStackInSlot(1).get(DataComponents.CONTAINER);
-                                if (contents != null) {
-                                    List<ItemStack> list = contents.stream().toList();
-                                    if (list.size() < YMConfig.get().thumbDriveSlots) {
-                                        progress = progress + 1;
-                                        myEnergyStorage.extractEnergy(YMConfig.get().energyEncoder, false);
-                                    }
-                                } else {
-                                    progress = progress + 1; //doesn't have data stored yet
-                                    myEnergyStorage.extractEnergy(YMConfig.get().energyEncoder, false);
-                                }
+        if (!this.queue.isEmpty()) {
+            ItemStack processIS = this.queue.get(this.queue.size() - 1);
+            if (processIS.isEmpty()) {
+                this.queue.remove(processIS);
+                return;
+            }
+
+            if (this.inventory != null) {
+                Item var7 = this.inventory.getStackInSlot(1).getItem();
+                if (var7 instanceof ThumbdriveItem thumb) {
+                    ItemContainerContents contents = this.inventory.getStackInSlot(1).get(DataComponents.CONTAINER);
+                    List<ItemStack> list = new ArrayList();
+                    if (contents != null) {
+                        for(ItemStack stack : contents.nonEmptyItems()) {
+                            list.add(stack);
+                        }
+                    }
+
+                    boolean alreadyEncoded = false;
+
+                    for(ItemStack encodedStack : list) {
+                        if (ItemStack.isSameItem(encodedStack, processIS)) {
+                            alreadyEncoded = true;
+                            break;
+                        }
+                    }
+
+                    if (!alreadyEncoded && list.size() < thumb.getMaxStorage()) {
+                        if (this.progress < 100) {
+                            if (this.getEnergy() >= YMConfig.get().energyEncoder) {
+                                ++this.progress;
+                                this.myEnergyStorage.extractEnergy(YMConfig.get().energyEncoder, false);
                             }
                         } else {
-                            ItemContainerContents contents = inventory.getStackInSlot(1).get(DataComponents.CONTAINER);
-                            if (contents != null) {
-                                List<ItemStack> list = new ArrayList<>(contents.stream().toList());
-                                if (list.size() < YMConfig.get().thumbDriveSlots) {
-                                    for (ItemStack stack : contents.nonEmptyItems()) {
-                                        list.add(stack);
-                                    }
-                                    this.inventory.getStackInSlot(1).set(DataComponents.CONTAINER, ItemContainerContents.fromItems(list));
-                                }
-                            } else {
-                                List<ItemStack> list = new ArrayList<>();
-                                list.add(processIS.getItem().getDefaultInstance());
-                                this.inventory.getStackInSlot(1).set(DataComponents.CONTAINER, ItemContainerContents.fromItems(list));
+                            list.add(processIS.split(1));
+                            this.inventory.getStackInSlot(1).set(DataComponents.CONTAINER, ItemContainerContents.fromItems(list));
+                            if (processIS.isEmpty()) {
+                                this.queue.remove(processIS);
                             }
+
+                            this.progress = 0;
                         }
-                        queue.remove(processIS);
-                        progress = 0;
+                    } else {
+                        processIS.shrink(1);
+                        if (processIS.isEmpty()) {
+                            this.queue.remove(processIS);
+                        }
+
+                        this.progress = 0;
                     }
+
+                    return;
                 }
+
+                this.progress = 0;
             }
         }
     }
