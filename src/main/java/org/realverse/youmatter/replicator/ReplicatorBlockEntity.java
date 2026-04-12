@@ -186,7 +186,7 @@ public class ReplicatorBlockEntity extends BlockEntity implements MenuProvider {
     public void tick(Level level, BlockPos pos, BlockState state) {
         if(currentPartTick == 5) {
             currentPartTick = 0;
-            if(inventory != null) {
+           if(inventory != null) {
                 if (!inventory.getStackInSlot(3).isEmpty()) {
                     ItemStack item = inventory.getStackInSlot(3);
                     if (item.getItem() instanceof BucketItem && GeneralUtils.canAddItemToSlot(inventory.getStackInSlot(4), new ItemStack(Items.BUCKET, 1), false)) {
@@ -216,30 +216,31 @@ public class ReplicatorBlockEntity extends BlockEntity implements MenuProvider {
                     }
                 }
 
-                ItemStack thumbdrive = inventory.getStackInSlot(0);
-                if (thumbdrive.isEmpty()){ //in case user removes thumb drive while replicator is in operation
+                ItemStack thumb = inventory.getStackInSlot(0);
+                if (thumb.isEmpty()){ //in case user removes thumb drive while replicator is in operation
                     inventory.setStackInSlot(2, ItemStack.EMPTY);
                     cachedItems = null;
                     currentIndex = 0;
                     progress = 0;
                 } else {
-                    if (thumbdrive.has(DataComponents.CONTAINER)) {
-                        ItemContainerContents contents = thumbdrive.get(DataComponents.CONTAINER);
+                    if (thumb.has(DataComponents.CONTAINER)) {
+                        ItemContainerContents contents = thumb.get(DataComponents.CONTAINER);
                         if(contents != null) {
                             this.cachedItems = new ArrayList<>();
-                            for (ItemStack newItem : contents.nonEmptyItems()) {
-                                if (newItem != null) {
-                                    cachedItems.add(newItem.copy());
+                            if (cachedItems != null) {
+                                for(ItemStack newIS : contents.nonEmptyItems()) {
+                                    if (newIS != null) {
+                                        cachedItems.add(newIS.copy());
+                                    }
                                 }
-                            }
-                            renderItem(cachedItems, currentIndex);
+                                renderItem(cachedItems, currentIndex);
                                 if(progress == 0) {
                                     if (!inventory.getStackInSlot(2).isEmpty()) {
                                         if (isActive) {
                                             currentItem = cachedItems.get(currentIndex);
-                                            if (myEnergyStorage != null) {
+                                            if(myEnergyStorage != null) {
                                                 if (myEnergyStorage.getEnergyStored() >= YMConfig.get().energyReplicator) {
-                                                    if (tank.getFluidAmount() >= GeneralUtils.getUMatterAmountForItem(currentItem.getItem())) {
+                                                    if(tank.getFluidAmount() >= GeneralUtils.getUMatterAmountForItem(currentItem.getItem())) {
                                                         tank.drain(GeneralUtils.getUMatterAmountForItem(currentItem.getItem()), IFluidHandler.FluidAction.EXECUTE);
                                                         progress++;
                                                         myEnergyStorage.extractEnergy(YMConfig.get().energyReplicator, false);
@@ -247,6 +248,7 @@ public class ReplicatorBlockEntity extends BlockEntity implements MenuProvider {
                                                 }
                                             }
                                         }
+                                    }
                                 } else {
                                     if(isActive) {
                                         if(progress >= 100) {
@@ -262,7 +264,7 @@ public class ReplicatorBlockEntity extends BlockEntity implements MenuProvider {
                                                 if (!currentItem.isEmpty()) {
                                                     if (ItemStack.isSameItem(currentItem, inventory.getStackInSlot(2))) { // Check if selected item hasn't changed
                                                         if(inventory.getStackInSlot(1).isEmpty() || GeneralUtils.canAddItemToSlot(inventory.getStackInSlot(1), currentItem, false)) { //check if output slot is still empty
-                                                            if (myEnergyStorage != null) {
+                                                            if(myEnergyStorage != null) {
                                                                 if (myEnergyStorage.getEnergyStored() >= YMConfig.get().energyReplicator) {
                                                                     progress++;
                                                                     myEnergyStorage.extractEnergy(YMConfig.get().energyReplicator, false);
