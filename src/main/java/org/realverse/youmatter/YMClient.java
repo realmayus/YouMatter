@@ -2,14 +2,10 @@ package org.realverse.youmatter;
 
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
-import net.neoforged.neoforge.client.gui.ConfigurationScreen;
-import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.fluids.FluidType;
 import org.jetbrains.annotations.NotNull;
 import org.realverse.youmatter.creator.CreatorScreen;
@@ -22,10 +18,6 @@ import org.realverse.youmatter.scanner.ScannerScreen;
         dist = Dist.CLIENT
 )
 public class YMClient {
-    public YMClient(ModContainer container, IEventBus modEventBus) {
-        container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
-    }
-
     public static void registerScreens(RegisterMenuScreensEvent event) {
         event.register(ModContent.SCANNER_MENU.get(), ScannerScreen::new);
         event.register(ModContent.ENCODER_MENU.get(), EncoderScreen::new);
@@ -40,8 +32,8 @@ public class YMClient {
 
     private static void registerFluidType(RegisterClientExtensionsEvent event, FluidType fluidType, final String fluidName) {
         event.registerFluidType(new IClientFluidTypeExtensions() {
-            private final ResourceLocation STILL_TEXTURE = ResourceLocation.fromNamespaceAndPath("youmatter", "block/" + fluidName + "_still");
-            private final ResourceLocation FLOWING_TEXTURE = ResourceLocation.fromNamespaceAndPath("youmatter", "block/" + fluidName + "_flow");
+            private final ResourceLocation STILL_TEXTURE = ResourceLocation.fromNamespaceAndPath(YouMatter.MODID, "block/" + fluidName + "_still");
+            private final ResourceLocation FLOWING_TEXTURE = ResourceLocation.fromNamespaceAndPath(YouMatter.MODID, "block/" + fluidName + "_flow");
 
             public @NotNull ResourceLocation getStillTexture() {
                 return this.STILL_TEXTURE;

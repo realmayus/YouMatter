@@ -18,7 +18,7 @@ public class YMConfig {
 
     public static class Data {
         public boolean filterMode = true;
-        public List<String> filterItems = List.of("youmatter:umatter_bucket", "youmatter:stabilizer_bucket");
+        public List<String> filterItems = List.of("youmatter:black_hole", "youmatter:umatter_bucket", "youmatter:stabilizer_bucket");
         public List<String> overrides = List.of("minecraft:diamond=2500", "minecraft:nether_star=5000");
         public int thumbDriveSlots = 8;
         public int defaultAmount = 1000;

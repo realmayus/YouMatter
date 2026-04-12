@@ -11,7 +11,7 @@ import java.util.List;
 
 public class BlackHoleItem extends Item {
     public BlackHoleItem() {
-        super(new Properties().stacksTo(1));
+        super(new Properties());
     }
 
     @Override

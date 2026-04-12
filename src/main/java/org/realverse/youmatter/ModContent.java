@@ -1,5 +1,6 @@
 package org.realverse.youmatter;
 
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
@@ -13,6 +14,7 @@ import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
+import net.neoforged.neoforge.common.loot.IGlobalLootModifier;
 import net.neoforged.neoforge.fluids.BaseFlowingFluid;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -35,9 +37,15 @@ import org.realverse.youmatter.replicator.ReplicatorMenu;
 import org.realverse.youmatter.scanner.ScannerBlock;
 import org.realverse.youmatter.scanner.ScannerBlockEntity;
 import org.realverse.youmatter.scanner.ScannerMenu;
+import org.realverse.youmatter.util.loot.AddItemModifier;
+
+import java.util.function.Supplier;
 
 
 public class ModContent {
+
+    public static final DeferredRegister<MapCodec<? extends IGlobalLootModifier>> LOOT_MODIFIERS = DeferredRegister.create(NeoForgeRegistries.Keys.GLOBAL_LOOT_MODIFIER_SERIALIZERS, YouMatter.MODID);
+    public static final Supplier<MapCodec<? extends IGlobalLootModifier>> ADD_ITEM = LOOT_MODIFIERS.register("add_item", () -> AddItemModifier.CODEC);
 
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(BuiltInRegistries.BLOCK, YouMatter.MODID);
     public static final DeferredRegister<MenuType<?>> MENU_TYPES = DeferredRegister.create(BuiltInRegistries.MENU, YouMatter.MODID);
@@ -88,6 +96,7 @@ public class ModContent {
     public static final DeferredHolder<Item, TransistorRawItem> TRANSISTOR_RAW_ITEM = ITEMS.register("transistor_raw", () -> new TransistorRawItem());
 
     public static void init(IEventBus modEventBus) {
+        LOOT_MODIFIERS.register(modEventBus);
         BLOCKS.register(modEventBus);
         MENU_TYPES.register(modEventBus);
         BLOCK_ENTITY_TYPES.register(modEventBus);
