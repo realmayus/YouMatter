@@ -8,10 +8,10 @@ import net.minecraft.resources.ResourceLocation;
 import org.realverse.youmatter.YouMatter;
 
 public record PacketChangeSettingsCreatorServer(boolean isActive, boolean mode) implements CustomPacketPayload {
-    public static final CustomPacketPayload.Type<PacketChangeSettingsCreatorServer> TYPE = new CustomPacketPayload.Type(ResourceLocation.fromNamespaceAndPath(YouMatter.MODID, "creator_settings_packet"));
+    public static final Type<PacketChangeSettingsCreatorServer> TYPE = new Type(ResourceLocation.fromNamespaceAndPath(YouMatter.MODID, "creator_settings_packet"));
     public static final StreamCodec<ByteBuf, PacketChangeSettingsCreatorServer> STREAM_CODEC;
 
-    public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
+    public Type<? extends CustomPacketPayload> type() {
         return TYPE;
     }
 

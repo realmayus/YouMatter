@@ -23,6 +23,9 @@ import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.realverse.youmatter.creator.CreatorBlock;
 import org.realverse.youmatter.creator.CreatorBlockEntity;
 import org.realverse.youmatter.creator.CreatorMenu;
+import org.realverse.youmatter.creator.old.CreatorBlockOld;
+import org.realverse.youmatter.creator.old.CreatorBlockEntityOld;
+import org.realverse.youmatter.creator.old.CreatorMenuOld;
 import org.realverse.youmatter.encoder.EncoderBlock;
 import org.realverse.youmatter.encoder.EncoderBlockEntity;
 import org.realverse.youmatter.encoder.EncoderMenu;
@@ -68,6 +71,15 @@ public class ModContent {
     public static final DeferredHolder<MenuType<?>, MenuType<CreatorMenu>> CREATOR_MENU = MENU_TYPES.register("creator", () -> IMenuTypeExtension.create((windowId, inv, data) -> new CreatorMenu(windowId, inv.player.level(), data.readBlockPos(), inv, inv.player)));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<CreatorBlockEntity>> CREATOR_BLOCK_ENTITY = BLOCK_ENTITY_TYPES.register("creator", () -> BlockEntityType.Builder.of(CreatorBlockEntity::new, CREATOR_BLOCK.get()).build(null));
     public static final DeferredHolder<Item, BlockItem> CREATOR_BLOCK_ITEM = ITEMS.register("creator", () -> new BlockItem(CREATOR_BLOCK.get(), new Item.Properties()));
+
+    /**
+     * @deprecated in favor of *new* "U-Matter Creator" block.
+     * Since 3.0.0-beta.3
+     */
+    public static final DeferredHolder<Block, CreatorBlockOld> CREATOR_BLOCK_OLD = BLOCKS.register("creator_old", () -> new CreatorBlockOld());
+    public static final DeferredHolder<MenuType<?>, MenuType<CreatorMenuOld>> CREATOR_MENU_OLD = MENU_TYPES.register("creator_old", () -> IMenuTypeExtension.create((windowId, inv, data) -> new CreatorMenuOld(windowId, inv.player.level(), data.readBlockPos(), inv, inv.player)));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<CreatorBlockEntityOld>> CREATOR_BLOCK_ENTITY_OLD = BLOCK_ENTITY_TYPES.register("creator_old", () -> BlockEntityType.Builder.of(CreatorBlockEntityOld::new, CREATOR_BLOCK_OLD.get()).build(null));
+    public static final DeferredHolder<Item, BlockItem> CREATOR_BLOCK_ITEM_OLD = ITEMS.register("creator_old", () -> new BlockItem(CREATOR_BLOCK_OLD.get(), new Item.Properties()));
 
     public static final DeferredHolder<Block, ReplicatorBlock> REPLICATOR_BLOCK = BLOCKS.register("replicator", () -> new ReplicatorBlock());
     public static final DeferredHolder<MenuType<?>, MenuType<ReplicatorMenu>> REPLICATOR_MENU = MENU_TYPES.register("replicator", () -> IMenuTypeExtension.create((windowId, inv, data) -> new ReplicatorMenu(windowId, inv.player.level(), data.readBlockPos(), inv, inv.player)));

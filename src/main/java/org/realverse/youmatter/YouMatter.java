@@ -16,6 +16,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.realverse.youmatter.network.*;
+import org.realverse.youmatter.network.old.PacketChangeSettingsCreatorServerOld;
 
 import java.util.List;
 
@@ -53,6 +54,10 @@ public class YouMatter {
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, ModContent.REPLICATOR_BLOCK_ENTITY.get(), (o, direction) -> o.getItemHandler());
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, ModContent.REPLICATOR_BLOCK_ENTITY.get(), (o, direction) -> o.getEnergyHandler());
         event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, ModContent.REPLICATOR_BLOCK_ENTITY.get(), (o, direction) -> o.getFluidHandler());
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, ModContent.CREATOR_BLOCK_ENTITY_OLD.get(), (o, direction) -> o.getItemHandler());
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, ModContent.CREATOR_BLOCK_ENTITY_OLD.get(), (o, direction) -> o.getEnergyHandler());
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, ModContent.CREATOR_BLOCK_ENTITY_OLD.get(), (o, direction) -> o.getFluidHandler());
+
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, ModContent.CREATOR_BLOCK_ENTITY.get(), (o, direction) -> o.getItemHandler());
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, ModContent.CREATOR_BLOCK_ENTITY.get(), (o, direction) -> o.getEnergyHandler());
         event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, ModContent.CREATOR_BLOCK_ENTITY.get(), (o, direction) -> o.getFluidHandler());
@@ -60,6 +65,7 @@ public class YouMatter {
 
     public void registerPayloads(RegisterPayloadHandlersEvent event) {
         PayloadRegistrar registrar = event.registrar("1");
+        registrar.playToServer(PacketChangeSettingsCreatorServerOld.TYPE, PacketChangeSettingsCreatorServerOld.STREAM_CODEC, PacketHandler.CreatorSettingsOld::handle);
         registrar.playToServer(PacketChangeSettingsCreatorServer.TYPE, PacketChangeSettingsCreatorServer.STREAM_CODEC, PacketHandler.CreatorSettings::handle);
         registrar.playToServer(PacketShowNext.TYPE, PacketShowNext.STREAM_CODEC, PacketHandler.ShowNext::handle);
         registrar.playToServer(PacketShowPrevious.TYPE, PacketShowPrevious.STREAM_CODEC, PacketHandler.ShowPrevious::handle);

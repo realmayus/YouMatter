@@ -1,4 +1,4 @@
-package org.realverse.youmatter.creator;
+package org.realverse.youmatter.creator.old;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -19,21 +19,21 @@ import net.neoforged.neoforge.fluids.IFluidTank;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.realverse.youmatter.ModContent;
 import org.realverse.youmatter.YouMatter;
-import org.realverse.youmatter.network.PacketChangeSettingsCreatorServer;
+import org.realverse.youmatter.network.old.PacketChangeSettingsCreatorServerOld;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class CreatorScreen extends AbstractContainerScreen<CreatorMenu> {
+public class CreatorScreenOld extends AbstractContainerScreen<CreatorMenuOld> {
 
     private static final int WIDTH = 176;
     private static final int HEIGHT = 168;
 
-    private CreatorBlockEntity creator;
+    private CreatorBlockEntityOld creator;
 
-    private static final ResourceLocation GUI = ResourceLocation.fromNamespaceAndPath(YouMatter.MODID, "textures/gui/creator.png");
+    private static final ResourceLocation GUI = ResourceLocation.fromNamespaceAndPath(YouMatter.MODID, "textures/gui/creator_old.png");
 
-    public CreatorScreen(CreatorMenu container, Inventory inv, Component name) {
+    public CreatorScreenOld(CreatorMenuOld container, Inventory inv, Component name) {
         super(container, inv, name);
         this.creator = container.creator;
     }
@@ -73,7 +73,7 @@ public class CreatorScreen extends AbstractContainerScreen<CreatorMenu> {
         drawOutputIcon(guiGraphics, creator.isCurrentMode());
 
 
-        guiGraphics.drawString(font, I18n.get(ModContent.CREATOR_BLOCK.get().getDescriptionId()), 8, 6, 0x404040, false);
+        guiGraphics.drawString(font, I18n.get(ModContent.CREATOR_BLOCK_OLD.get().getDescriptionId()), 8, 6, 0x404040, false);
     }
 
     private void drawEnergyBolt(GuiGraphics guiGraphics, int energy) {
@@ -196,13 +196,13 @@ public class CreatorScreen extends AbstractContainerScreen<CreatorMenu> {
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 creator.setActive(!creator.isActive());
                 //Sending packet to server
-                PacketDistributor.sendToServer(new PacketChangeSettingsCreatorServer(this.creator.isActive(), creator.isCurrentMode()));
+                PacketDistributor.sendToServer(new PacketChangeSettingsCreatorServerOld(this.creator.isActive(), creator.isCurrentMode()));
             } else if (xAxis >= 148 && xAxis <= 167 && yAxis >= 31 && yAxis <= 51) {
                 //Playing Click sound
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 creator.setCurrentMode(!creator.isCurrentMode());
                 //Sending packet to server
-                PacketDistributor.sendToServer(new PacketChangeSettingsCreatorServer(this.creator.isActive(), creator.isCurrentMode()));
+                PacketDistributor.sendToServer(new PacketChangeSettingsCreatorServerOld(this.creator.isActive(), creator.isCurrentMode()));
             }
         }
         return true;

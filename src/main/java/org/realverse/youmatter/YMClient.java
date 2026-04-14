@@ -9,6 +9,7 @@ import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsE
 import net.neoforged.neoforge.fluids.FluidType;
 import org.jetbrains.annotations.NotNull;
 import org.realverse.youmatter.creator.CreatorScreen;
+import org.realverse.youmatter.creator.old.CreatorScreenOld;
 import org.realverse.youmatter.encoder.EncoderScreen;
 import org.realverse.youmatter.replicator.ReplicatorScreen;
 import org.realverse.youmatter.scanner.ScannerScreen;
@@ -23,6 +24,7 @@ public class YMClient {
         event.register(ModContent.ENCODER_MENU.get(), EncoderScreen::new);
         event.register(ModContent.REPLICATOR_MENU.get(), ReplicatorScreen::new);
         event.register(ModContent.CREATOR_MENU.get(), CreatorScreen::new);
+        event.register(ModContent.CREATOR_MENU_OLD.get(), CreatorScreenOld::new);
     }
 
     public static void registerClientExtensions(RegisterClientExtensionsEvent event) {

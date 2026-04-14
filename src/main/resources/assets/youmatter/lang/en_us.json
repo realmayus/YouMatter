@@ -1,6 +1,7 @@
 {
   "_comment": "Blocks",
   "block.youmatter.replicator": "§7Replicator",
+  "block.youmatter.creator_old": "§7U-Matter Creator (Old)",
   "block.youmatter.creator": "§7U-Matter Creator",
   "block.youmatter.encoder": "§7Encoder",
   "block.youmatter.scanner": "§7Scanner",
@@ -33,6 +34,7 @@
 
   "_comment": "Names of the machines displayed in the GUI",
   "youmatter.guiname.encoder": "§7Encoder",
+  "youmatter.guiname.creator_old": "§7U-Matter Creator (Old)",
   "youmatter.guiname.creator": "§7U-Matter Creator",
   "youmatter.guiname.replicator": "§7Replicator",
   "youmatter.guiname.scanner": "§7Scanner",

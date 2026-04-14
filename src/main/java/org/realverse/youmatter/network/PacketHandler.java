@@ -3,10 +3,28 @@ package org.realverse.youmatter.network;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.realverse.youmatter.creator.CreatorMenu;
+import org.realverse.youmatter.creator.old.CreatorMenuOld;
+import org.realverse.youmatter.network.old.PacketChangeSettingsCreatorServerOld;
 import org.realverse.youmatter.replicator.ReplicatorMenu;
 
 public class PacketHandler {
     private PacketHandler() {
+    }
+
+    public static class CreatorSettingsOld {
+        private CreatorSettingsOld() {
+        }
+
+        public static void handle(PacketChangeSettingsCreatorServerOld data, IPayloadContext ctx) {
+            ctx.enqueueWork(() -> {
+                AbstractContainerMenu menu = ctx.player().containerMenu;
+                if (menu instanceof CreatorMenuOld openContainer) {
+                    openContainer.creator.setActive(data.isActive());
+                    openContainer.creator.setCurrentMode(data.mode());
+                }
+
+            });
+        }
     }
 
     public static class CreatorSettings {
