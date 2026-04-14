@@ -161,7 +161,7 @@ public class ReplicatorBlockEntity extends BlockEntity implements MenuProvider {
     }
 
     public void setActive(boolean active) {
-        isActive = active;
+        this.isActive = active;
         setChanged();
 
         if(level != null && !level.isClientSide) {
@@ -359,7 +359,7 @@ public class ReplicatorBlockEntity extends BlockEntity implements MenuProvider {
         tank.writeToNBT(provider, tagTank);
         compound.put("tank", tagTank);
         compound.putInt("energy", getEnergy());
-        compound.putBoolean("isActive", isActive);
+        compound.putBoolean("isActive", isActive());
         compound.putBoolean("mode", isCurrentMode());
         compound.putInt("progress", getProgress());
         if (inventory != null) {

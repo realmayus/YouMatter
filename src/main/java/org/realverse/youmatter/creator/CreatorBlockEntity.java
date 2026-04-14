@@ -40,7 +40,8 @@ public class CreatorBlockEntity extends BlockEntity implements MenuProvider {
     private static final int MAX_UMATTER = 16000;
     private static final int MAX_STABILIZER = 16000;
 
-    private boolean isActivated = true;
+    private boolean isActive = false;
+    private boolean currentMode = false;
 
     public ItemStackHandler inventory;
     private FluidTank uTank;
@@ -48,12 +49,25 @@ public class CreatorBlockEntity extends BlockEntity implements MenuProvider {
     private IFluidHandler fluidHandler;
     private MyEnergyStorage myEnergyStorage;
 
-    boolean isActivated() {
-        return isActivated;
+    boolean isActive() {
+        return isActive;
     }
 
-    public void setActivated(boolean activated) {
-        isActivated = activated;
+    public void setActive(boolean active) {
+        isActive = active;
+        setChanged();
+
+        if(level != null && !level.isClientSide) {
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+        }
+    }
+
+    boolean isCurrentMode() {
+        return currentMode;
+    }
+
+    public void setCurrentMode(boolean mode) {
+        this.currentMode = mode;
         setChanged();
 
         if(level != null && !level.isClientSide) {
@@ -188,21 +202,11 @@ public class CreatorBlockEntity extends BlockEntity implements MenuProvider {
     @Override
     public void loadAdditional(CompoundTag compound, HolderLookup.Provider provider) {
         super.loadAdditional(compound, provider);
-
-        if(compound.contains("uTank")) {
-            CompoundTag tagUTank = compound.getCompound("uTank");
-            this.uTank.readFromNBT(provider, tagUTank);
-        }
-        if (compound.contains("sTank")) {
-            CompoundTag tagSTank = compound.getCompound("sTank");
-            this.sTank.readFromNBT(provider, tagSTank);
-        }
-        if (compound.contains("energy")) {
-            setEnergy(compound.getInt("energy"));
-        }
-        if (compound.contains("isActivated")) {
-            isActivated = compound.getBoolean("isActivated");
-        }
+        this.uTank.readFromNBT(provider, compound.getCompound("uTank"));
+        this.sTank.readFromNBT(provider, compound.getCompound("sTank"));
+        setEnergy(compound.getInt("energy"));
+        setActive(compound.getBoolean("isActive"));
+        setCurrentMode(compound.getBoolean("mode"));
         if(compound.contains("inventory")) {
             inventory.deserializeNBT(provider, (CompoundTag) compound.get("inventory"));
         }
@@ -219,7 +223,8 @@ public class CreatorBlockEntity extends BlockEntity implements MenuProvider {
         compound.put("uTank", tagUTank);
         compound.put("sTank", tagSTank);
         compound.putInt("energy", getEnergy());
-        compound.putBoolean("isActivated", isActivated);
+        compound.putBoolean("isActive", isActive());
+        compound.putBoolean("mode", isCurrentMode());
         if(compound.contains("inventory")) {
             inventory.deserializeNBT(provider, (CompoundTag) compound.get("inventory"));
         }
@@ -242,7 +247,7 @@ public class CreatorBlockEntity extends BlockEntity implements MenuProvider {
 
     public void tick(Level level, BlockPos pos, BlockState state) {
         if (currentPartTick == 40) { // 2 sec
-            if(isActivated()) {
+            if(isActive()) {
                 if (getEnergy() >= 0.3f * 1000000 && sTank.getFluidAmount() >= 125) { // if energy more than 30 % of max energy
                     if (uTank.getFluidAmount() + YMConfig.get().productionPerTick <= MAX_UMATTER) {
                         sTank.drain(125, IFluidHandler.FluidAction.EXECUTE);
@@ -254,9 +259,11 @@ public class CreatorBlockEntity extends BlockEntity implements MenuProvider {
             //Auto-outputting U-Matter
             Object[] neighborTE = getNeighborTileEntity(pos);
             if (neighborTE != null) {
-                IFluidHandler handler = level.getCapability(Capabilities.FluidHandler.BLOCK, (BlockPos)neighborTE[0], (Direction)neighborTE[1]);
-                if (handler != null) {
-                    this.uTank.drain(handler.fill(new FluidStack(ModContent.UMATTER.get(), Math.min(this.uTank.getFluidAmount(), 500)), IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
+                if(isCurrentMode()) {
+                    IFluidHandler handler = level.getCapability(Capabilities.FluidHandler.BLOCK, (BlockPos) neighborTE[0], (Direction) neighborTE[1]);
+                    if (handler != null) {
+                        this.uTank.drain(handler.fill(new FluidStack(ModContent.UMATTER.get(), Math.min(this.uTank.getFluidAmount(), 500)), IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
+                    }
                 }
             }
             currentPartTick = 0;

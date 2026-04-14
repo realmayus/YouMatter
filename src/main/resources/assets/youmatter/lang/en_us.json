@@ -56,5 +56,7 @@
   "youmatter.gui.performInfiniteRuns": "§ePerform infinite runs",
   "youmatter.gui.performSingleRun": "§ePerform single run",
   "gui.youmatter.requiredAmount": "§aRequired Amount: %s mB",
+  "youmatter.gui.enabled": "§aEnabled",
+  "youmatter.gui.disabled" : "§4Disabled",
   "itemGroup.YouMatter": "YouMatter"
 }

@@ -7,7 +7,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import org.realverse.youmatter.YouMatter;
 
-public record PacketChangeSettingsCreatorServer(boolean isActivated) implements CustomPacketPayload {
+public record PacketChangeSettingsCreatorServer(boolean isActive, boolean mode) implements CustomPacketPayload {
     public static final CustomPacketPayload.Type<PacketChangeSettingsCreatorServer> TYPE = new CustomPacketPayload.Type(ResourceLocation.fromNamespaceAndPath(YouMatter.MODID, "creator_settings_packet"));
     public static final StreamCodec<ByteBuf, PacketChangeSettingsCreatorServer> STREAM_CODEC;
 
@@ -16,6 +16,6 @@ public record PacketChangeSettingsCreatorServer(boolean isActivated) implements 
     }
 
     static {
-        STREAM_CODEC = StreamCodec.composite(ByteBufCodecs.BOOL, PacketChangeSettingsCreatorServer::isActivated, PacketChangeSettingsCreatorServer::new);
+        STREAM_CODEC = StreamCodec.composite(ByteBufCodecs.BOOL, PacketChangeSettingsCreatorServer::isActive, ByteBufCodecs.BOOL, PacketChangeSettingsCreatorServer::mode, PacketChangeSettingsCreatorServer::new);
     }
 }

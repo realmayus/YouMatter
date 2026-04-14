@@ -17,7 +17,8 @@ public class PacketHandler {
             ctx.enqueueWork(() -> {
                 AbstractContainerMenu menu = ctx.player().containerMenu;
                 if (menu instanceof CreatorMenu openContainer) {
-                    openContainer.creator.setActivated(data.isActivated());
+                    openContainer.creator.setActive(data.isActive());
+                    openContainer.creator.setCurrentMode(data.mode());
                 }
 
             });

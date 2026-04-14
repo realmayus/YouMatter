@@ -21,6 +21,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import org.realverse.youmatter.ModContent;
 import org.realverse.youmatter.YouMatter;
 import org.realverse.youmatter.network.PacketChangeSettingsCreatorServer;
+import org.realverse.youmatter.network.PacketChangeSettingsReplicatorServer;
 
 import java.util.Arrays;
 import java.util.List;
@@ -58,11 +59,20 @@ public class CreatorScreen extends AbstractContainerScreen<CreatorMenu> {
         }
     }
 
+    private void drawOutputIcon(GuiGraphics guiGraphics, boolean isAutoOutputMode) {
+        if(isAutoOutputMode) {
+            guiGraphics.blit(GUI, 152, 33, 176, 0, 12, 14);
+        } else {
+            guiGraphics.blit(GUI, 152, 33, 188, 0, 12, 14);
+        }
+    }
+
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         drawEnergyBolt(guiGraphics, creator.getEnergy());
-        drawActiveIcon(guiGraphics, creator.isActivated());
+        drawActiveIcon(guiGraphics, creator.isActive());
+        drawOutputIcon(guiGraphics, creator.isCurrentMode());
 
 
         guiGraphics.drawString(font, I18n.get(ModContent.CREATOR_BLOCK.get().getDescriptionId()), 8, 6, 0x404040, false);
@@ -100,7 +110,10 @@ public class CreatorScreen extends AbstractContainerScreen<CreatorMenu> {
             drawTooltip(guiGraphics, mouseX, mouseY, Arrays.asList(Component.literal(I18n.get("youmatter.gui.energy.title")), Component.literal(I18n.get("youmatter.gui.energy.description", this.creator.getEnergy()))));
         }
         if(xAxis >= 148 && xAxis <= 167 && yAxis >= 7 && yAxis <= 27) {
-            drawTooltip(guiGraphics, mouseX, mouseY, Arrays.asList(Component.literal(creator.isActivated() ? I18n.get("youmatter.gui.active") : I18n.get("youmatter.gui.paused")), Component.literal(I18n.get("youmatter.gui.clicktochange"))));
+            drawTooltip(guiGraphics, mouseX, mouseY, Arrays.asList(Component.literal(creator.isActive() ? I18n.get("youmatter.gui.active") : I18n.get("youmatter.gui.paused")), Component.literal(I18n.get("youmatter.gui.clicktochange"))));
+        }
+        if(xAxis >= 148 && xAxis <= 167 && yAxis >= 31 && yAxis <= 51) {
+            drawTooltip(guiGraphics, mouseX, mouseY, Arrays.asList(Component.literal(creator.isCurrentMode() ? I18n.get("youmatter.gui.enabled") : I18n.get("youmatter.gui.disabled")), Component.literal(I18n.get("youmatter.gui.clicktochange"))));
         }
     }
 
@@ -180,12 +193,18 @@ public class CreatorScreen extends AbstractContainerScreen<CreatorMenu> {
         if(mouseButton == 0) {
             double xAxis = (mouseX - (width - imageWidth) / 2);
             double yAxis = (mouseY - (height - imageHeight) / 2);
-            if(xAxis >= 148 && xAxis <= 167 && yAxis >= 7 && yAxis <= 27) {
+            if (xAxis >= 148 && xAxis <= 167 && yAxis >= 7 && yAxis <= 27) {
                 //Playing Click sound
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
-                creator.setActivated(!creator.isActivated());
+                creator.setActive(!creator.isActive());
                 //Sending packet to server
-                PacketDistributor.sendToServer(new PacketChangeSettingsCreatorServer(this.creator.isActivated()));
+                PacketDistributor.sendToServer(new PacketChangeSettingsCreatorServer(this.creator.isActive(), creator.isCurrentMode()));
+            } else if (xAxis >= 148 && xAxis <= 167 && yAxis >= 31 && yAxis <= 51) {
+                //Playing Click sound
+                Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                creator.setCurrentMode(!creator.isCurrentMode());
+                //Sending packet to server
+                PacketDistributor.sendToServer(new PacketChangeSettingsCreatorServer(this.creator.isActive(), creator.isCurrentMode()));
             }
         }
         return true;
