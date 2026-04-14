@@ -8,7 +8,7 @@
   ],
   "key": {
     "c": {
-      "item": "youmatter:machine_casing"
+      "tag": "c:plates/steel"
     },
     "I": {
       "item": "minecraft:iron_ingot"

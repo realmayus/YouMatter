@@ -88,9 +88,10 @@ public class ModContent {
     public static final DeferredHolder<Item, BucketItem> UMATTER_BUCKET = ITEMS.register("umatter_bucket", () -> new BucketItem(UMATTER.get(), new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1)));
     public static final BaseFlowingFluid.Properties UMATTER_PROPERTIES = new BaseFlowingFluid.Properties(UMATTER_TYPE, UMATTER, UMATTER_FLOWING).bucket(UMATTER_BUCKET).block(UMATTER_FLUID_BLOCK);
 
+    public static final DeferredHolder<Item, SteelIngotItem> STEEL_INGOT_ITEM = ITEMS.register("steel_ingot", () -> new SteelIngotItem());
     public static final DeferredHolder<Item, BlackHoleItem> BLACK_HOLE_ITEM = ITEMS.register("black_hole", () -> new BlackHoleItem());
     public static final DeferredHolder<Item, ThumbdriveItem> THUMBDRIVE_ITEM = ITEMS.register("thumb_drive", () -> new ThumbdriveItem());
-    public static final DeferredHolder<Item, MachineCasingItem> MACHINE_CASING_ITEM = ITEMS.register("machine_casing", () -> new MachineCasingItem());
+    public static final DeferredHolder<Item, SteelCasingItem> STEEL_CASING_ITEM = ITEMS.register("steel_casing", () -> new SteelCasingItem());
     public static final DeferredHolder<Item, ComputeModuleItem> COMPUTE_MODULE_ITEM = ITEMS.register("compute_module", () -> new ComputeModuleItem());
     public static final DeferredHolder<Item, TransistorItem> TRANSISTOR_ITEM = ITEMS.register("transistor", () -> new TransistorItem());
     public static final DeferredHolder<Item, TransistorRawItem> TRANSISTOR_RAW_ITEM = ITEMS.register("transistor_raw", () -> new TransistorRawItem());

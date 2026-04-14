@@ -2,24 +2,24 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "MOc",
-    "OBO",
-    "bOb"
+    "123",
+    "242",
+    "525"
   ],
   "key": {
-    "M": {
-      "item": "youmatter:machine_casing"
+    "1": {
+      "tag": "c:plates/steel"
     },
-    "O": {
+    "2": {
       "tag": "c:obsidians/normal"
     },
-    "c": {
-      "item": "youmatter:compute_module"
+    "3": {
+      "tag": "c:circuits"
     },
-    "B": {
+    "4": {
       "item": "youmatter:black_hole"
     },
-    "b": {
+    "5": {
       "item": "minecraft:bucket"
     }
   },

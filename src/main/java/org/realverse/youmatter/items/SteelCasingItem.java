@@ -9,8 +9,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class MachineCasingItem extends Item {
-    public MachineCasingItem() {
+public class SteelCasingItem extends Item {
+    public SteelCasingItem() {
         super(new Properties());
     }
 

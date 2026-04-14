@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " 1 ",
+    "1 1",
+    " 1 "
+  ],
+  "key": {
+    "1": {
+      "tag": "c:ingots/steel"
+    }
+  },
+  "result": {
+    "id": "youmatter:steel_casing"
+  }
+}

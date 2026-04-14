@@ -5,9 +5,11 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-[v3.0.0-beta.1] - April 13th, 2026
+[v3.0.0-beta.2] - April 14th, 2026
 
 ### Added
+- v3.0.0-beta.2 Added blast furnace recipe for Steel Ingot. (April 14th, 2026)
+- v3.0.0-beta.2 Added Steel Ingot. (April 14th, 2026)
 - v3.0.0-beta.1 Chinese Translation file provided to me by nvzy. (April 13th, 2026)
 - v3.0.0-beta.1 Added toggle for U-Matter Creator's auto-output mode which is disabled by default. (April 13th, 2026)
 - v3.0.0-alpha.4 Added WIP Config Screen. (June 10th, 2025)
@@ -19,6 +21,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - v3.0.0-alpha.1 Added support for wildcards to config. (June 2nd, 2025)
 
 ### Changed
+- v3.0.0-beta.2 Steel Casing is interchangeable with other steel plates from other mods. (April 14th, 2026)
+- v3.0.0-beta.2 Compute module is now interchangeable with other circuits from other mods. (April 14th, 2026)
+- v3.0.0-beta.2 Changed "Machine Casing" to "Steel Casing". (April 14th, 2026)
+- v3.0.0-beta.2 Changed textures of machines to make them appear as if they were made of steel. (April 14th, 2026)
 - v3.0.0-beta.1 Changed GUIs to be a bit more modernized. (April 12th, 2026)
 - v3.0.0-beta.1 Creator is now off by default like the Replicator. (April 13th, 2026)
 - v3.0.0-beta.1 Reverted syntax change of "overrides" in config back to the original format. (April 11th, 2026)
@@ -47,6 +53,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - v3.0.0-alpha.1 Alternative stabilizer config option. (June 2nd, 2025)
 
 ### Fixed
+- v3.0.0-beta.2 Fixed weird pixel bug on GUIs. (April 14th, 2026)
 - v3.0.0-alpha.4 Fixed encoder encoding full stacks to the thumb drive. (June 11th, 2025)
 - v3.0.0-alpha.3 Scanner now properly transmits the data to the encoder. (June 8th, 2025)
 - v3.0.0-alpha.2 Fixed recipe for Machine Casing. (June 3rd, 2025)

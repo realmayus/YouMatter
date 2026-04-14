@@ -26,7 +26,7 @@ public class YouMatter {
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TAB = CREATIVE_MODE_TABS.register("tab", () -> CreativeModeTab.builder()
             .withTabsBefore(CreativeModeTabs.SPAWN_EGGS)
-            .icon(() -> new ItemStack(ModContent.SCANNER_BLOCK.get()))
+            .icon(() -> new ItemStack(ModContent.BLACK_HOLE_ITEM.get()))
             .title(Component.translatable("itemGroup.YouMatter"))
             .displayItems((displayParameters, output) -> {
                 output.acceptAll(List.of(
@@ -34,7 +34,8 @@ public class YouMatter {
                         new ItemStack(ModContent.ENCODER_BLOCK.get()),
                         new ItemStack(ModContent.CREATOR_BLOCK.get()),
                         new ItemStack(ModContent.REPLICATOR_BLOCK.get()),
-                        new ItemStack(ModContent.MACHINE_CASING_ITEM.get()),
+                        new ItemStack(ModContent.STEEL_INGOT_ITEM.get()),
+                        new ItemStack(ModContent.STEEL_CASING_ITEM.get()),
                         new ItemStack(ModContent.BLACK_HOLE_ITEM.get()),
                         new ItemStack(ModContent.COMPUTE_MODULE_ITEM.get()),
                         new ItemStack(ModContent.TRANSISTOR_RAW_ITEM.get()),

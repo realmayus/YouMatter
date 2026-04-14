@@ -2,18 +2,18 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "wTw",
-    "TGT",
-    "wTw"
+    "121",
+    "232",
+    "121"
   ],
   "key": {
-    "w": {
+    "1": {
       "tag": "wooden_slabs"
     },
-    "T": {
+    "2": {
       "item": "youmatter:transistor"
     },
-    "G": {
+    "3": {
       "item": "minecraft:gold_ingot"
     }
   },

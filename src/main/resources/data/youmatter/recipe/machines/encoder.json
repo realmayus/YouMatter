@@ -2,18 +2,18 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "cMc",
-    "MTM",
-    "MMM"
+    "121",
+    "232",
+    "222"
   ],
   "key": {
-    "c": {
-      "item": "youmatter:compute_module"
+    "1": {
+      "tag": "c:circuits"
     },
-    "M": {
-      "item": "youmatter:machine_casing"
+    "2": {
+      "tag": "c:plates/steel"
     },
-    "T": {
+    "3": {
       "item": "youmatter:transistor"
     }
   },

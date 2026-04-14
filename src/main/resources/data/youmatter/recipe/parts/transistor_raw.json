@@ -2,15 +2,15 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "ggg",
-    "sss",
-    "ggg"
+    "111",
+    "222",
+    "111"
   ],
   "key": {
-    "g": {
+    "1": {
       "item": "minecraft:gold_nugget"
     },
-    "s": {
+    "2": {
       "item": "minecraft:sand"
     }
   },
